@@ -1,0 +1,32 @@
+image:
+  name: atlassian/default-image:4
+
+clone: 
+  depth: full
+
+definitions:
+  steps:
+    - step: &build-staging
+        name: Build Staging
+        branch: dev
+        script:
+          - git archive --format=tar.gz dev -o tpt973-bo-stg.tar.gz
+        artifacts:
+          - tpt973-bo-stg.tar.gz
+
+    - step: &deploy-staging
+        name: Deploy Staging
+        deployment: Staging
+        script:
+          - pipe: atlassian/heroku-deploy:2.1.0
+            variables:
+              HEROKU_API_KEY: $HEROKU_API_KEY
+              HEROKU_APP_NAME: $HEROKU_APP_NAME
+              ZIP_FILE: tpt973-bo-stg.tar.gz
+              WAIT: 'true' # wait for build completion and then exit the pipe
+
+pipelines:
+  branches:
+    dev:
+      - step: *build-staging
+      - step: *deploy-staging
