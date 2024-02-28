@@ -12,6 +12,8 @@ import {
 import Roles from "./pages/dashboard/old/roles";
 import AddRoles from "./pages/dashboard/old/addRoles";
 import Folder from "./pages/dashboard/old/folder";
+import SubFolder from "./pages/dashboard/old/subFolder";
+import Files from "./pages/dashboard/old/files";
 
 
 function App() {
@@ -25,6 +27,10 @@ function App() {
         <Route path="/dashboard/old/add-role" element= {<AddRoles/>} />
 
         <Route path="/dashboard/old/folder" element= {<Folder/>} />
+
+        <Route path="/dashboard/old/subFolder" element= {<SubFolder/>} />
+
+        <Route path="/dashboard/old/files" element= {<Files/>} />
 
         <Route path="/dashboard/old" element= {<AddRoles/>} />
 
