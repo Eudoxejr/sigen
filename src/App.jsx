@@ -19,6 +19,7 @@ import Folder from "./pages/dashboard/old/folder";
 import SubFolder from "./pages/dashboard/old/subFolder";
 import Files from "./pages/dashboard/old/files";
 import Profile from "./pages/dashboard/profile";
+import Home from "./pages/dashboard/home";
 
 
 
@@ -68,7 +69,7 @@ function App() {
           }
         >
 
-          <Route index path="home" element={null} />
+          <Route index path="accueil" element={<Home/>} />
           <Route path="profil" element={<Profile/>} />
 
           <Route path="dossiers">
