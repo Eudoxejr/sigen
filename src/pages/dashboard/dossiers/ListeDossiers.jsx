@@ -6,10 +6,10 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import DataGridComponent from '@/components/common/datatable';
-import { columnColaborateurs } from '@/utils/columsDatatable';
+import { columnClients, columnDossier } from '@/utils/columsDatatable';
 import { useNavigate } from 'react-router-dom';
 import AsyncSelect from 'react-select/async';
-import { CollaboApi, RoleApi } from '@/api/api';
+import { FoldersApi } from '@/api/api';
 import debounce from 'lodash.debounce';
 import { produce } from "immer";
 import { useDialogueStore } from '@/store/dialogue.store';
@@ -18,22 +18,22 @@ import { useDialogueStore } from '@/store/dialogue.store';
 // import { isAllowedTo } from '@/utils';
 import { useQueryClient } from "@tanstack/react-query";
 
-const CollaborateursListe = () => {
+const DossierListe = () => {
 
   const navigate = useNavigate();
   const { setDialogue } = useDialogueStore()
-  
   const queryClient = useQueryClient();
-  const allQuery = queryClient.getQueriesData(["getCollabo"])
-  const collaboMeta = allQuery?.[allQuery.length - 1]?.[1]?.meta
 
-  const [searchTerm, setSearchTerm] = useState(collaboMeta?.keyword || null);
+  const clientMeta = queryClient.getQueriesData(["getDossier"])?.[0]?.[1]?.meta
+
+
+  const [searchTerm, setSearchTerm] = useState(null);
   const [pagination, setPagination] = useState({
-    page: (collaboMeta?.current_page - 1) || 0, 
-    pageSize: collaboMeta?.per_page || 25
+    page: 0, 
+    pageSize: 25
   })
   const [total, setTotal] = useState(0);
-  const [role, setRole] = useState(null);
+//   const [role, setRole] = useState(null);
 
   const handleChange = (e) => {
     setSearchTerm(e.target.value);
@@ -41,24 +41,6 @@ const CollaborateursListe = () => {
 
   const debouncedResults = useMemo(() => {
     return debounce(handleChange, 600);
-  }, []);
-
-  const getRole = async (inputValue) => {
-    const res = await RoleApi.getRole(1, 12, inputValue)
-    // res.data.unshift({ id: null, role_name: 'Tout les roles' })
-    return res.data.map((data) => { return { label: data.role_name, value: data.id } })
-  };
-
-  const loadRoleOptions = (inputValue) =>
-    new Promise((resolve) => {
-      resolve(getRole(inputValue))
-    }
-  );
-
-  useEffect(() => {
-    return () => {
-      debouncedResults.cancel();
-    };
   }, []);
 
 
@@ -69,26 +51,19 @@ const CollaborateursListe = () => {
             <CardBody className="md:h-[calc(100vh-125px)] shadow-none flex flex-col px-4 pt-0 pb-4 gap-[15px] overflow-auto">
               
               <Typography variant="h6" color="blue-gray" >
-                Collaborateurs ({collaboMeta?.total || total})
+                Dossiers ({clientMeta?.total || total})
               </Typography>
 
               <div className=" w-full mb-2 flex justify-between items-center flex-wrap gap-y-3 " >
 
                 <button 
-                  onClick={() => {
-                    setDialogue({
-                        size: "md",
-                        open: true,
-                        view: "create-collaborateur",
-                        data: null
-                    })
-                  }}
+                  onClick={() => navigate("add")}
                   class=' bg-primary text-white px-4 py-2 rounded-md text-[13px] font-semibold '
                 >
-                  Nouveau Collaborateur
+                  Nouveau Dossier
                 </button>
 
-                <div>
+                {/* <div>
                   <AsyncSelect 
                     cacheOptions 
                     defaultOptions 
@@ -109,7 +84,7 @@ const CollaborateursListe = () => {
                     onChange={(val) => { val.length > 0 ? setRole(val.map((item) => {return item.value})) : setRole(null) } }
                   />
 
-                </div>
+                </div> */}
 
                 <div class='w-[250px]'>
 
@@ -126,7 +101,6 @@ const CollaborateursListe = () => {
                       type="search"
                       id="search"
                       placeholder="Recherche..."
-                      defaultValue={searchTerm}
                       onChange={debouncedResults}
                     />
 
@@ -170,17 +144,17 @@ const CollaborateursListe = () => {
                 <DataGridComponent
                   idpri="id"
                   hidePagination={false}
-                  hideHeader={true}
-                  columns={columnColaborateurs}
+                  hideHeader={false}
+                  columns={columnDossier}
                   queryKey={[
-                    "getCollabo", 
+                    "getDossier", 
                     pagination.page+1,
                     pagination.pageSize,
                     searchTerm,
-                    role
+                    // role
                   ]}
-                  fnQuery={({ queryKey }) => CollaboApi.getCollabo(queryKey[1], queryKey[2], queryKey[3], queryKey[4] )}
-                  noRow={"Pas de collaborateur trouvé"}
+                  fnQuery={({ queryKey }) => FoldersApi.getFolders(queryKey[1], queryKey[2], queryKey[3] )}
+                  noRow={"Pas de dossier trouvé"}
                   totalInformation={{total, setTotal}}
                   paginationInformation={{pagination, setPagination}}
                 />
@@ -192,4 +166,4 @@ const CollaborateursListe = () => {
   );
 };
 
-export default CollaborateursListe;
+export default DossierListe;

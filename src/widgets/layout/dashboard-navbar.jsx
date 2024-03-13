@@ -88,7 +88,7 @@ export function DashboardNavbar() {
           </IconButton>
 
           
-          <Link to="/dashboard/profile">
+          <Link to="/dashboard/profil">
 
             <div
               className="hidden items-center gap-x-2 justify-center pl-2 xl:flex"

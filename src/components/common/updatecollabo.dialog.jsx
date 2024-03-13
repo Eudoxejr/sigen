@@ -101,13 +101,13 @@ function UpdateCollaborateur() {
         const res = await RoleApi.getRole(1, 12, inputValue)
         // res.data.unshift({ id: null, role_name: 'Tout les roles' })
         return res.data.map((data) => { return { label: data.role_name, value: data.id } })
-      };
-    
-      const loadRoleOptions = (inputValue) =>
+    };
+
+    const loadRoleOptions = (inputValue) =>
         new Promise((resolve) => {
-          resolve(getRole(inputValue))
+            resolve(getRole(inputValue))
         }
-      );
+    );
 
 
     return (

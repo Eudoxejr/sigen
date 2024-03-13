@@ -61,24 +61,24 @@ function UpdateModeDialog() {
               theme: "colored",
             });
 
-            queryClient.setQueriesData(["getAllCategorieGroups"], (dataGroup) => {
+            // queryClient.setQueriesData(["getAllCategorieGroups"], (dataGroup) => {
 
-              const indexUpdateGroupe = dataGroup.data.findIndex((group) => group.id == response.id  )
-              console.log(indexUpdateGroupe);
-              const nextData = produce(dataGroup, draftData => {
-                draftData.data[indexUpdateGroupe] = {...response, meta: {totalCategories: 0}}
-              })
+            //   const indexUpdateGroupe = dataGroup.data.findIndex((group) => group.id == response.id  )
+            //   console.log(indexUpdateGroupe);
+            //   const nextData = produce(dataGroup, draftData => {
+            //     draftData.data[indexUpdateGroupe] = {...response, meta: {totalCategories: 0}}
+            //   })
           
-              return nextData;
+            //   return nextData;
 
-            })
-            // // queryClient.invalidateQueries(["getZone"])
+            // })
+            queryClient.invalidateQueries(["getAllCategorieGroups"])
 
         },
         onError: ({response}) => {
-          const errorTraited = handleBackendErrors(response.data)
+          // const errorTraited = handleBackendErrors(response.data)
           setError('root.serverError', { 
-            message: errorTraited || "Une erreur s'est produite"
+            message: handleBackendErrors(response.data, "Une erreur s'est produite")
           })
         }
 

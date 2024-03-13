@@ -3,17 +3,23 @@ import { Dashboard, Auth } from "@/layouts";
 import Dialogue from "./components/common/dialogue";
 import RequireAuth from "./layouts/requireAuth";
 import { SignIn } from "./pages/auth";
+import ForgotPsw from "./pages/auth/forgot-psw";
+import ResetPsw from "./pages/auth/reset-psw";
 import {
   CategoriesListe,
   CategoriesCreate,
   CollaborateursListe,
-  ClientsListe
+  ClientsListe,
+  DossiersListe,
+  DossierCreate,
 } from "./pages/dashboard";
 import Roles from "./pages/dashboard/old/roles";
 import AddRoles from "./pages/dashboard/old/addRoles";
 import Folder from "./pages/dashboard/old/folder";
 import SubFolder from "./pages/dashboard/old/subFolder";
 import Files from "./pages/dashboard/old/files";
+import Profile from "./pages/dashboard/profile";
+
 
 
 function App() {
@@ -34,12 +40,18 @@ function App() {
 
         <Route path="/dashboard/old" element= {<AddRoles/>} />
 
+
+
+
+
+
+
         <Route path="/auth/" element={<Navigate to="/auth/login" replace />} />
         <Route path="/auth/*" element={<Auth />}>
 
           <Route path="login" element={<SignIn />} />
-          {/* <Route path="ForgotPassword" element={<ForgetMdp />} />
-          <Route path="/reset_password/:id" element={<ResetMdp/>} /> */}
+          <Route path="forgot-password" element={<ForgotPsw/>} />
+          <Route path="reset-password" element={<ResetPsw/>} />
 
         </Route>
 
@@ -57,7 +69,13 @@ function App() {
         >
 
           <Route index path="home" element={null} />
-          <Route path="profile" element={null} />
+          <Route path="profil" element={<Profile/>} />
+
+          <Route path="dossiers">
+            <Route index element={<DossiersListe/>} />
+            <Route path="add" element={<DossierCreate/>} />
+            <Route path=":id" element={<Folder/>} />
+          </Route>
 
           <Route path="categories">
             <Route index element={<CategoriesListe/>} />

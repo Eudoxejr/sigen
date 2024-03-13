@@ -58,23 +58,22 @@ function CreateCategorieGroup() {
           theme: "colored",
         });
 
-        queryClient.setQueriesData(["getAllCategorieGroups"], (dataGroup) => {
+        // queryClient.setQueriesData(["getAllCategorieGroups"], (dataGroup) => {
 
-          const nextData = produce(dataGroup, draftData => {
-            draftData.data.unshift({...response.data[0], meta: {totalCategories: 0}})
-            draftData.meta.total = dataGroup.meta.total+1
-          })
+        //   const nextData = produce(dataGroup, draftData => {
+        //     draftData.data.unshift({...response.data[0], meta: {totalCategories: 0}})
+        //     draftData.meta.total = dataGroup.meta.total+1
+        //   })
       
-          return nextData;
+        //   return nextData;
 
-        })
-        // queryClient.invalidateQueries(["getZone"])
+        // })
+        queryClient.invalidateQueries(["getAllCategorieGroups"])
 
       },
       onError: ({response}) => {
-        const errorTraited = handleBackendErrors(response.data)
         setError('root.serverError', { 
-          message: errorTraited || "Une erreur s'est produite"
+          message: handleBackendErrors(response.data, "Une erreur s'est produite")
         })
       }
 
