@@ -61,7 +61,7 @@ export function SignIn() {
 
           <h3 className="text-[#000] font-sans text-lg md:text-xl px-[5px] md:px-[15px] font-bold" >Connectez-vous à SIGEN</h3>
 
-          <form className="mt-[20px] bg-white w-[100%] md:w-[90%] px-[2.5%] pb-8 no-scrollbar" onSubmit={handleSubmit(handleClick)}>
+          <div className="mt-[20px] bg-white w-[100%] md:w-[90%] px-[2.5%] pb-8 no-scrollbar" >
 
             {errors.root?.serverError &&
               <p className="flex justify-center text-xs mb-[10px] text-red-600" >Email ou password éronné</p>
@@ -113,7 +113,7 @@ export function SignIn() {
                         placeholder="******************" 
                       />
 
-                      <button onClick={() => sethidepasw((hide) => !hide)} className=" w-[35px] h-[35px] justify-center item-center" >
+                      <button onClick={(e) => sethidepasw((hide) => !hide)} className=" w-[35px] h-[35px] justify-center item-center" >
                         {hidepasw ? <FaRegEyeSlash /> : <FaRegEye />}
                       </button>
 
@@ -131,10 +131,10 @@ export function SignIn() {
             </div>
 
             <div className="mt-[30px] flex items-center justify-center rounded-md">
-              <input disabled={isLoading} className="cursor-pointer disabled:bg-[#E8F0FE] disabled:text-gray-700 bg-primary items-center font-medium w-full rounded-[50px] linearback text-white h-[48px]" type="submit" value={isLoading ? "Chargement..." : "Me Connecter"} />
+              <button onClick={handleSubmit(handleClick)} disabled={isLoading} className=" disabled:bg-[#E8F0FE] disabled:text-gray-700 bg-primary items-center font-medium w-full rounded-[50px] linearback text-white h-[48px]" >{isLoading ? "Chargement..." : "Me Connecter"}</button>
             </div>
 
-          </form>
+          </div>
 
         </div>
 

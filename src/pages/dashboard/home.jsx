@@ -3,18 +3,22 @@ import {
   BanknotesIcon,
   UserIcon
 } from "@heroicons/react/24/solid";
+import { FaFolder } from "react-icons/fa";
+import { HiUsers } from "react-icons/hi2";
 import { PiIdentificationCardBold } from "react-icons/pi";
 import { AiFillCar } from "react-icons/ai";
+import { FaUserShield } from "react-icons/fa6"
 import { MdOutlineModeOfTravel, MdEmojiTransportation } from "react-icons/md";
 import { GiTransportationRings } from "react-icons/gi";
-import TransportModeCard from "@/components/home/transportMode";
-import DriverMiniatureCard from "@/components/home/driverMiniature";
+import { BiCategoryAlt } from "react-icons/bi";
+// import TransportModeCard from "@/components/home/transportMode";
+// import DriverMiniatureCard from "@/components/home/driverMiniature";
 import { StatisticsCard } from "@/widgets/cards";
-import { isAllowedTo } from "@/utils";
-import { Permissions } from "@/data/role-access-data";
-import { RenderIf } from "@/components/common";
+// import { isAllowedTo } from "@/utils";
+// import { Permissions } from "@/data/role-access-data";
+// import { RenderIf } from "@/components/common";
 import { useQuery } from "@tanstack/react-query";
-import { OtherApi } from "@/api/api";
+// import { OtherApi } from "@/api/api";
 
 export function Home() {
 
@@ -36,67 +40,57 @@ export function Home() {
 
   return (
 
-    <RenderIf allowedTo={Permissions.VIEW_STATS}>
+    // <RenderIf allowedTo={Permissions.VIEW_STATS}>
 
       <div className="mt-12">
 
         <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
 
           <StatisticsCard
-            key={"Utilisateurs"}
+            key={"Dossiers"}
             color={"pink"}
-            value={!isLoading ? kpis?.data?.user || "" : "..."}
-            title={"Utilisateurs"}
-            icon={React.createElement(UserIcon, {
+            value={!isLoading ? kpis?.data?.user || "18" : "..."}
+            title={"Dossiers"}
+            icon={React.createElement(FaFolder, {
               className: "w-6 h-6 text-white",
             })}
           />
 
           <StatisticsCard
-            key={"Conducteurs"}
+            key={"Clients"}
             color={"green"}
-            value={!isLoading ? kpis?.data?.driver || "" : "..."}
-            title={"Conducteurs"}
-            icon={React.createElement(UserIcon, {
+            value={!isLoading ? kpis?.data?.driver || "18" : "..."}
+            title={"Clients"}
+            icon={React.createElement(HiUsers, {
               className: "w-6 h-6 text-white",
             })}
           />
           
           <StatisticsCard
-            key={"Courses"}
+            key={"Collaborateurs"}
             color={"orange"}
-            value={!isLoading ? kpis?.data?.reservation || "" : "..."}
-            title={"Courses"}
-            icon={React.createElement(MdOutlineModeOfTravel, {
+            value={!isLoading ? kpis?.data?.reservation || "18" : "..."}
+            title={"Collaborateurs"}
+            icon={React.createElement(FaUserShield, {
               className: "w-6 h-6 text-white",
             })}
           />
           
           <StatisticsCard
-            key={"Mode transport"}
+            key={"Catégories"}
             color={"cyan"}
-            value={!isLoading ? kpis?.data?.transportMode || "" : "..."}
-            title={"Mode transport"}
-            icon={React.createElement(GiTransportationRings, {
-              className: "w-6 h-6 text-white",
-            })}
-          />
-
-          <StatisticsCard
-            key={"Moyen transport"}
-            color={"purple"}
-            value={!isLoading ? kpis?.data?.transportMoyen || "" : "..."}
-            title={"Moyen transport"}
-            icon={React.createElement(MdEmojiTransportation, {
+            value={!isLoading ? kpis?.data?.transportMode || "18" : "..."}
+            title={"Catégories"}
+            icon={React.createElement(BiCategoryAlt, {
               className: "w-6 h-6 text-white",
             })}
           />
           
           <StatisticsCard
-            key={"Véhicules"}
+            key={"Templates"}
             color={"brown"}
-            value={!isLoading ? kpis?.data?.vehicule || "" : "..."}
-            title={"Véhicules"}
+            value={!isLoading ? kpis?.data?.vehicule || "18" : "..."}
+            title={"Templates de minute"}
             icon={React.createElement(AiFillCar, {
               className: "w-6 h-6 text-white",
             })}
@@ -104,31 +98,17 @@ export function Home() {
 
         </div>
 
-        {/* <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
-          {statisticsChartsData.map((props) => (
-            <StatisticsChart
-              key={props.title}
-              {...props}
-              footer={
-                <Typography
-                  variant="small"
-                  className="flex items-center font-normal text-blue-gray-600"
-                >
-                  <ClockIcon strokeWidth={2} className="h-4 w-4 text-inherit" />
-                  &nbsp;{props.footer}
-                </Typography>
-              }
-            />
-          ))}
-        </div> */}
-
         <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
-          {isAllowedTo(Permissions.VIEW_MODE_TRANSPORT) && <TransportModeCard />}
-          {isAllowedTo(Permissions.VIEW_DRIVERS_LIST) && <DriverMiniatureCard />}
+          {/* {isAllowedTo(Permissions.VIEW_MODE_TRANSPORT) &&  */}
+            {/* <TransportModeCard /> */}
+          {/* } */}
+          {/* {isAllowedTo(Permissions.VIEW_DRIVERS_LIST) &&  */}
+            {/* <DriverMiniatureCard /> */}
+          {/* } */}
         </div>
 
       </div>
-    </RenderIf>
+
   );
 }
 
