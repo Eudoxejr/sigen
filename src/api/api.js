@@ -49,6 +49,34 @@ export const AuthApi = {
 			})
 		})
 		return response.data;
+	},
+
+	async forgetPsw(data) {
+		const response = await axiosInstance.request({
+			method: 'post',
+			url: API_URL + '/auth/password-forgot/',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			data: JSON.stringify({
+				...data
+			})
+		})
+		return response.data;
+	},
+
+	async resetPsw(data) {
+		const response = await axiosInstance.request({
+			method: 'post',
+			url: API_URL + '/auth/reset-password/',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			data: JSON.stringify({
+				...data
+			})
+		})
+		return response.data;
 	}
 
 }
@@ -116,14 +144,14 @@ export const CategorieGroupeApi = {
 
 export const CategoriesApi = {
 
-	async getMoyen(page, perPage, q) {
+	async getCategories(page, perPage, q) {
 		const response = await axiosPrivate.request({
 			method: 'get',
-			url: API_URL + '/all-transport-moyen/',
+			url: API_URL + '/categories',
 			params: {
 				page: page,
-				per_page: perPage,
-				q: q
+				perPage: perPage,
+				keyword: q
 			}
 		})
 		return response.data;
@@ -135,6 +163,39 @@ export const CategoriesApi = {
 		const response = await axiosPrivate.request({
 			method: 'post',
 			url: API_URL + '/categories',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			data: JSON.stringify(data)
+		})
+		return response.data;
+	}
+
+}
+
+export const FoldersApi = {
+
+	async getFolders(page, perPage, q, categories) {
+
+		const response = await axiosPrivate.request({
+			method: 'get',
+			url: API_URL + '/folders',
+			params: {
+				page: page,
+				perPage: perPage,
+				keyword: q,
+				categories: JSON.stringify(categories),
+			}
+		})
+		return response.data;
+	},
+
+
+	async createFolders(data) {
+		// console.log(data);
+		const response = await axiosPrivate.request({
+			method: 'post',
+			url: API_URL + '/folders',
 			headers: {
 				'Content-Type': 'application/json'
 			},
@@ -207,6 +268,53 @@ export const CollaboApi = {
 
 
 }
+
+
+export const ClientApi = {
+
+	async getClient(page, perPage, q) {
+
+		const response = await axiosPrivate.request({
+			method: 'get',
+			url: API_URL + '/clients',
+			params: {
+				page: page,
+				perPage: perPage,
+				keyword: q,
+				// role: JSON.stringify(role),
+			}
+		})
+		return response.data;
+	},
+
+	async createClient(data) {
+		// console.log(data);
+		const response = await axiosPrivate.request({
+			method: 'post',
+			url: API_URL + '/clients',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			data: JSON.stringify(data)
+		})
+		return response.data;
+	},
+
+	async updateClient(data, id) {
+		// console.log(data);
+		const response = await axiosPrivate.request({
+			method: 'put',
+			url: API_URL + '/clients/'+id,
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			data: JSON.stringify(data)
+		})
+		return response.data;
+	}
+
+}
+
 
 
 export const RoleApi = {

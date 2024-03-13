@@ -76,9 +76,9 @@ const CategoriesCreate = () => {
                         return partyTitles.length === uniquepartyTitle.size;
                     }),
                     otherwise: () => yup.array().test('is-unique-party-title', 'Les noms des partie doivent être unique', function (value) {
-                        const partyTitles = value.map(partyInvolved => partyInvolved.partyTitle);
+                        const partyTitles = value?.map(partyInvolved => partyInvolved.partyTitle);
                         const uniquepartyTitle = new Set(partyTitles);
-                        return partyTitles.length === uniquepartyTitle.size;
+                        return partyTitles?.length === uniquepartyTitle.size;
                     })
                 }),
                 informationRequested: yup.array().of(
@@ -86,9 +86,10 @@ const CategoriesCreate = () => {
                         question: yup.string().trim().required("L'information est requise").max(250, "Ne doit pas dépasser 250 caractères")
                     })
                 ).test('is-unique-question', 'Vous demandez la même information plusieurs fois', function (value) {
-                    const questions = value.map(informationRequested => informationRequested.question);
+                    const questions = value?.map(informationRequested => informationRequested.question);
                     const uniquepartyquestions = new Set(questions);
-                    return questions.length === uniquepartyquestions.size;
+                    // console.log(questions?.length === uniquepartyquestions.size);
+                    return questions?.length === uniquepartyquestions.size;
                 })
             })
         ).test('is-unique', 'Les noms des sous-catégorie doivent être unique', function (value) {
@@ -113,8 +114,7 @@ const CategoriesCreate = () => {
                     partyInvolvedAreCustomer: false,
                     youKnowNumberOfPart: false,
                     isMinutier: false,
-                    partyInvolved: [
-                    ],
+                    partyInvolved: [],
                     informationRequested: []
                 }
             ]
@@ -154,7 +154,7 @@ const CategoriesCreate = () => {
         onSuccess: (response) => {
 
             navigate(-1)
-            toast.success('Moyen de transport créé avec succès', {
+            toast.success('Catégories créé avec succès', {
                 position: "top-right",
                 autoClose: 2000,
                 hideProgressBar: true,
@@ -165,13 +165,13 @@ const CategoriesCreate = () => {
                 theme: "colored",
             });
 
-            // queryClient.setQueriesData(["getMoyen"], (dataMoyen) => {
-            //     const nextData = produce(dataMoyen, draftData => {
-            //         draftData.data.unshift(response.data)
-            //         draftData.meta.total = dataMoyen.meta.total+1
-            //     })
-            //     return nextData;
-            // })
+            queryClient.setQueriesData(["getAllCategories"], (dataCat) => {
+                const nextData = produce(dataCat, draftData => {
+                    draftData.data.unshift(response.data)
+                    draftData.meta.total = dataCat.meta.total+1
+                })
+                return nextData;
+            })
 
             setBackdrop({active: false})
 
@@ -199,7 +199,6 @@ const CategoriesCreate = () => {
 
 
     const handleClick = async (data) => {
-        console.log(data);
         setBackdrop({active: true})
         mutate(data)
     };
@@ -350,6 +349,9 @@ const CategoriesCreate = () => {
                                             fieldState: { invalid, error}
                                             }) => (
                                                 <>
+                                                    <div className=" flex justify-center items-center px-5 w-[90%] sm:w-[62%] h-[50px] mb-3 border-[1px] border-gray-500 rounded-md " >
+                                                        <div style={{ backgroundColor: value }} className={" w-full h-[40px] rounded-md "} />
+                                                    </div>
                                                     <TwitterPicker
                                                         color={value} 
                                                         onChangeComplete={(color, event) => onChange(color.hex)} 
@@ -446,6 +448,18 @@ const CategoriesCreate = () => {
                                                                             onChange(e.target.checked);
                                                                             e.target.checked ? 
                                                                                 setValue(`subCategories[${index}].subCategoryName`, "Les Actes", { shouldDirty: true })
+                                                                                // setValue(
+                                                                                //     `subCategories[${index}]`, 
+                                                                                //     {
+                                                                                //         subCategoryName: "Les Actes",
+                                                                                //         isMinutier: e.target.checked,
+                                                                                //         isMultiParts: false,
+                                                                                //         partyInvolvedAreCustomer: false,
+                                                                                //         youKnowNumberOfPart: false,
+
+                                                                                //     }, 
+                                                                                //     { shouldDirty: true }
+                                                                                // )
                                                                             :
                                                                                 setValue(`subCategories[${index}].subCategoryName`, "", { shouldDirty: true })
                                                                         }} 
@@ -591,9 +605,15 @@ const CategoriesCreate = () => {
 
                                                     <span className=" text-[13px] font-normal text-blue-gray-600" >Entrez les informations qui doivent être entrées lors de la création d'un dossier:</span>
                                                     
-                                                    <NextedInformation disabled={watchSubCategories[index]?.isMinutier || watchSubCategories[index]?.partyInvolvedAreCustomer} nextIndex={index} control={control}/>
-                                                    {errors?.subCategories?.[index]?.informationRequested && <span className=" text-[11px] text-red-400 mt-1" >{errors?.subCategories?.[index]?.informationRequested?.message}</span>}
-
+                                                    {(watchSubCategories[index]?.isMinutier || watchSubCategories[index]?.partyInvolvedAreCustomer)  ?
+                                                        null
+                                                        :
+                                                        <>
+                                                            <NextedInformation disabled={watchSubCategories[index]?.isMinutier || watchSubCategories[index]?.partyInvolvedAreCustomer} nextIndex={index} control={control}/>
+                                                            {errors?.subCategories?.[index]?.informationRequested && <span className=" text-[11px] text-red-400 mt-1" >{errors?.subCategories?.[index]?.informationRequested?.message}</span>}
+                                                        </>
+                                                    }
+                                                    
                                                     {(watchSubCategories[index]?.isMinutier || watchSubCategories[index]?.partyInvolvedAreCustomer ) &&
                                                         <div className=" absolute w-[100%] h-full rounded-md backdrop-blur-sm bg-gray-500/10 flex justify-center items-center" >
                                                             <RiForbidLine size={70} />

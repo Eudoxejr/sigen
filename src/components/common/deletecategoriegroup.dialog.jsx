@@ -33,28 +33,49 @@ function DeleteCategorieGroup() {
             data: null
           })
 
-            toast.success('Groupe de catégorie supprimé avec succès', {
-              position: "top-right",
-              autoClose: 2000,
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: false,
-              draggable: false,
-              progress: undefined,
-              theme: "colored",
-            });
+          toast.success('Groupe de catégorie supprimé avec succès', {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: false,
+            progress: undefined,
+            theme: "colored",
+          });
 
-            queryClient.setQueriesData(["getAllCategorieGroups"], (dataGroup) => {
+          queryClient.setQueriesData(["getAllCategorieGroups"], (dataGroup) => {
 
-              const indexUpdateGroup = dataGroup.data.findIndex((group) => group.id == dialogue?.data?.id )
-              const nextData = produce(dataGroup, draftData => {
-                draftData.data.splice(indexUpdateGroup,1)
-                draftData.meta.total = dataGroup.meta.total-1
-              })
-          
-              return nextData;
-
+            const indexUpdateGroup = dataGroup.data.findIndex((group) => group.id == dialogue?.data?.id )
+            const nextData = produce(dataGroup, draftData => {
+              draftData.data.splice(indexUpdateGroup,1)
+              draftData.meta.total = dataGroup.meta.total-1
             })
+        
+            return nextData;
+
+          })
+
+        },
+        onError: ({response}) => {
+          
+          setDialogue({
+            size: "sm",
+            open: false,
+            view: null,
+            data: null
+          })
+
+          toast.error(handleBackendErrors(response.data, "une erreur s'est produite lors de la suppression"), {
+            position: "top-right",
+            autoClose: 6000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: false,
+            progress: undefined,
+            theme: "colored",
+          });
 
         }
 

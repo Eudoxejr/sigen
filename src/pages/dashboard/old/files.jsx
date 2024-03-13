@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
 
-import AddCommentIcon from "@mui/icons-material/AddComment";
 import { FaFolderMinus } from "react-icons/fa";
 import { FaUserCheck } from "react-icons/fa6";
 import { Box } from "@mui/material";
@@ -12,8 +11,6 @@ import { FaFileWord } from "react-icons/fa6";
 
 import { BiSolidFilePlus } from "react-icons/bi";
 
-import ControlPointDuplicateIcon from "@mui/icons-material/ControlPointDuplicate";
-import { red } from "@mui/material/colors";
 
 export default function Files() {
   return (

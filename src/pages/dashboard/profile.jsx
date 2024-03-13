@@ -1,4 +1,3 @@
-import useAuth from "@/hooks/useAuth";
 import styled from "@emotion/styled";
 import {
   Card,
@@ -13,21 +12,23 @@ import { useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
+import { useUserStore } from "@/store/user.store"
 
 
 export function Profile() {
+
+  const {user} = useUserStore()
   const navigate = useNavigate();
-
-  const { auth: currentUser } = useAuth();
-
   const [showPassword, setShowPassword] = useState(false);
+
+  console.log(user);
 
   return (
     <>
       <div className="relative mt-8 h-72 w-full overflow-hidden rounded-xl bg-[url(https://images.unsplash.com/photo-1531512073830-ba890ca4eba2?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80)] bg-cover	bg-center">
         <div className="absolute inset-0 h-full w-full bg-blue-500/50" />
       </div>
-      <Card className="mx-3 -mt-16 mb-6 lg:mx-4">
+      <Card className="mx-3 -mt-44 mb-6 lg:mx-4">
         <CardHeader variant="gradient" className="mb-2 p-6 h-[70px] bg-blue-300 flex flex-row items-center justify-between ">
           <div className='flex items-center' >
             <Tooltip content="Retour">
@@ -51,13 +52,13 @@ export function Profile() {
               />
               <div>
                 <Typography variant="h5" color="blue-gray" className="mb-1">
-                  {currentUser?.lastName ?? "-"} {currentUser?.firstName ?? ""}
+                  {user?.user?.lastname ?? "-"} {user?.user?.firstname ?? ""}
                 </Typography>
                 <Typography
                   variant="small"
                   className="font-normal text-blue-gray-600"
                 >
-                  {currentUser?.role ?? "-"}
+                  {user?.user?.role?.role_name ?? "-"}
                 </Typography>
               </div>
             </div>
@@ -69,33 +70,28 @@ export function Profile() {
                 <Input
                   label="Nom"
                   type="text" color="blue-gray" size="lg"
-                  value={currentUser?.lastName ?? ""}
+                  // value={currentUser?.lastName ?? ""}
                   readOnly
                 />
                 <Input
                   label="Prénom"
                   type="text" color="blue-gray" size="lg"
-                  value={currentUser?.firstName ?? ""}
+                  // value={currentUser?.firstName ?? ""}
                   readOnly
                 />
                 <Input
                   label="Email"
                   type="email" color="blue-gray" size="lg"
-                  value={currentUser?.email ?? ""}
+                  // value={currentUser?.email ?? ""}
                   readOnly
                 />
                 <Input
                   label="Téléphone"
-                  type="text" color="blue-gray" size="lg"
-                  value={currentUser?.telephone ?? ""}
+                  type="p" color="blue-gray" size="lg"
+                  // value={currentUser?.telephone ?? ""}
                   readOnly
                 />
-                <Input
-                  label="Genre"
-                  type="text" color="blue-gray" size="lg"
-                  value={currentUser?.sexe ?? ""}
-                  readOnly
-                />
+
                 <div className="col-span-2 flex items-center justify-center pt-4">
                   <SubmitButton
                     className={`w-[200px]`}

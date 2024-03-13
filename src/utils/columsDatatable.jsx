@@ -23,7 +23,7 @@ import { BsChevronRight, BsEyeFill, BsThreeDotsVertical } from "react-icons/bs";
 import { FaKey } from "react-icons/fa";
 import img1 from '/img/home-decor-4.jpeg';
 import dummyProfileImg from '/img/sigen/user.png';
-import { CiEdit } from "react-icons/ci";
+import { FaFolderMinus } from "react-icons/fa";
 import { useDialogueStore } from '@/store/dialogue.store';
 // import { isAllowedTo } from "./isAllowedTo";
 // import { Permissions } from "@/data/role-access-data";
@@ -206,7 +206,6 @@ export const columnColaborateurs = [
 						<IconButton size="sm" variant="text" color="blue-gray">
 							<EllipsisVerticalIcon
 								strokeWidth={1.5}
-								fill="currenColor"
 								className="h-6 w-6"
 							/>
 						</IconButton>
@@ -312,7 +311,7 @@ export const columnClients = [
 					color="blue-gray"
 					className="font-semibold text-[13.5px] "
 				>
-					#858556555
+					{params?.row?.id}
 				</Typography>
 
 			)
@@ -380,94 +379,6 @@ export const columnClients = [
 		}
 	},
 
-	// {
-	// 	field: 'moyen',
-	// 	headerName: 'Moyen de transport',
-	// 	flex: 2,
-	// 	minWidth: 170,
-	// 	sortable: false,
-	// 	hideSortIcons: true,
-	// 	disableColumnMenu: true,
-	// 	renderCell: (params) => {
-	// 		const [_, dispatch] = useDialogController();
-
-	// 		const navigate = useNavigate();
-
-	// 		return (
-	// 			<RenderIf
-	// 				allowedTo={Permissions.VIEW_TRANPORT_MEAN_PAPERS}
-	// 				placeholder="Pas accessible"
-	// 			>
-	// 				<div>
-	// 					<Typography
-	// 						variant="small"
-	// 						color="blue-gray"
-	// 						className="font-semibold text-[12px] "
-	// 					>
-	// 						{params.row?.transportMoyens?.length + " moyen(s) de transport"}
-	// 					</Typography>
-
-	// 					<div className=" flex flex-1 justify-between mt-2 " >
-
-	// 						<div className=" flex flex-col " >
-
-	// 							{params.row?.transportMoyens.map((item, key) => (
-	// 								<Typography
-	// 									key={key}
-	// 									variant="small"
-	// 									color="blue-gray"
-	// 									className={
-	// 										"font-normal mt-1 text-[10.5px] " + (
-	// 											item?.status === "REJECTED" ? " text-red-500"
-	// 												: item?.status === "EXPIRED" ? " text-gray-600"
-	// 													: item?.status === "CHECKING" ? " text-orange-600"
-	// 														: " text-green-500 "
-	// 										)
-	// 									}
-	// 								>
-	// 									{item.transportMoyen.title}
-	// 								</Typography>
-	// 							))}
-	// 							<Button color="green" size="sm" className="mt-2"
-	// 								onClick={() => {
-	// 									navigate(
-	// 										`./inscription/${params.row?.idUser}`
-	// 									)
-	// 								}}
-	// 							>
-	// 								voir plus
-	// 							</Button>
-	// 						</div>
-
-	// 						{/* <MenuHandler> */}
-	// 						{/* {params.row?.transportMoyens.length > 0 &&
-	// 						<IconButton
-	// 							onClick={() => dispatch({
-	// 								type: "SET_DIALOG",
-	// 								value: {
-	// 									active: true,
-	// 									view: "viewTransportMoyen",
-	// 									value: params.row?.transportMoyens
-	// 								}
-	// 							})}
-	// 							size="sm" variant="text" color="blue-gray"
-	// 						>
-	// 							<EllipsisVerticalIcon
-	// 								strokeWidth={1.5}
-	// 								fill="currenColor"
-	// 								className="h-6 w-6"
-	// 							/>
-	// 						</IconButton>
-	// 					} */}
-	// 						{/* </MenuHandler> */}
-
-	// 					</div>
-	// 				</div>
-	// 			</RenderIf>
-	// 		)
-	// 	}
-	// },
-
 	{
 		field: 'ifu',
 		headerName: 'Numéro IFU',
@@ -482,9 +393,9 @@ export const columnClients = [
 				<div className="w-full h-full flex items-center" >
 					<Chip
 						variant="gradient"
-						color={!params?.row.is_suspend ? "green" : "red"}
-						value="1854862358965"
-						className="py-0.5 px-2 text-[11px] font-medium"
+						color={params?.row?.numero_ufu ? "green" : "red"}
+						value={params?.row?.numero_ufu}
+						className="py-2 px-2 text-[12.5px] font-medium"
 					/>
 				</div>
 
@@ -528,7 +439,8 @@ export const columnClients = [
 		disableColumnMenu: true,
 		renderCell: (params) => {
 
-			const navigate = useNavigate()
+			const navigate = useNavigate();
+			const { setDialogue } = useDialogueStore();
 
 			return (
 				// isAllowedTo(Permissions.VIEW_A_DRIVER_DETAILS) || isAllowedTo(Permissions.ENABLE_AND_DISABLE_A_DRIVER) ?
@@ -537,7 +449,6 @@ export const columnClients = [
 						<IconButton size="sm" variant="text" color="blue-gray">
 							<EllipsisVerticalIcon
 								strokeWidth={1.5}
-								fill="currenColor"
 								className="h-6 w-6"
 							/>
 						</IconButton>
@@ -559,8 +470,12 @@ export const columnClients = [
 						{/* {isAllowedTo(Permissions.VIEW_A_DRIVER_DETAILS) && */}
 							<MenuItem
 								onClick={() =>
-									navigate(`./${params.row.idUser}`,
-										{ state: params.row })
+									setDialogue({
+										size: "md",
+										open: true,
+										view: "update-client",
+										data: params.row
+									})
 								}
 								className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-primary hover:!text-white font-medium flex items-center justify-between mt-1"
 							>
@@ -570,16 +485,244 @@ export const columnClients = [
 
 						
 						{/* {isAllowedTo(Permissions.VIEW_A_DRIVER_DETAILS) && */}
-						<MenuItem
+							<MenuItem
 								onClick={() =>
-									navigate(`./${params.row.idUser}`,
-										{ state: params.row })
+									setDialogue({
+										size: "md",
+										open: true,
+										view: "details-client",
+										data: params.row
+									})
 								}
 								className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-primary hover:!text-white font-medium flex items-center justify-between mt-1"
 							>
 								Détails du client
 							</MenuItem>
 						{/* } */}
+
+						<MenuItem
+							// onClick={() => dispatch({
+							// 	type: "SET_DIALOG",
+							// 	value: {
+							// 		active: true,
+							// 		view: "suspendDriver",
+							// 		value: {
+							// 			wasActive: true,
+							// 			user: params.row,
+							// 		}
+							// 	}
+							// })}
+							className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-red-600 hover:!text-white font-medium flex items-center justify-between mt-1"
+						>
+							Supprimer le client
+						</MenuItem>
+
+					</MenuList>
+				</Menu>
+			)
+		}
+	}
+];
+
+export const columnDossier = [
+	{ 
+		field: ' ',
+		headerName: 'Dossier',
+		flex: 1.2,
+		minWidth: 170,
+		sortable: false,
+		hideSortIcons: true,
+		disableColumnMenu: true,
+		renderCell: (params) => {
+
+			return (
+
+				<div className="my-6 flex items-center">
+					<div style={{backgroundColor: params.row?.category?.category_color}} className="flex h-[40px] w-[40px] items-center justify-center rounded-md">
+						<FaFolderMinus size={18} color="white" />
+					</div>
+					<div className="ml-8">
+						<h2>{params.row?.category?.category_name}</h2>
+						<p className="text-gray-500">#{params.row.id}</p>
+					</div>
+				</div>
+
+			)
+
+		}
+	},
+
+	{
+		field: 'fullname',
+		headerName: 'Clients',
+		flex: 1.5,
+		minWidth: 170,
+		sortable: true,
+		hideSortIcons: false,
+		disableColumnMenu: true,
+		renderCell: ({row}) => {
+
+			return (
+
+				<div className="flex items-center gap-4 py-3">
+					<AvatarMui>
+
+					</AvatarMui>
+					<Typography
+						variant="small"
+						color="blue-gray"
+						className="font-semibold text-[13.5px] "
+					>
+						{row?.client?.firstname + " " + row?.client?.lastname}
+					</Typography>
+				</div>
+
+			)
+
+		}
+	},
+
+	{
+		field: 'coordone',
+		headerName: 'Collaborateurs',
+		flex: 2,
+		minWidth: 170,
+		sortable: false,
+		hideSortIcons: true,
+		disableColumnMenu: true,
+		renderCell: ({row}) => {
+			return (
+				<div>
+					<Typography
+						variant="small"
+						color="blue-gray"
+						className="font-semibold text-[13.5px] "
+					>
+						{row?.manager?.firstname + " " + row?.manager?.lastname+" (Titulaire)"}
+					</Typography>
+					{/* <Typography
+						variant="small"
+						color="blue-gray"
+						className=" font-normal mt-1 text-[12.5px] "
+					>
+						{"Titulaire"}
+					</Typography> */}
+
+					<Typography
+						variant="small"
+						color="blue-gray"
+						className="font-semibold mt-3 text-[13.5px] "
+					>
+						{row?.subManager?.firstname + " " + row?.subManager?.lastname+" (Suppléant)"}
+					</Typography>
+					{/* <Typography
+						variant="small"
+						color="blue-gray"
+						className=" font-normal mt-1 text-[12.5px] "
+					>
+						{"Suppléant"}
+					</Typography> */}
+				</div>
+			)
+		}
+	},
+
+	{
+		field: 'status',
+		headerName: 'Status',
+		width: 170,
+		sortable: true,
+		hideSortIcons: false,
+		disableColumnMenu: true,
+		renderCell: (params) => {
+
+			return (
+
+				<div className="w-full h-full flex items-center" >
+					<Chip
+						variant="gradient"
+						color={params?.row?.is_treated_folder ? "green" : "orange"}
+						value={params?.row?.is_treated_folder ? "Traité" : "En Cours"}
+						className="py-2 px-2 text-[12.5px] font-medium"
+					/>
+				</div>
+
+			)
+		}
+	},
+
+
+	{
+		field: 'action',
+		headerAlign: 'center',
+		headerName: '',
+		width: 70,
+		sortable: false,
+		hideSortIcons: true,
+		disableColumnMenu: true,
+		renderCell: (params) => {
+
+			const navigate = useNavigate();
+			const { setDialogue } = useDialogueStore();
+
+			return (
+				// isAllowedTo(Permissions.VIEW_A_DRIVER_DETAILS) || isAllowedTo(Permissions.ENABLE_AND_DISABLE_A_DRIVER) ?
+				<Menu placement="bottom-end">
+					<MenuHandler>
+						<IconButton size="sm" variant="text" color="blue-gray">
+							<EllipsisVerticalIcon
+								strokeWidth={1.5}
+								className="h-6 w-6"
+							/>
+						</IconButton>
+					</MenuHandler>
+
+					<MenuList className="p-1 rounded-[5px]">
+						{/* {isAllowedTo(Permissions.VIEW_A_DRIVER_DETAILS) && */}
+							<MenuItem
+								onClick={() =>
+									navigate(`./${params.row.idUser}`,
+										{ state: params.row })
+								}
+								className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-primary hover:!text-white font-medium flex items-center justify-between"
+							>
+								Voir le dossier
+							</MenuItem>
+						{/* } */}
+
+						{/* {isAllowedTo(Permissions.VIEW_A_DRIVER_DETAILS) && */}
+							<MenuItem
+								onClick={() =>
+									setDialogue({
+										size: "md",
+										open: true,
+										view: "update-client",
+										data: params.row
+									})
+								}
+								className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-primary hover:!text-white font-medium flex items-center justify-between mt-1"
+							>
+								Modifier le dossier
+							</MenuItem>
+						{/* } */}
+
+						
+						<MenuItem
+							// onClick={() => dispatch({
+							// 	type: "SET_DIALOG",
+							// 	value: {
+							// 		active: true,
+							// 		view: "suspendDriver",
+							// 		value: {
+							// 			wasActive: true,
+							// 			user: params.row,
+							// 		}
+							// 	}
+							// })}
+							className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-red-600 hover:!text-white font-medium flex items-center justify-between mt-1"
+						>
+							Supprimer le dossier
+						</MenuItem>
 
 					</MenuList>
 				</Menu>

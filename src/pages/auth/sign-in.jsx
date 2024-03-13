@@ -1,9 +1,4 @@
-import {
-  Input,
-  Checkbox,
-  Button,
-  Typography,
-} from "@material-tailwind/react";
+import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
@@ -12,6 +7,9 @@ import { useNavigate, Link } from "react-router-dom";
 import { AuthApi } from "@/api/api";
 import { handleBackendErrors } from "@/utils/handleHandler";
 import { useUserStore } from "@/store/user.store"
+
+import { FaRegEye, FaRegEyeSlash  } from "react-icons/fa6";
+
 
 
 export function SignIn() {
@@ -35,14 +33,12 @@ export function SignIn() {
     },
     gcTime: 0,
     onSuccess: async (response) => {
-      ;
       setUser(response)
       navigate("/");
     },
     onError: ({ response }) => {
-      const errorTraited = handleBackendErrors(response.data)
       setError('root.serverError', {
-        message: errorTraited || "Une erreur s'est produite lors de la connexion"
+        message: handleBackendErrors(response.data, "Une erreur s'est produite lors de la connexion")
       })
     }
 
@@ -51,6 +47,8 @@ export function SignIn() {
   const handleClick = async (data) => {
     mutate(data)
   };
+
+  const [hidepasw, sethidepasw] = useState(true);
 
 
   return (
@@ -102,10 +100,24 @@ export function SignIn() {
                   fieldState: {error, invalid},
                 }) => (
                   <>
-                    <input
-                      onChange={onChange} value={value}
-                      className="h-[45px] text-[13px]  border rounded-[50px] bg-[#E8F0FE] w-full px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="******************" 
-                    />
+                    <div
+                      // onChange={onChange} value={value}
+                      className="h-[45px] flex justify-center items-center border rounded-[50px] bg-[#E8F0FE] w-full px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                    >
+
+                      <input
+                        onChange={onChange} value={value}
+                        className=" flex flex-1 h-full text-[13px] bg-[#E8F0FE] text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                        id="password" 
+                        type={hidepasw ? "password" : "text"} 
+                        placeholder="******************" 
+                      />
+
+                      <button onClick={() => sethidepasw((hide) => !hide)} className=" w-[35px] h-[35px] justify-center item-center" >
+                        {hidepasw ? <FaRegEyeSlash /> : <FaRegEye />}
+                      </button>
+
+                    </div>
                     {error && <span className="text-[10px] ml-3 mt-[5px] text-red-600">{error.message}</span>}
                   </>
                 )}
@@ -115,7 +127,7 @@ export function SignIn() {
             </div>
 
             <div className=" mt-3 " >
-              <Link to={"/"} className="text-center text-neutral-800 text-[11px] font-medium self-start font-montserrat underline">Mot de passe oublié</Link>
+              <Link to={"../forgot-password"} className="text-center text-neutral-800 text-[11px] font-medium self-start font-montserrat underline">Mot de passe oublié</Link>
             </div>
 
             <div className="mt-[30px] flex items-center justify-center rounded-md">

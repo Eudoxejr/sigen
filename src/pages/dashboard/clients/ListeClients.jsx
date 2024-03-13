@@ -9,7 +9,7 @@ import DataGridComponent from '@/components/common/datatable';
 import { columnClients } from '@/utils/columsDatatable';
 import { useNavigate } from 'react-router-dom';
 import AsyncSelect from 'react-select/async';
-import { CollaboApi, RoleApi } from '@/api/api';
+import { ClientApi } from '@/api/api';
 import debounce from 'lodash.debounce';
 import { produce } from "immer";
 import { useDialogueStore } from '@/store/dialogue.store';
@@ -24,7 +24,7 @@ const ClientListe = () => {
   const { setDialogue } = useDialogueStore()
   const queryClient = useQueryClient();
 
-  const collaboMeta = queryClient.getQueriesData(["getClient"])?.[0]?.[1]?.meta
+  const clientMeta = queryClient.getQueriesData(["getClient"])?.[0]?.[1]?.meta
 
 
   const [searchTerm, setSearchTerm] = useState(null);
@@ -43,18 +43,6 @@ const ClientListe = () => {
     return debounce(handleChange, 600);
   }, []);
 
-//   const getRole = async (inputValue) => {
-//     const res = await RoleApi.getRole(1, 12, inputValue)
-//     // res.data.unshift({ id: null, role_name: 'Tout les roles' })
-//     return res.data.map((data) => { return { label: data.role_name, value: data.id } })
-//   };
-
-//   const loadRoleOptions = (inputValue) =>
-//     new Promise((resolve) => {
-//       resolve(getRole(inputValue))
-//     }
-//   );
-
 
   return (
     // <RenderIf allowedTo={Permissions.VIEW_ADMINS_LIST}>
@@ -63,20 +51,20 @@ const ClientListe = () => {
             <CardBody className="md:h-[calc(100vh-125px)] shadow-none flex flex-col px-4 pt-0 pb-4 gap-[15px] overflow-auto">
               
               <Typography variant="h6" color="blue-gray" >
-                Clients ({collaboMeta?.total || total})
+                Clients ({clientMeta?.total || total})
               </Typography>
 
               <div className=" w-full mb-2 flex justify-between items-center flex-wrap gap-y-3 " >
 
                 <button 
-                //   onClick={() => {
-                //     setDialogue({
-                //         size: "md",
-                //         open: true,
-                //         view: "create-collaborateur",
-                //         data: null
-                //     })
-                //   }}
+                  onClick={() => {
+                    setDialogue({
+                        size: "md",
+                        open: true,
+                        view: "create-client",
+                        data: null
+                    })
+                  }}
                   class=' bg-primary text-white px-4 py-2 rounded-md text-[13px] font-semibold '
                 >
                   Nouveau Client
@@ -172,7 +160,7 @@ const ClientListe = () => {
                     searchTerm,
                     // role
                   ]}
-                  fnQuery={({ queryKey }) => CollaboApi.getCollabo(queryKey[1], queryKey[2], queryKey[3], queryKey[4] )}
+                  fnQuery={({ queryKey }) => ClientApi.getClient(queryKey[1], queryKey[2], queryKey[3] )}
                   noRow={"Pas de client trouvé"}
                   totalInformation={{total, setTotal}}
                   paginationInformation={{pagination, setPagination}}
