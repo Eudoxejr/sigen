@@ -8,7 +8,7 @@ import Select from 'react-select';
 import { AiFillEuroCircle } from "react-icons/ai";
 import { toast } from 'react-toastify';
 import NextedInformationDone2 from '@/components/common/nestedInformationDone2'
-import AsyncSelect from 'react-select/async';
+
 
 const NextedParty = ({nextIndex, control, isCustomer}) => {
 

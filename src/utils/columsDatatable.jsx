@@ -157,27 +157,32 @@ export const columnColaborateurs = [
 		disableColumnMenu: true,
 		renderCell: ({row}) => {
 
+			// const dossierManager
+
+			const dossierManagerCount = parseInt(row.meta.folderManage_count)
+			const dossierSubManagerCount = parseInt(row.meta.folderSubManage_count)
+
 			return (
 
 				<div className="w-full h-full py-3 flex items-center flex-col justify-center" >
 
 					<div className="w-full flex justify-between" >
 						<span className="font-medium opacity-75 text-[10.5px] capitalize" >Dossiers</span>
-						<span className="font-medium opacity-75 text-[10.5px] capitalize" >10</span>
+						<span className="font-medium opacity-75 text-[10.5px] capitalize" >{dossierManagerCount+dossierSubManagerCount}</span>
 					</div>
 					<Progress value={100} color="blue" />
 
 					<div className="w-full mt-2 flex justify-between" >
 						<span className="font-medium opacity-75 text-[10.5px] capitalize">Titulaire</span>
-						<span className="font-medium opacity-75 text-[10.5px] capitalize">4</span>
+						<span className="font-medium opacity-75 text-[10.5px] capitalize">{dossierManagerCount}</span>
 					</div>
-					<Progress value={40} color="green" />
+					<Progress value={(dossierManagerCount*100)/(dossierManagerCount+dossierSubManagerCount)} color="green" />
 
 					<div className="w-full mt-2 flex justify-between" >
 						<span className="font-medium opacity-75 text-[10.5px] capitalize">Suppléant</span>
-						<span className="font-medium opacity-75 text-[10.5px] capitalize">6</span>
+						<span className="font-medium opacity-75 text-[10.5px] capitalize">{dossierSubManagerCount}</span>
 					</div>
-					<Progress value={60} color="deep-orange" />
+					<Progress value={(dossierSubManagerCount*100)/(dossierManagerCount+dossierSubManagerCount)} color="deep-orange" />
 
 				</div>
 
@@ -296,7 +301,56 @@ export const columnColaborateurs = [
 export const columnClients = [
 	{
 		field: 'id',
-		headerName: 'Identifiants',
+		headerName: 'Matricule',
+		flex: 0.4,
+		minWidth: 170,
+		sortable: false,
+		hideSortIcons: true,
+		disableColumnMenu: true,
+		renderCell: (params) => {
+
+			function convertToFiveDigits(number) {
+				// Convertir le nombre en chaîne de caractères
+				let strNumber = number.toString();
+				
+				// Vérifier la longueur de la chaîne de caractères
+				if (strNumber.length < 5) {
+					// Ajouter des zéros à gauche jusqu'à ce que la longueur soit de 5
+					strNumber = '0'.repeat(5 - strNumber.length) + strNumber;
+				}
+				
+				return '0'.repeat(1) + strNumber;
+			}
+
+			return (
+
+				<div className="flex flex-col" >
+					<Typography
+						variant="small"
+						color="blue-gray"
+						className="font-semibold text-[13.5px] "
+					>
+						{dayjs().year()+"-"+convertToFiveDigits(params?.row?.id)}
+					</Typography>
+
+					<Typography
+						variant="small"
+						color="blue-gray"
+						className=" font-extralight mt-2 text-[12.5px] "
+					>
+						{dayjs(params?.row?.created_at).format('DD MMM YYYY')}
+					</Typography>
+
+				</div>
+
+			)
+
+		}
+	},
+
+	{
+		field: 'civility',
+		headerName: 'Civilité',
 		flex: 0.4,
 		minWidth: 170,
 		sortable: false,
@@ -311,9 +365,8 @@ export const columnClients = [
 					color="blue-gray"
 					className="font-semibold text-[13.5px] "
 				>
-					{params?.row?.id}
+					{params?.row?.civility}
 				</Typography>
-
 			)
 
 		}
@@ -332,7 +385,7 @@ export const columnClients = [
 			return (
 
 				<div className="flex items-center gap-4 py-3">
-					<AvatarMui>
+					<AvatarMui >
 
 					</AvatarMui>
 					<Typography
@@ -340,7 +393,7 @@ export const columnClients = [
 						color="blue-gray"
 						className="font-semibold text-[13.5px] "
 					>
-						{row?.firstname + " " + row?.lastname}
+						{row.civility == "Structure" ? row?.denomination : row?.firstname + " " + row?.lastname}
 					</Typography>
 				</div>
 
@@ -390,6 +443,7 @@ export const columnClients = [
 
 			return (
 
+				params?.row?.numero_ufu &&
 				<div className="w-full h-full flex items-center" >
 					<Chip
 						variant="gradient"
@@ -419,7 +473,7 @@ export const columnClients = [
 					<Chip
 						variant="gradient"
 						color={"blue"}
-						value={"0 Dossiers"}
+						value={row.meta.folders_count+" Dossiers"}
 						className="py-0.5 px-2 text-[11px] font-medium"
 					/>
 				</div>
@@ -526,7 +580,7 @@ export const columnClients = [
 
 export const columnDossier = [
 	{ 
-		field: ' ',
+		field: '',
 		headerName: 'Dossier',
 		flex: 1.2,
 		minWidth: 170,

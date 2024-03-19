@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { FaFolderMinus } from "react-icons/fa";
 import debounce from 'lodash.debounce';
 import { useQueryClient } from "@tanstack/react-query";
+import AsyncSelect from 'react-select/async'
 
 export default function CategoriesListe() {
 
@@ -21,6 +22,7 @@ export default function CategoriesListe() {
 
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState(categoriesMeta?.keyword || null);
+    const [groupeCat, setGroupeCat] = useState(null);
     const [pagination, setPagination] = useState({
         page: (categoriesMeta?.current_page - 1) || 0, 
         pageSize: categoriesMeta?.per_page || 25
@@ -36,13 +38,24 @@ export default function CategoriesListe() {
 	});
 
     const { isLoading:isLoadingCat, data:categories } = useQuery({
-		queryKey: ["getAllCategories",  pagination.page+1, pagination.pageSize, searchTerm],
+		queryKey: ["getAllCategories",  pagination.page+1, pagination.pageSize, searchTerm, groupeCat],
 		queryFn: async ({ queryKey }) => {
-			return CategoriesApi.getCategories(queryKey[1], queryKey[2], queryKey[3])
+			return CategoriesApi.getCategories(queryKey[1], queryKey[2], queryKey[3], queryKey[4])
 		},
 		enabled: true,
         staleTime: 40*60*1000  
 	});
+    
+    const getGroup = async (inputValue) => {
+        const res = await CategorieGroupeApi.getCategorieGroups(1, 12, inputValue)
+        return res.data.map((data) => { return { label: data.group_name, value: data.id } })
+    };
+
+    const loadOptionsGroupCategorie = (inputValue) => 
+        new Promise((resolve) => {
+            resolve(getGroup(inputValue))
+        }
+    );
 
     const { setDialogue } = useDialogueStore()
 
@@ -160,6 +173,25 @@ export default function CategoriesListe() {
                 </Tooltip>
             </div>
 
+            <AsyncSelect 
+                cacheOptions 
+                defaultOptions 
+                loadOptions={loadOptionsGroupCategorie} 
+                isMulti
+                styles={{
+                    control: (baseStyles, state) => ({
+                    ...baseStyles,
+                        minHeight: 42,
+                        fontSize: 13,
+                        width: 300,
+                        fontWeight: "400",
+                        color: "red"
+                    }),
+                }}
+                placeholder="Filtrer par proupe de catégorie"
+                onChange={(val) => {val.length > 0 ? setGroupeCat(val.map((item) => {return item.value})) : setGroupeCat(null) } }
+            />
+
             <div class='w-[250px]'>
 
                 <div className="relative flex items-center w-full h-[42px] rounded-lg focus-within:shadow-md bg-blue-gray-800 overflow-hidden">
@@ -184,6 +216,7 @@ export default function CategoriesListe() {
             </div>
             
         </div>
+        
 
         <div className=" w-full mt-9 flex flex-row gap-x-8 gap-y-6 flex-wrap " > 
 
@@ -222,7 +255,7 @@ export default function CategoriesListe() {
                             </div>
                         </div>
 
-                        <div className=" h-[125px] w-[95%] overflow-x-auto items-start px-4 self-center flex flex-row gap-x-6 no-scrollbar bg-white rounded-md mt-4 " >
+                        <div className=" h-[125px] w-[95%] overflow-x-auto items-start px-4 self-center flex flex-row gap-x-6  bg-white rounded-md mt-4 " >
 
                             {category?.subCategories?.map((subCat, key) => (
                                 <div key={'subcat'+key} className=" flex flex-col justify-center items-center w-[100px] ">
