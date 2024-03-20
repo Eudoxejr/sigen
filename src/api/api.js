@@ -144,14 +144,15 @@ export const CategorieGroupeApi = {
 
 export const CategoriesApi = {
 
-	async getCategories(page, perPage, q) {
+	async getCategories(page, perPage, q, groupeCat) {
 		const response = await axiosPrivate.request({
 			method: 'get',
 			url: API_URL + '/categories',
 			params: {
 				page: page,
-				perPage: perPage,
-				keyword: q
+				perPage: perPage, 
+				keyword: q,
+				groupCat: JSON.stringify(groupeCat)
 			}
 		})
 		return response.data;

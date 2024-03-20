@@ -198,9 +198,7 @@ function TransportModeCard() {
 					<div className=" w-full animate-pulse">
 
 						{Array.from(Array(8).keys()).map((_, key) => (
-
 							<div key={key} className="h-[70px] bg-gray-200 rounded-[5px] dark:bg-gray-700 max-w-full mb-2.5" />
-
 						))}
 
 					</div>

@@ -154,7 +154,7 @@ const CategoriesCreate = () => {
         onSuccess: (response) => {
 
             navigate(-1)
-            toast.success('Catégories créé avec succès', {
+            toast.success('Catégorie créé avec succès', {
                 position: "top-right",
                 autoClose: 2000,
                 hideProgressBar: true,
@@ -373,28 +373,10 @@ const CategoriesCreate = () => {
                             </div>
 
                             
-                            <div className=" w-full md:w-[100%] min-h-[300px] border-[0.5px] py-6 rounded-lg bg-[#fff] shadow-sm " >
+                            <div className=" w-full flex flex-col md:w-[100%] min-h-[300px] border-[0.5px] py-6 rounded-lg bg-[#fff] shadow-sm " >
                                 
                                 <div className="h-[50px] w-full flex items-center mb-2  pl-4 justify-between " >
                                     <span className=" text-blue-gray-500 text-[14px] font-semibold " >Sous-catégorie</span>
-                                    <Button 
-                                        onClick={() => { 
-                                            appendSubCategory({
-                                                id: uuidv4(),
-                                                subCategoryName: "Sous-catégorie",
-                                                subCategoryDescription: "",
-                                                isMultiParts: false,
-                                                partyInvolvedAreCustomer: false,
-                                                youKnowNumberOfPart: false,
-                                                isMinutier: false,
-                                                partyInvolved: [
-                                                ],
-                                                informationRequested: []
-                                            })
-                                        }} 
-                                        className='self-center h-[38px] bg-green-500 hover:shadow-none mr-[8px] ' >
-                                        <span>Ajouter</span>
-                                    </Button>  
                                 </div>
 
                                 <span className=" font-medium text-[12px] px-6 " >Pour chaque catégorie (transaction immobilière, Succession, partage, immatriculation, fonds de commerce, déclaration, etc.), ajouter les sous-catégories qui vont avec:</span>
@@ -402,11 +384,10 @@ const CategoriesCreate = () => {
                                 <div className= " flex flex-1 mx-3 flex-wrap gap-y-12 py-5 justify-center " >
 
                                     {fieldSubCategory.map((field, index) => (
-
                                         <fieldset key={field.id} className={"py-2 md:w-[95%] w-[100%] gap-y-4 rounded-md outline outline-[1px] overflow-hidden outline-blue-gray-100 flex flex-col " }>
                                                                                     
                                             <legend className="text-[14px] w-full rounded-t-md bg-primary py-4 text-white px-2 flex justify-start items-center gap-x-4 font-bold " >
-                                                Sous-catégories {index+1}
+                                                Sous-catégories {index+1} 
                                                 <button 
                                                     onClick={() => { 
                                                         fieldSubCategory.length > 1 ? 
@@ -625,10 +606,28 @@ const CategoriesCreate = () => {
                                             </div>
 
                                         </fieldset>
-
                                     ))}
 
                                 </div>
+
+                                <Button 
+                                    onClick={() => { 
+                                        appendSubCategory({
+                                            id: uuidv4(),
+                                            subCategoryName: "Sous-catégorie",
+                                            subCategoryDescription: "",
+                                            isMultiParts: false,
+                                            partyInvolvedAreCustomer: false,
+                                            youKnowNumberOfPart: false,
+                                            isMinutier: false,
+                                            partyInvolved: [
+                                            ],
+                                            informationRequested: []
+                                        })
+                                    }} 
+                                    className='self-center  h-[38px] bg-green-500 hover:shadow-none mr-[8px] ' >
+                                    <span>Ajouter une sous catégorie</span>
+                                </Button>  
 
                                 {errors?.subCategories && <span className=" text-[11px] text-red-400 mx-3 mt-3" >{errors?.subCategories?.message}</span>}
 
