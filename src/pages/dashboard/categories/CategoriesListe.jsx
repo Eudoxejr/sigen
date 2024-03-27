@@ -232,39 +232,72 @@ export default function CategoriesListe() {
                 :
                 categories?.data?.map((category, key) => (
 
-                    <div key={"category"+key} className="border border-[#ddd] w-[350px] sm:w-[45%] flex flex-col px-3 py-4 rounded-lg bg-gradient-to-br from-gray-100 to-gray-100 min-h-[250px] ">
+                    <div key={"category"+key} className="border border-[#ddd] w-[350px] sm:w-[45%] flex flex-col px-3 py-4 rounded-lg bg-gradient-to-br from-gray-100 to-gray-100 min-h-[150px] ">
             
                         <div className=" flex gap-x-4 justify-start items-center" >     
-                            <FaLayerGroup className="text-gray-800" size={15} />
-                            <span className=" font-medium text-[14px] leading-[20px] text-gray-800 opacity-90 " >{category.category_name}</span>
+                            <FaLayerGroup className="text-gray-800" size={25} />
+                            <span className=" font-medium text-[17px] leading-[20px] text-gray-800 opacity-90 " >{category.category_name}</span>
                         </div>
 
                         <div className=" flex mt-4 gap-x-3 justify-start " >     
-                            <GiBookPile  className="text-gray-800" size={20} />
-                            <span className=" font-semibold text-[13px] leading-[20px] text-gray-800 opacity-90 " >0 template(s) de minute </span>
+                            <GiBookPile  className="text-gray-800" size={25} />
+                            <span className=" font-semibold text-[17px] leading-[20px] text-gray-800 opacity-90 " >0 template(s) de minute </span>
                         </div>
 
                         <div className=" w-full flex flex-row justify-between " >
                             <div className=" flex mt-4 gap-x-3 justify-start items-center " >     
-                                <BiSolidCategoryAlt className="text-gray-800" size={20} />
-                                <span className=" font-semibold text-[13px] leading-[20px] text-gray-800 opacity-90 " >{category.subCategories.length} dossiers(s)</span>
+                                {/* <BiSolidCategoryAlt className="text-gray-800" size={20} /> */}
+                                <span className=" font-semibold text-[16px] leading-[20px] text-gray-800 opacity-90 " >Slug: <span className=" uppercase " >{category?.category_slug}</span></span>
                             </div>
-                            <div className=" flex mt-4 gap-x-3 justify-start items-center " >     
+                            {/* <div className=" flex mt-4 gap-x-3 justify-start items-center " >     
                                 <span className=" font-semibold text-[13px] leading-[20px] text-gray-800 opacity-90 " >Couleur: </span>
                                 <span style={{ backgroundColor: category?.category_color }} className={" rounded-md w-[40px] h-[30px] " } />
-                            </div>
+                            </div> */}
                         </div>
 
-                        <div className=" h-[125px] w-[95%] overflow-x-auto items-start px-4 self-center flex flex-row gap-x-6  bg-white rounded-md mt-4 " >
+                        <div style={{ backgroundColor: category?.category_color }} className=" h-[100px] w-[97%] overflow-x-auto items-start px-4 self-center flex flex-row gap-x-6 rounded-md mt-4 " >
 
-                            {category?.subCategories?.map((subCat, key) => (
+                            {/* {category?.subCategories?.map((subCat, key) => (
                                 <div key={'subcat'+key} className=" flex flex-col justify-center items-center w-[100px] ">
                                     <FaFolderMinus size={80} color={subCat?.is_minutier ? "#2C93EB" : "#FFC312"} />
                                     <span className="text-center text-[12px] line-clamp-2 ">{subCat.sub_category_name}</span>
                                 </div>
-                            ))}
+                            ))} */}
 
                         </div>
+
+                            <div className='flex justify-start mt-8 gap-x-[20px]'>
+                                <Tooltip content="Modifier">   
+                                    <div 
+                                        onClick={() => {
+                                            setDialogue({
+                                                size: "sm",
+                                                open: true,
+                                                view: "update-group-categorie",
+                                                data: group
+                                            })
+                                        }}
+                                        className="cursor-pointer py-2 px-2 gap-x-2 flex flex-row " 
+                                    >
+                                        <CiEdit color='gray' size={23} /> Modifier
+                                    </div>  
+                                </Tooltip>
+                                <Tooltip content="Supprimer">   
+                                    <div 
+                                        onClick={() => {
+                                            setDialogue({
+                                                size: "sm",
+                                                open: true,
+                                                view: "delete-group-categorie",
+                                                data: group
+                                            })
+                                        }}
+                                        className="cursor-pointer py-2 px-2 gap-x-2 flex flex-row" 
+                                    >
+                                        <MdDeleteForever color='gray' size={23} /> Supprimer
+                                    </div>   
+                                </Tooltip>     
+                            </div>
                     
                     </div>
 

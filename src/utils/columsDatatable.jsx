@@ -300,7 +300,7 @@ export const columnColaborateurs = [
 
 export const columnClients = [
 	{
-		field: 'id',
+		field: 'matricule',
 		headerName: 'Matricule',
 		flex: 0.4,
 		minWidth: 170,
@@ -330,13 +330,13 @@ export const columnClients = [
 						color="blue-gray"
 						className="font-semibold text-[13.5px] "
 					>
-						{dayjs().year()+"-"+convertToFiveDigits(params?.row?.id)}
+						{params?.row?.matricule}
 					</Typography>
 
 					<Typography
 						variant="small"
 						color="blue-gray"
-						className=" font-extralight mt-2 text-[12.5px] "
+						className=" font-medium mt-2 text-[12.5px] "
 					>
 						{dayjs(params?.row?.created_at).format('DD MMM YYYY')}
 					</Typography>
@@ -776,6 +776,265 @@ export const columnDossier = [
 							className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-red-600 hover:!text-white font-medium flex items-center justify-between mt-1"
 						>
 							Supprimer le dossier
+						</MenuItem>
+
+					</MenuList>
+				</Menu>
+			)
+		}
+	}
+];
+
+export const columnMinutes = [
+	{
+		field: 'matricule',
+		headerName: 'Matricule',
+		flex: 0.4,
+		minWidth: 170,
+		sortable: false,
+		hideSortIcons: true,
+		disableColumnMenu: true,
+		renderCell: (params) => {
+
+			return (
+
+				<div className="flex flex-col" >
+					<Typography
+						variant="small"
+						color="blue-gray"
+						className="font-semibold text-[13.5px] "
+					>
+						{params?.row?.matricule}
+					</Typography>
+
+					<Typography
+						variant="small"
+						color="blue-gray"
+						className=" font-medium mt-2 text-[12.5px] "
+					>
+						{dayjs(params?.row?.created_at).format('DD MMM YYYY')}
+					</Typography>
+
+				</div>
+
+			)
+
+		}
+	},
+
+	{
+		field: 'fullname',
+		headerName: 'Titre du template',
+		flex: 1.5,
+		minWidth: 170,
+		sortable: true,
+		hideSortIcons: false,
+		disableColumnMenu: true,
+		renderCell: ({row}) => {
+
+			return (
+
+				<div className="flex items-center gap-4 py-3">
+					<AvatarMui >
+
+					</AvatarMui>
+					<Typography
+						variant="small"
+						color="blue-gray"
+						className="font-semibold text-[13.5px] "
+					>
+						{row.civility == "Structure" ? row?.denomination : row?.firstname + " " + row?.lastname}
+					</Typography>
+				</div>
+
+			)
+
+		}
+	},
+
+	{
+		field: 'description',
+		headerName: 'Description',
+		flex: 2,
+		minWidth: 170,
+		sortable: false,
+		hideSortIcons: true,
+		disableColumnMenu: true,
+		renderCell: (params) => {
+			return (
+				<div>
+					<Typography
+						variant="small"
+						color="blue-gray"
+						className="font-semibold text-[13.5px] "
+					>
+						{params.row.email || "Email inexistant"}
+					</Typography>
+					<Typography
+						variant="small"
+						color="blue-gray"
+						className=" font-normal mt-1 text-[12.5px] "
+					>
+						{params.row.phone_number || "Tel inexistant"}
+					</Typography>
+				</div>
+			)
+		}
+	},
+
+	{
+		field: 'categorie',
+		headerName: 'Catégorie',
+		flex: 1.2,
+		width: 170,
+		sortable: true,
+		hideSortIcons: false,
+		disableColumnMenu: true,
+		renderCell: (params) => {
+
+			return (
+
+				params?.row?.numero_ufu &&
+				<div className="w-full h-full flex items-center" >
+					<Chip
+						variant="gradient"
+						color={params?.row?.numero_ufu ? "green" : "red"}
+						value={params?.row?.numero_ufu}
+						className="py-2 px-2 text-[12.5px] font-medium"
+					/>
+				</div>
+
+			)
+		}
+	},
+
+	{
+		field: 'createDate',
+		headerName: 'Date de création',
+		flex: 0.3,
+		minWidth: 170,
+		sortable: true,
+		hideSortIcons: false,
+		disableColumnMenu: true,
+		renderCell: ({row}) => {
+
+			return (
+
+				<div className="w-full h-full flex items-center" >
+					<Chip
+						variant="gradient"
+						color={"blue"}
+						value={row.meta.folders_count+" Dossiers"}
+						className="py-0.5 px-2 text-[11px] font-medium"
+					/>
+				</div>
+
+			)
+
+		}
+	},
+
+	{
+		field: 'updateDate',
+		headerName: 'Dernière modification',
+		flex: 0.3,
+		minWidth: 170,
+		sortable: true,
+		hideSortIcons: false,
+		disableColumnMenu: true,
+		renderCell: ({row}) => {
+
+			return (
+
+				<div className="w-full h-full flex items-center" >
+					<Chip
+						variant="gradient"
+						color={"blue"}
+						value={row.meta.folders_count+" Dossiers"}
+						className="py-0.5 px-2 text-[11px] font-medium"
+					/>
+				</div>
+
+			)
+
+		}
+	},
+
+	{
+		field: 'action',
+		headerAlign: 'center',
+		headerName: '',
+		width: 70,
+		sortable: false,
+		hideSortIcons: true,
+		disableColumnMenu: true,
+		renderCell: (params) => {
+
+			const navigate = useNavigate();
+			const { setDialogue } = useDialogueStore();
+
+			return (
+				// isAllowedTo(Permissions.VIEW_A_DRIVER_DETAILS) || isAllowedTo(Permissions.ENABLE_AND_DISABLE_A_DRIVER) ?
+				<Menu placement="bottom-end">
+					<MenuHandler>
+						<IconButton size="sm" variant="text" color="blue-gray">
+							<EllipsisVerticalIcon
+								strokeWidth={1.5}
+								className="h-6 w-6"
+							/>
+						</IconButton>
+					</MenuHandler>
+
+					<MenuList className="p-1 rounded-[5px]">
+
+						{/* {isAllowedTo(Permissions.VIEW_A_DRIVER_DETAILS) && */}
+							<MenuItem
+								onClick={() =>
+									setDialogue({
+										size: "md",
+										open: true,
+										view: "update-client",
+										data: params.row
+									})
+								}
+								className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-primary hover:!text-white font-medium flex items-center justify-between mt-1"
+							>
+								Modifier le template
+							</MenuItem>
+						{/* } */}
+
+						
+						{/* {isAllowedTo(Permissions.VIEW_A_DRIVER_DETAILS) && */}
+							<MenuItem
+								onClick={() =>
+									setDialogue({
+										size: "md",
+										open: true,
+										view: "details-client",
+										data: params.row
+									})
+								}
+								className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-primary hover:!text-white font-medium flex items-center justify-between mt-1"
+							>
+								Voir le template
+							</MenuItem>
+						{/* } */}
+
+						<MenuItem
+							// onClick={() => dispatch({
+							// 	type: "SET_DIALOG",
+							// 	value: {
+							// 		active: true,
+							// 		view: "suspendDriver",
+							// 		value: {
+							// 			wasActive: true,
+							// 			user: params.row,
+							// 		}
+							// 	}
+							// })}
+							className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-red-600 hover:!text-white font-medium flex items-center justify-between mt-1"
+						>
+							Supprimer le template
 						</MenuItem>
 
 					</MenuList>

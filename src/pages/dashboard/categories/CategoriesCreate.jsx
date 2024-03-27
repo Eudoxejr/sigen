@@ -53,34 +53,13 @@ const CategoriesCreate = () => {
 
         categoryName: yup.string().trim().required("Le nom de la catégorie est requis").max(250, "Ne doit pas dépasser 250 caractères"),
         categoryColor: yup.string().trim().required("Sélectionner une couleur de dossier").max(120, "Ne doit pas dépasser 120 caractères"),
+        categorySlug: yup.string().trim().required("Ajouter un slug").max(6, "Ne doit pas dépasser 6 caractères"),
         categoryDescription: yup.string().trim(),
         categorieGroupId: yup.string().trim().required("Sélectionner un groupe de catégorie"),
         subCategories: yup.array().of(
             yup.object({
-                isMinutier: yup.boolean().required(),
                 subCategoryName: yup.string().trim().required("Le nom de la sous-catégorie est requis").max(250, "Ne doit pas dépasser 250 caractères"),
                 subCategoryDescription: yup.string().trim(),
-                isMultiParts: yup.boolean().required(),
-                partyInvolvedAreCustomer: yup.boolean().required(),
-                youKnowNumberOfPart: yup.boolean().required(),
-                partyInvolved: yup.array().when(['isMultiParts', 'youKnowNumberOfPart'], {
-                    is: (isMultiParts, youKnowNumberOfPart) => isMultiParts && youKnowNumberOfPart,
-                    then: () => yup.array().of(
-                      yup.object().shape({
-                        partyTitle: yup.string().trim().required("Le titre de la partie est requis").max(250, "Ne doit pas dépasser 250 caractères")
-                      })
-                    ).min(1, "Au moins une partie impliquée est requise")
-                    .test('is-unique-party-title', 'Les noms des partie doivent être unique', function (value) {
-                        const partyTitles = value.map(partyInvolved => partyInvolved.partyTitle);
-                        const uniquepartyTitle = new Set(partyTitles);
-                        return partyTitles.length === uniquepartyTitle.size;
-                    }),
-                    otherwise: () => yup.array().test('is-unique-party-title', 'Les noms des partie doivent être unique', function (value) {
-                        const partyTitles = value?.map(partyInvolved => partyInvolved.partyTitle);
-                        const uniquepartyTitle = new Set(partyTitles);
-                        return partyTitles?.length === uniquepartyTitle.size;
-                    })
-                }),
                 informationRequested: yup.array().of(
                     yup.object({
                         question: yup.string().trim().required("L'information est requise").max(250, "Ne doit pas dépasser 250 caractères")
@@ -110,11 +89,6 @@ const CategoriesCreate = () => {
                     id: uuidv4(),
                     subCategoryName: "Sous-catégorie",
                     subCategoryDescription: "",
-                    isMultiParts: false,
-                    partyInvolvedAreCustomer: false,
-                    youKnowNumberOfPart: false,
-                    isMinutier: false,
-                    partyInvolved: [],
                     informationRequested: []
                 }
             ]
@@ -312,6 +286,24 @@ const CategoriesCreate = () => {
                                                 />
                                             </div>
 
+                                            <div className=" w-[95%] min-w-[200px] mx-[2.5%] " >
+                                                <Controller
+                                                    render={({
+                                                        field: { onChange, value, ref },
+                                                        fieldState: { invalid, error}
+                                                    }) => (
+                                                        <>
+                                                            <Input ref={ref} onChange={onChange} className="h-[45px] w-full uppercase text-[13px] font-normal text-blue-gray-600" value={value} type="text" color="blue-gray" label="Slug de la catégorie" size="lg" error={invalid} />
+                                                            {error && 
+                                                                <span className=" text-[11px] text-red-400 mt-1" >{error.message}</span>
+                                                            }
+                                                        </>
+                                                    )}
+                                                    name="categorySlug"
+                                                    control={control}
+                                                />
+                                            </div>
+
                                         </div>
 
                                         <div className=" w-full flex flex-row flex-wrap gap-y-2 mt-5 justify-center " >
@@ -373,10 +365,10 @@ const CategoriesCreate = () => {
                             </div>
 
                             
-                            <div className=" w-full flex flex-col md:w-[100%] min-h-[300px] border-[0.5px] py-6 rounded-lg bg-[#fff] shadow-sm " >
+                            {/* <div className=" w-full flex flex-col md:w-[100%] min-h-[300px] border-[0.5px] py-6 rounded-lg bg-[#fff] shadow-sm " >
                                 
                                 <div className="h-[50px] w-full flex items-center mb-2  pl-4 justify-between " >
-                                    <span className=" text-blue-gray-500 text-[14px] font-semibold " >Sous-catégorie</span>
+                                    <span className=" text-blue-gray-500 text-[14px] font-semibold " >Informations</span>
                                 </div>
 
                                 <span className=" font-medium text-[12px] px-6 " >Pour chaque catégorie (transaction immobilière, Succession, partage, immatriculation, fonds de commerce, déclaration, etc.), ajouter les sous-catégories qui vont avec:</span>
@@ -390,19 +382,7 @@ const CategoriesCreate = () => {
                                                 Sous-catégories {index+1} 
                                                 <button 
                                                     onClick={() => { 
-                                                        fieldSubCategory.length > 1 ? 
-                                                            removeSubCategory(index) 
-                                                        :  
-                                                            toast.error('Vous devez ajouter au moins une sous-catégorie', {
-                                                                position: "top-right",
-                                                                autoClose: 4000,
-                                                                hideProgressBar: true,
-                                                                closeOnClick: true,
-                                                                pauseOnHover: false,
-                                                                draggable: false,
-                                                                progress: undefined,
-                                                                theme: "colored",
-                                                            });
+                                                        removeSubCategory(index) 
                                                     }} 
                                                     className='w-[30px] h-[30px] rounded-sm flex justify-center items-center ml-1 bg-red-400 text-[#fff] ' 
                                                 >
@@ -413,47 +393,6 @@ const CategoriesCreate = () => {
                                             <div className=" w-full gap-x-5 flex flex-1 flex-wrap mt-4 px-4 " >
 
                                                 <div className=" flex flex-1 flex-col gap-y-2 " >
-
-                                                    <Controller
-                                                        render={({
-                                                            field: { onChange, value, ref },
-                                                            fieldState: { invalid, error}
-                                                        }) => (
-                                                            <>
-                                                                <div className="flex flex-row items-center justify-between mt-[4px]">
-                                                                    <span className=" text-[13px] font-normal text-blue-gray-600" >Cet sous-catégorie représentera le cartable des actes ?</span>
-                                                                    <Switch 
-                                                                        inputRef={ref}
-                                                                        checked={value}
-                                                                        onChange={(e) => { 
-                                                                            onChange(e.target.checked);
-                                                                            e.target.checked ? 
-                                                                                setValue(`subCategories[${index}].subCategoryName`, "Les Actes", { shouldDirty: true })
-                                                                                // setValue(
-                                                                                //     `subCategories[${index}]`, 
-                                                                                //     {
-                                                                                //         subCategoryName: "Les Actes",
-                                                                                //         isMinutier: e.target.checked,
-                                                                                //         isMultiParts: false,
-                                                                                //         partyInvolvedAreCustomer: false,
-                                                                                //         youKnowNumberOfPart: false,
-
-                                                                                //     }, 
-                                                                                //     { shouldDirty: true }
-                                                                                // )
-                                                                            :
-                                                                                setValue(`subCategories[${index}].subCategoryName`, "", { shouldDirty: true })
-                                                                        }} 
-                                                                    />
-                                                                </div>
-                                                                {error && 
-                                                                    <span className=" text-[11px] text-red-400 mt-1" >{error.message}</span>
-                                                                }
-                                                            </>
-                                                        )}
-                                                        name={`subCategories[${index}].isMinutier`}
-                                                        control={control}
-                                                    />
 
                                                     <>
                                                         <Controller
@@ -491,96 +430,11 @@ const CategoriesCreate = () => {
                                                         />
                                                     </>
                                                     
-                                                    {!watchSubCategories[index]?.isMinutier &&
-                                                        <Controller
-                                                            render={({
-                                                                field: { onChange, value, ref },
-                                                                fieldState: { invalid, error}
-                                                            }) => (
-                                                                <>
-                                                                    <div className="flex flex-row items-center justify-between mt-[4px]">
-                                                                        <span className=" text-[13px] font-normal text-blue-gray-600" >Ce cartable inclut plusieurs parties prenantes</span>
-                                                                        <Switch ref={ref} disabled={watchSubCategories[index]?.isMinutier} checked={value} onChange={(e) => {onChange(e.target.checked)}} />
-                                                                    </div>
-                                                                    {error && 
-                                                                        <span className=" text-[11px] text-red-400 mt-1" >{error.message}</span>
-                                                                    }
-                                                                </>
-                                                            )}
-                                                            name={`subCategories[${index}].isMultiParts`}
-                                                            control={control}
-                                                        />
-                                                    }
-
                                                 </div>
+
 
                                                 <div/>
 
-                                                <div className=" relative flex flex-1 flex-col gap-y-2" >
-
-                                                    <Controller
-                                                        render={({
-                                                            field: { onChange, value, ref },
-                                                            fieldState: { invalid, error}
-                                                        }) => (
-                                                            <>
-                                                                <div className="flex flex-row items-center justify-between mt-[4px]">
-                                                                    <span className="text-[13px] font-normal text-blue-gray-600" >Les parties prenantes sont des clients enrégistrés au pléalabre ?</span>
-                                                                    <Switch 
-                                                                        ref={ref} 
-                                                                        disabled={watchSubCategories[index]?.isMinutier || !watchSubCategories[index]?.isMultiParts} 
-                                                                        checked={value} onChange={(e) => {onChange(e.target.checked)}} 
-                                                                    />
-                                                                </div>
-                                                                {error && 
-                                                                    <span className=" text-[11px] text-red-400 mt-1" >{error.message}</span>
-                                                                }
-                                                            </>
-                                                        )}
-                                                        name={`subCategories[${index}].partyInvolvedAreCustomer`}
-                                                        control={control} 
-                                                    />
-
-                                                    
-                                                    <Controller
-                                                        render={({
-                                                            field: { onChange, value, ref },
-                                                            fieldState: { invalid, error}
-                                                        }) => (
-                                                            <>
-                                                                <div className="flex flex-row items-center justify-between mt-[4px]">
-                                                                    <span className=" text-[13px] font-normal text-blue-gray-600" >Vous avez une idée exacte du nombre de partie</span>
-                                                                    <Switch 
-                                                                        ref={ref}
-                                                                        disabled={watchSubCategories[index]?.isMinutier || !watchSubCategories[index]?.isMultiParts} 
-                                                                        checked={value} onChange={(e) => {onChange(e.target.checked)}} 
-                                                                    />
-                                                                </div>
-                                                                {error && 
-                                                                    <span className=" text-[11px] text-red-400 mt-1" >{error.message}</span>
-                                                                }
-                                                            </>
-                                                        )}
-                                                        name={`subCategories[${index}].youKnowNumberOfPart`}
-                                                        control={control}
-                                                    />
-
-                                                    {watchSubCategories[index]?.youKnowNumberOfPart &&
-                                                        <>
-                                                            <NextedParty disabled={watchSubCategories[index]?.isMinutier || !watchSubCategories[index]?.isMultiParts } nextIndex={index} control={control}/>
-                                                            {errors?.subCategories?.[index]?.partyInvolved && <span className=" text-[11px] text-red-400 mt-1" >{errors?.subCategories?.[index]?.partyInvolved?.message}</span>}
-                                                        </>
-                                                    }
-
-                                                    {(watchSubCategories[index]?.isMinutier || !watchSubCategories[index]?.isMultiParts) &&
-                                                        <div className=" absolute w-[100%] h-full rounded-md backdrop-blur-sm bg-gray-500/10 flex justify-center items-center" >
-                                                            <RiForbidLine size={70} />
-                                                        </div>
-                                                    }
-
-                                                </div>
-
-                                                <div/>
 
                                                 <div className=" relative flex flex-1 flex-col " >
 
@@ -616,12 +470,6 @@ const CategoriesCreate = () => {
                                             id: uuidv4(),
                                             subCategoryName: "Sous-catégorie",
                                             subCategoryDescription: "",
-                                            isMultiParts: false,
-                                            partyInvolvedAreCustomer: false,
-                                            youKnowNumberOfPart: false,
-                                            isMinutier: false,
-                                            partyInvolved: [
-                                            ],
                                             informationRequested: []
                                         })
                                     }} 
@@ -631,26 +479,22 @@ const CategoriesCreate = () => {
 
                                 {errors?.subCategories && <span className=" text-[11px] text-red-400 mx-3 mt-3" >{errors?.subCategories?.message}</span>}
 
-                            </div>
+                            </div> */}
 
 
                         </div>
 
-                        <Button
-                            className='mt-8'
-                            variant="gradient"
-                            color="green"
+                        <button
+                            className='mt-8 w-full h-[45px] bg-green-500 rounded-md text-white font-semibold '
                             onClick={handleSubmit(handleClick)}
                             disabled={isLoading}
                         >
-
                             {isLoading ?
                                 <BeatLoader color="#fff" size={8} />
                                 :
                                 <span>Sauvegarder</span>
                             }
-
-                        </Button>
+                        </button>
 
                     </CardBody>
                     
