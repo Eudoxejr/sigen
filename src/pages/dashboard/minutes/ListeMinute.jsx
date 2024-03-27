@@ -6,10 +6,10 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import DataGridComponent from '@/components/common/datatable';
-import { columnClients, columnDossier } from '@/utils/columsDatatable';
+import { columnMinutes } from '@/utils/columsDatatable';
 import { useNavigate } from 'react-router-dom';
 import AsyncSelect from 'react-select/async';
-import { FoldersApi } from '@/api/api';
+import { ClientApi } from '@/api/api';
 import debounce from 'lodash.debounce';
 import { produce } from "immer";
 import { useDialogueStore } from '@/store/dialogue.store';
@@ -18,13 +18,13 @@ import { useDialogueStore } from '@/store/dialogue.store';
 // import { isAllowedTo } from '@/utils';
 import { useQueryClient } from "@tanstack/react-query";
 
-const DossierListe = () => {
+const MinuteListe = () => {
 
   const navigate = useNavigate();
   const { setDialogue } = useDialogueStore()
   const queryClient = useQueryClient();
 
-  const clientMeta = queryClient.getQueriesData(["getDossier"])?.[0]?.[1]?.meta
+  const minuteMeta = queryClient.getQueriesData(["getClient"])?.[0]?.[1]?.meta
 
 
   const [searchTerm, setSearchTerm] = useState(null);
@@ -51,7 +51,7 @@ const DossierListe = () => {
             <CardBody className="md:h-[calc(100vh-125px)] shadow-none flex flex-col px-4 pt-0 pb-4 gap-[15px] overflow-auto">
               
               <Typography variant="h6" color="blue-gray" >
-                DOSSIERS ({clientMeta?.total || total})
+                Template de minute ({minuteMeta?.total || total})
               </Typography>
 
               <div className=" w-full mb-2 flex justify-between items-center flex-wrap gap-y-3 " >
@@ -60,7 +60,7 @@ const DossierListe = () => {
                   onClick={() => navigate("add")}
                   class=' bg-primary text-white px-4 py-2 rounded-md text-[13px] font-semibold '
                 >
-                  Nouveau Dossier
+                  Ajouter un template de minute
                 </button>
 
                 {/* <div>
@@ -145,16 +145,16 @@ const DossierListe = () => {
                   idpri="id"
                   hidePagination={false}
                   hideHeader={false}
-                  columns={columnDossier}
+                  columns={columnMinutes}
                   queryKey={[
-                    "getDossier", 
+                    "getClient", 
                     pagination.page+1,
                     pagination.pageSize,
                     searchTerm,
                     // role
                   ]}
-                  fnQuery={({ queryKey }) => FoldersApi.getFolders(queryKey[1], queryKey[2], queryKey[3] )}
-                  noRow={"Pas de dossier trouvé"}
+                  fnQuery={({ queryKey }) => ClientApi.getClient(queryKey[1], queryKey[2], queryKey[3] )}
+                  noRow={"Pas de client trouvé"}
                   totalInformation={{total, setTotal}}
                   paginationInformation={{pagination, setPagination}}
                 />
@@ -166,4 +166,4 @@ const DossierListe = () => {
   );
 };
 
-export default DossierListe;
+export default MinuteListe;

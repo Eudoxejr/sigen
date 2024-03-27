@@ -12,6 +12,8 @@ import {
   ClientsListe,
   DossiersListe,
   DossierCreate,
+  MinuteListe,
+  MinuteCreate
 } from "./pages/dashboard";
 import Roles from "./pages/dashboard/old/roles";
 import AddRoles from "./pages/dashboard/old/addRoles";
@@ -40,8 +42,6 @@ function App() {
         <Route path="/dashboard/old/files" element= {<Files/>} />
 
         <Route path="/dashboard/old" element= {<AddRoles/>} />
-
-
 
 
 
@@ -85,12 +85,15 @@ function App() {
 
           <Route path="collaborateurs">
             <Route index element={<CollaborateursListe/>} />
-            <Route path="add" element={<CategoriesCreate/>} />
           </Route>
 
           <Route path="clients">
             <Route index element={<ClientsListe/>} />
-            <Route path="add" element={<CategoriesCreate/>} />
+          </Route>
+
+          <Route path="minutes">
+            <Route index element={<MinuteListe/>} />
+            <Route path="add" element={<MinuteCreate/>} />
           </Route>
 
         </Route>
