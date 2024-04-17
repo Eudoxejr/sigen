@@ -9,7 +9,7 @@ import DataGridComponent from '@/components/common/datatable';
 import { columnClients, columnDossier } from '@/utils/columsDatatable';
 import { useNavigate } from 'react-router-dom';
 import AsyncSelect from 'react-select/async';
-import { FoldersApi } from '@/api/api';
+import { FoldersApi, CategoriesApi } from '@/api/api';
 import debounce from 'lodash.debounce';
 import { produce } from "immer";
 import { useDialogueStore } from '@/store/dialogue.store';
@@ -33,16 +33,26 @@ const DossierListe = () => {
     pageSize: 25
   })
   const [total, setTotal] = useState(0);
-//   const [role, setRole] = useState(null);
 
   const handleChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
+  const getCat = async (inputValue) => {
+    const res = await CategoriesApi.getCategories(1, 10, inputValue)
+    return res.data.map((data) => { return { label: data.category_name, value: data.id, other: data } })
+  };
+
+  const loadOptionsCategorie = (inputValue) =>
+    new Promise((resolve) => {
+      resolve(getCat(inputValue))
+    })
+
   const debouncedResults = useMemo(() => {
     return debounce(handleChange, 600);
   }, []);
 
+  const [categorie, setCategorie] = useState(null);
 
   return (
     // <RenderIf allowedTo={Permissions.VIEW_ADMINS_LIST}>
@@ -63,11 +73,12 @@ const DossierListe = () => {
                   Nouveau Dossier
                 </button>
 
-                {/* <div>
+                <div>
+
                   <AsyncSelect 
                     cacheOptions 
                     defaultOptions 
-                    loadOptions={loadRoleOptions} 
+                    loadOptions={loadOptionsCategorie} 
                     isMulti
                     styles={{
                       control: (baseStyles, state) => ({
@@ -80,11 +91,11 @@ const DossierListe = () => {
                         zIndex: 100
                       }),
                     }}
-                    placeholder="Filtrer par role"
-                    onChange={(val) => { val.length > 0 ? setRole(val.map((item) => {return item.value})) : setRole(null) } }
+                    placeholder="Filtrer par catégorie"
+                    onChange={(val) => { val.length > 0 ? setCategorie(val.map((item) => {return item.value})) : setCategorie(null) } }
                   />
 
-                </div> */}
+                </div>
 
                 <div class='w-[250px]'>
 
@@ -151,9 +162,9 @@ const DossierListe = () => {
                     pagination.page+1,
                     pagination.pageSize,
                     searchTerm,
-                    // role
+                    categorie
                   ]}
-                  fnQuery={({ queryKey }) => FoldersApi.getFolders(queryKey[1], queryKey[2], queryKey[3] )}
+                  fnQuery={({ queryKey }) => FoldersApi.getFolders(queryKey[1], queryKey[2], queryKey[3], queryKey[4] )}
                   noRow={"Pas de dossier trouvé"}
                   totalInformation={{total, setTotal}}
                   paginationInformation={{pagination, setPagination}}

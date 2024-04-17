@@ -1,11 +1,13 @@
 import React from 'react'
+import { produce } from "immer"
 import { useForm, Controller, useFieldArray, useWatch } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import AsyncSelect from 'react-select/async';
 import { CategoriesApi, ClientApi, CollaboApi, FoldersApi } from "@/api/api";
 
-
+import IconButton from '@mui/material/IconButton';
+import { FaTrash } from "react-icons/fa";
 import { styled, alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
@@ -17,23 +19,12 @@ import { FaFolder } from "react-icons/fa";
 
 import Typography from '@mui/material/Typography';
 import { useDialogueStore } from '@/store/dialogue.store';
+import TreeFolderGen2 from './treeFolderGen2';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-function DotIcon() {
-    return (
-        <Box
-            sx={{
-                width: 6,
-                height: 6,
-                borderRadius: '70%',
-                bgcolor: 'warning.main',
-                display: 'inline-block',
-                verticalAlign: 'middle',
-                zIndex: 1,
-                mr: 1,
-            }}
-        />
-    );
-}
+import { toast } from 'react-toastify';
+import { useNavigate } from "react-router-dom";
+
 
 const StyledTreeItemLabel = styled(Typography)({
     color: 'inherit',
@@ -131,13 +122,28 @@ const StyledTreeItem = React.forwardRef(function StyledTreeItem(props, ref) {
                         alignItems: 'center',
                     }}
                 >
-                    <Box
-                        component={LabelIcon}
-                        className="labelIcon"
-                        color="inherit"
-                        sx={{ mr: 1, fontSize: '1.2rem' }}
-                    />
-                    <StyledTreeItemLabel variant="body2">{labelText}</StyledTreeItemLabel>
+                    <StyledTreeItemLabel className=' line-clamp-1 ' variant="body2">{labelText}</StyledTreeItemLabel>
+
+                    <div className=" flex flex-row " >
+
+                        {/* {other.add &&
+                            <IconButton
+                                // onClick={handleClick}
+                            >
+                                <IoMdAdd size={18} />
+                            </IconButton>
+                        } */}
+
+                        {!other.delete &&
+                            <IconButton
+                                onClick={(e) => { other.onHandleDelete(), e.stopPropagation()}}
+                            >
+                                <FaTrash color="red" size={15} />
+                            </IconButton>
+                        }
+
+                    </div>
+
                 </Box>
             }
             {...other}
@@ -151,6 +157,9 @@ const StyledTreeItem = React.forwardRef(function StyledTreeItem(props, ref) {
 export default function TreeFolder({ setActiveStep, configFolder, setConfigFolder }) {
 
     const { setDialogue } = useDialogueStore()
+    const queryClient = useQueryClient();
+    const { setBackdrop } = useDialogueStore()
+    const navigate = useNavigate();
 
     const schema = yup.object({
         subFoldersGen1: yup.array().of(
@@ -160,29 +169,20 @@ export default function TreeFolder({ setActiveStep, configFolder, setConfigFolde
                 subFoldersGen2: yup.array().of(
                     yup.object({
                         folderName: yup.string().trim().required("Le nom du dossier est requis").max(250, "Ne doit pas dépasser 250 caractères"),
-                        isMinuteFolder: yup.boolean().required(),
-                        informationRequested: yup.array().of(
-                            yup.object({
-                                question: yup.string().trim().required("L'information est requise").max(250, "Ne doit pas dépasser 250 caractères")
-                            })
-                        ).test('is-unique-question', 'Vous demandez la même information plusieurs fois', function (value) {
-                            const questions = value.map(informationRequested => informationRequested.question);
-                            const uniquepartyquestions = new Set(questions);
-                            return questions.length === uniquepartyquestions.size;
-                        })
+                        isMinuteFolder: yup.boolean().required()
                     })
-                ),
-                informationRequested: yup.array().of(
-                    yup.object({
-                        question: yup.string().trim().required("L'information est requise").max(250, "Ne doit pas dépasser 250 caractères")
-                    })
-                ).test('is-unique-question', 'Vous demandez la même information plusieurs fois', function (value) {
-                    const questions = value.map(informationRequested => informationRequested.question);
-                    const uniquepartyquestions = new Set(questions);
-                    return questions.length === uniquepartyquestions.size;
+                )
+                .test('is-unique-gen2', 'Les noms des sous dossiers doivent être unique', function (value) {
+                    if(value)
+                    {
+                        const sub_dossier_names = value?.map(subDos => subDos.folderName);
+                        const uniqueSubDosNames = new Set(sub_dossier_names);
+                        return sub_dossier_names.length === uniqueSubDosNames.size;
+                    }
+                    return true
                 })
             })
-        ).test('is-unique', 'Les noms des dossiers et sous dossiers doivent être unique', function (value) {
+        ).test('is-unique', 'Les noms des dossiers doivent être unique', function (value) {
             const sub_dossier_names = value.map(subDos => subDos.folderName);
             const uniqueSubDosNames = new Set(sub_dossier_names);
             return sub_dossier_names.length === uniqueSubDosNames.size;
@@ -192,104 +192,162 @@ export default function TreeFolder({ setActiveStep, configFolder, setConfigFolde
 
     const { control, setValue, handleSubmit, setError, formState: { errors, isDirty } } = useForm({
         resolver: yupResolver(schema),
-        // defaultValues: null
+        defaultValues: {
+            "subFoldersGen1": [
+                {
+                    "folderName": 'Minute',
+                    "isMinuteFolder": true,
+                }
+            ]
+        }
     });
 
-    const { fields:fieldSubFoldersGen1, append:appendSubFoldersGen1, remove:removeSubFoldersGen1 } = useFieldArray({
+    const { fields:fieldSubFoldersGen1, prepend: prependSubFoldersGen1, remove:removeSubFoldersGen1 } = useFieldArray({
         control, // control props comes from useForm (optional: if you are using FormContext)
         name: "subFoldersGen1", // unique name for your Field Array
     });
 
 
-    const getCient = async (inputValue) => {
-        const res = await ClientApi.getClient(1, 12, inputValue)
-        return res.data.map((data) => { return { label: data?.civility !== 'Structure' ? data.firstname + ' ' + data.lastname : data.denomination, value: data.id } })
-    };
-    const loadOptionsClient = (inputValue) =>
-    new Promise((resolve) => {
-        resolve(getCient(inputValue))
-    });
+    const {mutate, isLoading} = useMutation({
+
+        mutationFn: async (data) => {
+            return FoldersApi.createFolders(data)
+        },
+        gcTime:0,
+        onSuccess: (response) => {
+
+            navigate(-1)
+            toast.success('Dossier créé avec succès', {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "colored",
+            });
+
+            queryClient.setQueriesData(["getDossier"], (dataDos) => {
+                const nextData = produce(dataDos, draftData => {
+                    draftData.data.unshift(response.data)
+                    draftData.meta.total = dataDos.meta.total+1
+                })
+                return nextData;
+            })
+
+            setBackdrop({active: false})
+
+        },
+        onError: ({response}) => {
+            
+            setError('root.serverError', { 
+                message: response.data.message || "Une erreur s'est produite lors de la création du dossier"
+                // message: "Une erreur s'est produite lors de la connexion"
+            })
+            toast.error('Une Erreur s\'est produite', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "colored",
+            });
+            setBackdrop({active: false})
+        }
+
+    })
 
 
     const handleClick = async (data) => {
-        // setBackdrop({ active: true })
-        // mutate(data)
-        setConfigFolder(data)
-        setActiveStep(1)
-        console.log('====================================');
-        console.log(data);
-        console.log('====================================');
+        const finalData = {
+            ...configFolder,
+            ...data
+        }
+        setBackdrop({active: true})
+        mutate(finalData)
     };
 
 
     return (
         <>
 
-            <div className=" w-full md:w-[80%] self-center py-6 flex flex-wrap gap-y-5 gap-x-[4%] rounded-md mb-[30px] mt-[50px] justify-center shadow-md " >
+            <div className=" w-full md:w-[80%] self-center py-6 flex flex-wrap gap-y-5 gap-x-[4%] rounded-md mb-[30px] mt-[50px] " >
 
-                <div className=" w-full md:w-[40%] flex flex-col flex-wrap gap-y-2 justify-center " >
+                <div className=" w-full md:w-[40%] flex flex-col font-medium flex-wrap text-[13px] " >
+                    Créer l'arborescence du dossier. Ajouter des dossiers et sous-dossiers au besoin. <br/>
+                    <br/>
+                    Vous pouvez aussi sélectionnez modèle d'arborescence:
+                    <AsyncSelect
+                        cacheOptions
+                        defaultOptions
+                        // loadOptions={loadOptionsCategorie}
+                        styles={{
+                            control: (baseStyles, state) => ({
+                                ...baseStyles,
+                                height: 40,
+                                fontSize: 13,
+                                fontWeight: "400",
+                                marginTop: 15,
+                                color: "red"
+                            }),
+                        }}
+                        placeholder="Choisir un modèle"
+                        onChange={(val) => { onChange(val.value)}}
+                    />
+                </div>
+
+                <div className=" w-full md:w-[45%] flex flex-col flex-wrap gap-y-2 px-[2%] " >
 
                     <SimpleTreeView
-                        aria-label="gmail"
                         defaultExpandedItems={['1']}
-                        defaultSelectedItems="3"
                         sx={{ height: 'fit-content', flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
                     >
 
-                        <StyledTreeItem itemId="1" labelText="Le Dossier" labelIcon={FaFolder}>
-
-                            {/* <StyledTreeItem itemId="5" labelText="Company" labelIcon={FaFolder}>
-                                <StyledTreeItem itemId="8" labelText="Payments" labelIcon={DotIcon} />
-                                <StyledTreeItem itemId="9" labelText="Meeting notes" labelIcon={DotIcon} />
-                                <StyledTreeItem itemId="10" labelText="Tasks list" labelIcon={DotIcon} />
-                                <StyledTreeItem itemId="11" labelText="Equipment" labelIcon={DotIcon} />
-                            </StyledTreeItem>
-
-                            <StyledTreeItem itemId="6" labelText="Personal" labelIcon={DotIcon} />
-
-                            <StyledTreeItem itemId="7" labelText="Images" labelIcon={DotIcon} /> */}
+                        <StyledTreeItem 
+                            itemId="1" 
+                            labelText="Le Dossier" 
+                            labelIcon={FaFolder}
+                            delete={true} 
+                        >
 
                             {fieldSubFoldersGen1.map((field, index) => (
-                                <StyledTreeItem key={index} itemId={`FoldersGen1${index}`} labelText={field.folderName} labelIcon={FaFolder}>
-                                    
-                                    <button 
-                                        onClick={() => { 
-                                            appendSubFoldersGen1({
-                                                folderName: "Sous-catégorie",
-                                                isMinuteFolder: false,
-                                                subFoldersGen2: [],
-                                                informationRequested: []
-                                            })
-                                        }}
-                                        className=" w-[35px] [35ppx] flex justify-left items-center text-[12px] px-4 mt-2 text-white h-[32px] bg-green-500 rounded-md" 
-                                    >
-                                        +
-                                    </button>
-
+                                
+                                <StyledTreeItem 
+                                    key={index} 
+                                    itemId={`FoldersGen1${index}`} 
+                                    labelText={field.folderName} 
+                                    labelIcon={FaFolder}
+                                    delete={field.folderName == "Minute"} 
+                                    onHandleDelete={() => removeSubFoldersGen1(index)}
+                                >
+                                    {field.folderName !== "Minute" &&
+                                        <TreeFolderGen2 errors={errors} add={field.folderName !== "Minute"} nextIndex={index} control={control} />
+                                    }
                                 </StyledTreeItem>
+
                             ))}
 
                             <button 
                                 onClick={() => { 
-                                    
                                     setDialogue({
-                                        size: "md",
+                                        size: "sm",
                                         open: true,
                                         view: "add-sub-folder",
                                         data: null,
-                                        function: () => appendSubFoldersGen1({
-                                            folderName: "",
-                                            isMinuteFolder: false,
-                                            subFoldersGen2: [],
-                                            informationRequested: [],
-                                        })
+                                        function: prependSubFoldersGen1
                                     })
-
                                 }}
-                                className=" w-[35px]== [35px] flex justify-start items-center text-[12px] px-4 mt-2 text-white h-[32px] bg-green-500 rounded-md" 
+                                className=" w-[35px] text-[12px] mt-2 text-white flex justify-center items-center h-[32px] bg-green-500 rounded-md" 
                             >
                                 +
                             </button>
+
+                            { errors.subFoldersGen1 &&
+                                <span className=" text-red-500 text-[12px] " >{errors.subFoldersGen1.message}</span>
+                            }
 
                         </StyledTreeItem>
 
@@ -297,19 +355,14 @@ export default function TreeFolder({ setActiveStep, configFolder, setConfigFolde
 
                 </div>
 
-                <div className=" w-full md:w-[40%] flex flex-col flex-wrap gap-y-2 justify-center " >
-
-
-                </div>
-
             </div>
 
             <div className=" w-full md:w-[80%] mt-5 self-center flex flex-row justify-end gap-x-5 " >
-                <button onClick={() => setActiveStep(0)} className=" bg-primary text-white px-3 py-2 rounded-md  " >
+                <button onClick={() => setActiveStep(0)} className=" bg-primary font-medium text-[14px] text-white px-4 py-2 rounded-md  " >
                     Précédent
                 </button>
-                <button onClick={handleSubmit(handleClick)} className=" bg-primary text-white px-3 py-2 rounded-md  " >
-                    Suivant
+                <button onClick={handleSubmit(handleClick)} className=" bg-green-600 font-medium text-[14px] text-white px-4 py-2 rounded-md  " >
+                    Créer le dossier
                 </button>
             </div>
 

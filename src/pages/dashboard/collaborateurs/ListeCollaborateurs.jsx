@@ -77,10 +77,10 @@ const CollaborateursListe = () => {
                 <button 
                   onClick={() => {
                     setDialogue({
-                        size: "md",
-                        open: true,
-                        view: "create-collaborateur",
-                        data: null
+                      size: "md",
+                      open: true,
+                      view: "create-collaborateur",
+                      data: null
                     })
                   }}
                   class=' bg-primary text-white px-4 py-2 rounded-md text-[13px] font-semibold '

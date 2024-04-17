@@ -30,11 +30,11 @@ export function Dashboard() {
           {
             layout: "dashboard",
             pages: [
-              {
-                icon: <HomeIcon {...icon} />,
-                name: "Accueil",
-                path: "/accueil"
-              },
+              // {
+              //   icon: <HomeIcon {...icon} />,
+              //   name: "Accueil",
+              //   path: "/accueil"
+              // },
               {
                 icon: <FaFolder {...icon} />,
                 name: "Dossiers",
@@ -60,11 +60,11 @@ export function Dashboard() {
                 name: "Categories",
                 path: "/categories"
               },
-              {
-                icon: <SiAuth0 {...icon} />,
-                name: "Roles & permissions",
-                path: "/roles"
-              },
+              // {
+              //   icon: <SiAuth0 {...icon} />,
+              //   name: "Roles & permissions",
+              //   path: "/roles"
+              // },
             ],
           },
         ]}

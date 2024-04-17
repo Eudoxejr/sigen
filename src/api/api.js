@@ -170,7 +170,20 @@ export const CategoriesApi = {
 			data: JSON.stringify(data)
 		})
 		return response.data;
-	}
+	},
+
+	async updateCategorie(data, id) {
+		// console.log(data);
+		const response = await axiosPrivate.request({
+			method: 'put',
+			url: API_URL + '/categories/'+id,
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			data: JSON.stringify(data)
+		})
+		return response.data;
+	},
 
 }
 
@@ -191,6 +204,27 @@ export const FoldersApi = {
 		return response.data;
 	},
 
+	async getFolderTree(id) {
+
+		const response = await axiosPrivate.request({
+			method: 'get',
+			url: API_URL + '/folders/tree/'+id
+		})
+		return response.data;
+		
+	},
+
+
+	async getFolder(id) {
+
+		const response = await axiosPrivate.request({
+			method: 'get',
+			url: API_URL + '/folders/'+id
+		})
+		return response.data;
+		
+	},
+
 
 	async createFolders(data) {
 		// console.log(data);
@@ -203,7 +237,36 @@ export const FoldersApi = {
 			data: JSON.stringify(data)
 		})
 		return response.data;
+	},
+
+
+	async createSubFolders(data, id) {
+		// console.log(data);
+		const response = await axiosPrivate.request({
+			method: 'post',
+			url: API_URL + '/folders/subfolders/'+id,
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			data: JSON.stringify(data)
+		})
+		return response.data;
+	},
+
+
+	async addFolders(data, id) {
+		// console.log(data);
+		const response = await axiosPrivate.request({
+			method: 'post',
+			url: API_URL + '/folders/file/'+id,
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			data: JSON.stringify(data)
+		})
+		return response.data;
 	}
+
 
 }
 
@@ -265,7 +328,33 @@ export const CollaboApi = {
 
 		return response.data;
 
-	}
+	},
+
+	async updateMe(data) {
+		// console.log(data);
+		const response = await axiosPrivate.request({
+			method: 'put',
+			url: API_URL + '/users',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			data: JSON.stringify(data)
+		})
+		return response.data;
+	},
+
+	async updatePassword(data) {
+		// console.log(data);
+		const response = await axiosPrivate.request({
+			method: 'put',
+			url: API_URL + '/users/password',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			data: JSON.stringify(data)
+		})
+		return response.data;
+	},
 
 
 }

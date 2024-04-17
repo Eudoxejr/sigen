@@ -13,6 +13,7 @@ import { FaFolderMinus } from "react-icons/fa";
 import debounce from 'lodash.debounce';
 import { useQueryClient } from "@tanstack/react-query";
 import AsyncSelect from 'react-select/async'
+import Pagination from '@mui/material/Pagination';
 
 export default function CategoriesListe() {
 
@@ -54,8 +55,7 @@ export default function CategoriesListe() {
     const loadOptionsGroupCategorie = (inputValue) => 
         new Promise((resolve) => {
             resolve(getGroup(inputValue))
-        }
-    );
+        });
 
     const { setDialogue } = useDialogueStore()
 
@@ -80,7 +80,7 @@ export default function CategoriesListe() {
     <div className=" flex flex-col" >
         
         <div className=" w-full flex flex-row mt-5 items-center gap-x-3 " >
-            <span className="font-bold text-blue-gray-800" >Groupes de catégories</span>
+            <span className="font-bold capitalize text-blue-gray-800" >Groupes de catégories</span>
         </div>
 
         <div className=" w-full mt-5 flex flex-row gap-x-6 gap-y-6 flex-wrap " > 
@@ -162,7 +162,7 @@ export default function CategoriesListe() {
         </div>
 
 
-        <div className="w-full flex flex-row mt-10 items-center justify-between gap-x-3 " >
+        <div className="w-full flex flex-row mt-10 flex-wrap gap-y-4 items-center justify-between gap-x-3 " >
 
             <div className="gap-x-3" >
                 <span className="font-bold mr-3" >Catégories</span>
@@ -232,22 +232,22 @@ export default function CategoriesListe() {
                 :
                 categories?.data?.map((category, key) => (
 
-                    <div key={"category"+key} className="border border-[#ddd] w-[350px] sm:w-[45%] flex flex-col px-3 py-4 rounded-lg bg-gradient-to-br from-gray-100 to-gray-100 min-h-[150px] ">
+                    <div key={"category"+key} className="border border-[#ddd] w-[280px] sm:w-[30%] flex flex-col px-3 py-4 rounded-lg bg-gradient-to-br from-gray-100 to-gray-100 min-h-[150px] ">
             
                         <div className=" flex gap-x-4 justify-start items-center" >     
-                            <FaLayerGroup className="text-gray-800" size={25} />
-                            <span className=" font-medium text-[17px] leading-[20px] text-gray-800 opacity-90 " >{category.category_name}</span>
+                            <FaLayerGroup className="text-gray-800" size={16} />
+                            <span className=" font-medium text-[14px] leading-[20px] text-gray-800 opacity-90 " >{category.category_name}</span>
                         </div>
 
                         <div className=" flex mt-4 gap-x-3 justify-start " >     
-                            <GiBookPile  className="text-gray-800" size={25} />
-                            <span className=" font-semibold text-[17px] leading-[20px] text-gray-800 opacity-90 " >0 template(s) de minute </span>
+                            <GiBookPile className="text-gray-800" size={16} />
+                            <span className=" font-semibold text-[13px] leading-[20px] text-gray-800 opacity-90 " >0 Template(s) de minute </span>
                         </div>
 
                         <div className=" w-full flex flex-row justify-between " >
                             <div className=" flex mt-4 gap-x-3 justify-start items-center " >     
                                 {/* <BiSolidCategoryAlt className="text-gray-800" size={20} /> */}
-                                <span className=" font-semibold text-[16px] leading-[20px] text-gray-800 opacity-90 " >Slug: <span className=" uppercase " >{category?.category_slug}</span></span>
+                                <span className=" font-semibold text-[13px] leading-[20px] text-gray-800 opacity-90 " >Slug: <span className=" uppercase " >{category?.category_slug}</span></span>
                             </div>
                             {/* <div className=" flex mt-4 gap-x-3 justify-start items-center " >     
                                 <span className=" font-semibold text-[13px] leading-[20px] text-gray-800 opacity-90 " >Couleur: </span>
@@ -255,7 +255,7 @@ export default function CategoriesListe() {
                             </div> */}
                         </div>
 
-                        <div style={{ backgroundColor: category?.category_color }} className=" h-[100px] w-[97%] overflow-x-auto items-start px-4 self-center flex flex-row gap-x-6 rounded-md mt-4 " >
+                        <div style={{ backgroundColor: category?.category_color }} className=" h-[40px] w-[97%] overflow-x-auto items-start px-4 self-center flex flex-row gap-x-6 rounded-md mt-4 " >
 
                             {/* {category?.subCategories?.map((subCat, key) => (
                                 <div key={'subcat'+key} className=" flex flex-col justify-center items-center w-[100px] ">
@@ -266,20 +266,13 @@ export default function CategoriesListe() {
 
                         </div>
 
-                            <div className='flex justify-start mt-8 gap-x-[20px]'>
+                            <div className='flex justify-start mt-5 gap-x-[5px]'>
                                 <Tooltip content="Modifier">   
                                     <div 
-                                        onClick={() => {
-                                            setDialogue({
-                                                size: "sm",
-                                                open: true,
-                                                view: "update-group-categorie",
-                                                data: group
-                                            })
-                                        }}
-                                        className="cursor-pointer py-2 px-2 gap-x-2 flex flex-row " 
+                                        onClick={() => navigate("/dashboard/categories/edit", { state: category }) }
+                                        className="cursor-pointer px-2 gap-x-2 flex flex-row "
                                     >
-                                        <CiEdit color='gray' size={23} /> Modifier
+                                        <CiEdit color='gray' size={23} />
                                     </div>  
                                 </Tooltip>
                                 <Tooltip content="Supprimer">   
@@ -288,13 +281,13 @@ export default function CategoriesListe() {
                                             setDialogue({
                                                 size: "sm",
                                                 open: true,
-                                                view: "delete-group-categorie",
-                                                data: group
+                                                view: "delete-categorie",
+                                                // data: group
                                             })
                                         }}
-                                        className="cursor-pointer py-2 px-2 gap-x-2 flex flex-row" 
+                                        className="cursor-pointer px-2 gap-x-2 flex flex-row" 
                                     >
-                                        <MdDeleteForever color='gray' size={23} /> Supprimer
+                                        <MdDeleteForever color='gray' size={23} />
                                     </div>   
                                 </Tooltip>     
                             </div>
@@ -306,6 +299,10 @@ export default function CategoriesListe() {
             
             
 
+        </div>
+
+        <div className="w-full flex justify-end !mt-8 items-end" >
+            <Pagination count={categoriesMeta?.last_page || 1} page={pagination.page+1} onChange={(_, value) => { setPagination(pag => ({ ...pag, page: value-1 }))} } variant="outlined" color='primary' size="small" />
         </div>
 
     </div>

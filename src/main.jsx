@@ -25,7 +25,7 @@ import { registerLicense } from '@syncfusion/ej2-base';
 dayjs.locale('fr')
 
 // Registering Syncfusion license key
-registerLicense('Ngo9BigBOggjHTQxAR8/V1NBaF5cXmZCfUx1RXxbf1x0ZFRMY1hbRnNPMyBoS35RckVgW3xecXdRRGVYUUB/');
+registerLicense('ORg4AjUWIQA/Gnt2UFhhQlJBfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTX5Xd0FjXn1adHZXQGlc');
 
 const queryClient = new QueryClient()
 

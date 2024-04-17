@@ -63,29 +63,6 @@ const MinuteListe = () => {
                   Ajouter un template de minute
                 </button>
 
-                {/* <div>
-                  <AsyncSelect 
-                    cacheOptions 
-                    defaultOptions 
-                    loadOptions={loadRoleOptions} 
-                    isMulti
-                    styles={{
-                      control: (baseStyles, state) => ({
-                        ...baseStyles,
-                        minHeight: 42,
-                        width: 250,
-                        fontSize: 13,
-                        fontWeight: "300",
-                        color: "red",
-                        zIndex: 100
-                      }),
-                    }}
-                    placeholder="Filtrer par role"
-                    onChange={(val) => { val.length > 0 ? setRole(val.map((item) => {return item.value})) : setRole(null) } }
-                  />
-
-                </div> */}
-
                 <div class='w-[250px]'>
 
                   <div className="relative flex items-center w-full h-[42px] rounded-lg focus-within:shadow-md bg-blue-gray-800 overflow-hidden">
@@ -144,17 +121,17 @@ const MinuteListe = () => {
                 <DataGridComponent
                   idpri="id"
                   hidePagination={false}
-                  hideHeader={false}
+                  hideHeader={true}
                   columns={columnMinutes}
                   queryKey={[
-                    "getClient", 
+                    "getMinute", 
                     pagination.page+1,
                     pagination.pageSize,
                     searchTerm,
                     // role
                   ]}
                   fnQuery={({ queryKey }) => ClientApi.getClient(queryKey[1], queryKey[2], queryKey[3] )}
-                  noRow={"Pas de client trouvé"}
+                  noRow={"Pas de template de minute trouvé"}
                   totalInformation={{total, setTotal}}
                   paginationInformation={{pagination, setPagination}}
                 />

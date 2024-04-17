@@ -350,7 +350,7 @@ const DossierCreate = () => {
         mutate(data)
     };
 
-    const steps = ['Configuration du dossier', 'Arborescence du dossier'];
+    const steps = ['1.Configuration du dossier', '2.Arborescence du dossier'];
 
     return (
 
@@ -362,11 +362,11 @@ const DossierCreate = () => {
 
                 <div className='flex items-center' >
                     <Tooltip content="Retour">
-                        <button onClick={() => navigate(-1)} className=" bg-primary w-[35px] h-[35px] mr-3 rounded-full flex justify-center items-center" >
+                        <button onClick={() => navigate(-1)} className=" bg-primary w-[40px] h-[40px] mr-4 rounded-full flex justify-center items-center" >
                             <AiOutlineArrowLeft className=' text-white ' size={16} />
                         </button>
                     </Tooltip>
-                    <Typography variant="h6" className=" text-blue-gray-700 text-[15px] " color="blue-gray" >
+                    <Typography variant="h6" className=" text-blue-gray-700 text-[14px] " color="blue-gray" >
                         CREER UN DOSSIER
                     </Typography>
                 </div>

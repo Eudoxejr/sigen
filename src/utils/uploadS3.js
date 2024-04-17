@@ -84,7 +84,7 @@ export const uploadFile = async (file,objectUrl) => {
   });
 
   return upload.done().then((val) => {
-    console.log(val);
+    // console.log(val);
     return {
       Location: val?.Location
     }
