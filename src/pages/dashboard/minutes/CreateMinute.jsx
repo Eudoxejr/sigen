@@ -151,7 +151,6 @@ const MinuteCreate = () => {
     );
 
 
-
     const {mutate, isLoading} = useMutation({
 
         mutationFn: async (data) => {
@@ -220,9 +219,7 @@ const MinuteCreate = () => {
 
         // <RenderIf allowedTo={Permissions.ADD_TRANSPORT_MEAN}>
 
-            <div className="overflow-scroll " >
-                <TemplateEdit/>
-            </div>
+            <TemplateEdit/>
 
         // </RenderIf>
 

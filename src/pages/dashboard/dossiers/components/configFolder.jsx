@@ -69,7 +69,7 @@ export default function ConfigFolder({setActiveStep, configFolder, setConfigFold
     return (
         <>
 
-            <div className=" w-full md:w-[80%] self-center py-6 flex flex-wrap gap-y-5 gap-x-[4%] rounded-md mb-[30px] mt-[70px] justify-center shadow-md " >
+            <div className=" w-full md:w-[80%] self-center py-2 flex flex-wrap gap-y-8 gap-x-[4%] rounded-md mb-[30px] mt-[40px] justify-center  " >
 
                 <div className=" w-full md:w-[40%] flex flex-col flex-wrap gap-y-2 justify-center " >
 
@@ -89,7 +89,7 @@ export default function ConfigFolder({setActiveStep, configFolder, setConfigFold
                                         styles={{
                                             control: (baseStyles, state) => ({
                                                 ...baseStyles,
-                                                height: 45,
+                                                height: 40,
                                                 fontSize: 13,
                                                 fontWeight: "400",
                                                 color: "red",
@@ -99,7 +99,7 @@ export default function ConfigFolder({setActiveStep, configFolder, setConfigFold
                                         onChange={(val) => onChange(val.value)}
                                     />
                                     {error &&
-                                        <span className=" text-[14px] text-red-400 " >{error.message}</span>
+                                        <span className=" text-[12px] text-red-400 " >{error.message}</span>
                                     }
                                 </>
                             )}
@@ -127,7 +127,7 @@ export default function ConfigFolder({setActiveStep, configFolder, setConfigFold
                                         styles={{
                                             control: (baseStyles, state) => ({
                                                 ...baseStyles,
-                                                height: 45,
+                                                height: 40,
                                                 fontSize: 13,
                                                 fontWeight: "400",
                                                 color: "red"
@@ -137,7 +137,7 @@ export default function ConfigFolder({setActiveStep, configFolder, setConfigFold
                                         onChange={(val) => { onChange(val.value)}}
                                     />
                                     {error &&
-                                        <span className=" text-[14px] text-red-400 " >{error.message}</span>
+                                        <span className=" text-[12px] text-red-400 " >{error.message}</span>
                                     }
                                 </>
                             )}
@@ -165,7 +165,7 @@ export default function ConfigFolder({setActiveStep, configFolder, setConfigFold
                                         styles={{
                                             control: (baseStyles, state) => ({
                                                 ...baseStyles,
-                                                height: 45,
+                                                height: 40,
                                                 fontSize: 13,
                                                 fontWeight: "400",
                                                 color: "red"
@@ -175,7 +175,7 @@ export default function ConfigFolder({setActiveStep, configFolder, setConfigFold
                                         onChange={(val) => onChange(val.value)}
                                     />
                                     {error &&
-                                        <span className=" text-[14px] text-red-400 " >{error.message}</span>
+                                        <span className=" text-[12px] text-red-400 " >{error.message}</span>
                                     }
                                 </>
                             )}
@@ -204,7 +204,7 @@ export default function ConfigFolder({setActiveStep, configFolder, setConfigFold
                                         styles={{
                                             control: (baseStyles, state) => ({
                                                 ...baseStyles,
-                                                height: 45,
+                                                height: 40,
                                                 fontSize: 13,
                                                 fontWeight: "400",
                                                 color: "red"
@@ -214,7 +214,7 @@ export default function ConfigFolder({setActiveStep, configFolder, setConfigFold
                                         onChange={(val) => onChange(val.value)}
                                     />
                                     {error &&
-                                        <span className=" text-[14px] text-red-400 " >{error.message}</span>
+                                        <span className=" text-[12px] text-red-400 " >{error.message}</span>
                                     }
                                 </>
                             )}
@@ -228,7 +228,7 @@ export default function ConfigFolder({setActiveStep, configFolder, setConfigFold
             </div>
 
             <div className=" w-full md:w-[80%] mt-5 self-center flex flex-row justify-end " >
-                <button onClick={handleSubmit(handleClick)} className=" bg-primary text-white px-3 py-2 rounded-md  " >
+                <button onClick={handleSubmit(handleClick)} className=" bg-primary font-medium text-[14px] text-white px-4 py-2 rounded-md  " >
                     Suivant
                 </button>
             </div>

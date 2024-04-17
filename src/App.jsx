@@ -9,15 +9,16 @@ import {
   CategoriesListe,
   CategoriesCreate,
   CollaborateursListe,
+  CategoriesEdit,
   ClientsListe,
   DossiersListe,
   DossierCreate,
   MinuteListe,
-  MinuteCreate
+  MinuteCreate,
 } from "./pages/dashboard";
 import Roles from "./pages/dashboard/old/roles";
 import AddRoles from "./pages/dashboard/old/addRoles";
-import Folder from "./pages/dashboard/old/folder";
+import Folder from "./pages/dashboard/dossiers/folder";
 import SubFolder from "./pages/dashboard/old/subFolder";
 import Files from "./pages/dashboard/old/files";
 import Profile from "./pages/dashboard/profile";
@@ -31,22 +32,6 @@ function App() {
     <div>
       <Routes>
 
-        <Route path="/dashboard/old/roles" element= {<Roles/>} />
-
-        <Route path="/dashboard/old/add-role" element= {<AddRoles/>} />
-
-        <Route path="/dashboard/old/folder" element= {<Folder/>} />
-
-        <Route path="/dashboard/old/subFolder" element= {<SubFolder/>} />
-
-        <Route path="/dashboard/old/files" element= {<Files/>} />
-
-        <Route path="/dashboard/old" element= {<AddRoles/>} />
-
-
-
-
-
         <Route path="/auth/" element={<Navigate to="/auth/login" replace />} />
         <Route path="/auth/*" element={<Auth />}>
 
@@ -59,7 +44,8 @@ function App() {
         {/* <Route path="unauthorized" element={<Unauthorized />} /> */}
 
         <Route path="/dashboard/" element={<Navigate to="/dashboard/accueil" replace />} />
-        <Route path="/" element={<Navigate to="/dashboard/accueil" replace />} />
+        {/* <Route path="/" element={<Navigate to="/dashboard/accueil" replace />} /> */}
+        <Route path="/" element={<Navigate to="/dashboard/dossiers" replace />} />
 
         <Route path="/dashboard/*"
           element={
@@ -69,18 +55,19 @@ function App() {
           }
         >
 
-          <Route index path="accueil" element={<Home/>} />
+          {/* <Route index path="accueil" element={<Home/>} /> */}
           <Route path="profil" element={<Profile/>} />
 
           <Route path="dossiers">
             <Route index element={<DossiersListe/>} />
             <Route path="add" element={<DossierCreate/>} />
-            <Route path=":id" element={<Folder/>} />
+            <Route path="view" element={<Folder/>} />
           </Route>
 
           <Route path="categories">
             <Route index element={<CategoriesListe/>} />
             <Route path="add" element={<CategoriesCreate/>} />
+            <Route path="edit" element={<CategoriesEdit/>} />
           </Route>
 
           <Route path="collaborateurs">

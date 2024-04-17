@@ -12,7 +12,7 @@ import {
 	Input,
 	Textarea
 } from "@material-tailwind/react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { AiOutlineArrowLeft, AiOutlinePercentage, AiFillEuroCircle } from "react-icons/ai";
 import { BsCardImage } from "react-icons/bs";
 import { useForm, Controller, useFieldArray, useWatch } from "react-hook-form";
@@ -38,45 +38,46 @@ import { v4 as uuidv4 } from 'uuid';
 import { useDialogueStore } from '@/store/dialogue.store';
 import { TwitterPicker } from 'react-color';
 
-
 // import { RenderIf } from "@/components/common";
 // import { Permissions } from "@/data/role-access-data";
 
 
-const CategoriesCreate = () => {
+const CategoriesEdit = () => {
 
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const { setBackdrop } = useDialogueStore()
+    const {state} = useLocation();
 
+    console.log(state);
 
     const schema = yup.object({
 
         categoryName: yup.string().trim().required("Le nom de la catégorie est requis").max(250, "Ne doit pas dépasser 250 caractères"),
         categoryColor: yup.string().trim().required("Sélectionner une couleur de dossier").max(120, "Ne doit pas dépasser 120 caractères"),
         categorySlug: yup.string().trim().required("Ajouter un slug").max(6, "Ne doit pas dépasser 6 caractères"),
-        categoryDescription: yup.string().trim(),
+        categoryDescription: yup.string().trim().nullable(),
         categorieGroupId: yup.string().trim().required("Sélectionner un groupe de catégorie"),
-        subCategories: yup.array().of(
-            yup.object({
-                subCategoryName: yup.string().trim().required("Le nom de la sous-catégorie est requis").max(250, "Ne doit pas dépasser 250 caractères"),
-                subCategoryDescription: yup.string().trim(),
-                informationRequested: yup.array().of(
-                    yup.object({
-                        question: yup.string().trim().required("L'information est requise").max(250, "Ne doit pas dépasser 250 caractères")
-                    })
-                ).test('is-unique-question', 'Vous demandez la même information plusieurs fois', function (value) {
-                    const questions = value?.map(informationRequested => informationRequested.question);
-                    const uniquepartyquestions = new Set(questions);
-                    // console.log(questions?.length === uniquepartyquestions.size);
-                    return questions?.length === uniquepartyquestions.size;
-                })
-            })
-        ).test('is-unique', 'Les noms des sous-catégorie doivent être unique', function (value) {
-            const subCategoryNames = value.map(subCat => subCat.subCategoryName);
-            const uniqueSubCategoryNames = new Set(subCategoryNames);
-            return subCategoryNames.length === uniqueSubCategoryNames.size;
-        })
+        // subCategories: yup.array().of(
+        //     yup.object({
+        //         subCategoryName: yup.string().trim().required("Le nom de la sous-catégorie est requis").max(250, "Ne doit pas dépasser 250 caractères"),
+        //         subCategoryDescription: yup.string().trim(),
+        //         informationRequested: yup.array().of(
+        //             yup.object({
+        //                 question: yup.string().trim().required("L'information est requise").max(250, "Ne doit pas dépasser 250 caractères")
+        //             })
+        //         ).test('is-unique-question', 'Vous demandez la même information plusieurs fois', function (value) {
+        //             const questions = value?.map(informationRequested => informationRequested.question);
+        //             const uniquepartyquestions = new Set(questions);
+        //             // console.log(questions?.length === uniquepartyquestions.size);
+        //             return questions?.length === uniquepartyquestions.size;
+        //         })
+        //     })
+        // ).test('is-unique', 'Les noms des sous-catégorie doivent être unique', function (value) {
+        //     const subCategoryNames = value.map(subCat => subCat.subCategoryName);
+        //     const uniqueSubCategoryNames = new Set(subCategoryNames);
+        //     return subCategoryNames.length === uniqueSubCategoryNames.size;
+        // })
         
     }).required();
 
@@ -84,15 +85,11 @@ const CategoriesCreate = () => {
     const {control, setValue, handleSubmit, setError, formState:{ errors, isDirty } } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
-            categoryColor: "#607D8B",
-            subCategories: [
-                {
-                    id: uuidv4(),
-                    subCategoryName: "Sous-catégorie",
-                    subCategoryDescription: "",
-                    informationRequested: []
-                }
-            ]
+            categoryColor: state.category_color,
+            categoryName: state.category_name,
+            categorySlug: state.category_slug,
+            categoryDescription: state.category_description,
+            categorieGroupId: state.categorie_group_id
         }
     });
 
@@ -112,13 +109,13 @@ const CategoriesCreate = () => {
     const {mutate, isLoading} = useMutation({
 
         mutationFn: async (data) => {
-            return CategoriesApi.createCategorie(data)
+            return CategoriesApi.updateCategorie(data, state.id)
         },
         gcTime:0,
         onSuccess: (response) => {
 
             navigate(-1)
-            toast.success('Catégorie créée avec succès', {
+            toast.success('Catégorie modifiée avec succès', {
                 position: "top-right",
                 autoClose: 2000,
                 hideProgressBar: true,
@@ -129,30 +126,17 @@ const CategoriesCreate = () => {
                 theme: "colored",
             });
 
+            // queryClient.invalidateQueries(["getAllCategories"]) 
+
             queryClient.setQueriesData(["getAllCategories"], (dataCat) => {
-                const nextData = produce(dataCat, draftData => {
-                    draftData.data.unshift(response.data)
-                    draftData.meta.total = dataCat.meta.total+1
-                })
-                return nextData;
-            })
-
-            queryClient.setQueriesData(["getAllCategorieGroups"], (dataCatGroup) => {
-
-                const indexUpdateCategorieGroup = dataCatGroup.data.findIndex((dataCatGroup) => dataCatGroup.id == response?.data?.categorie_group_id )
-                if(indexUpdateCategorieGroup >= 0)
+                const indexUpdateCategorie = dataCat.data.findIndex((categorie) => categorie.id== response?.data?.id )
+                if(indexUpdateCategorie >= 0)
                 {
-                    const nextData = produce(dataCatGroup, draftData => {
-                        const targetData = draftData.data[indexUpdateCategorieGroup];
-                        const totalCategories = dataCatGroup?.data[indexUpdateCategorieGroup]?.meta?.totalCategories;
-                        const incrementedTotalCategories = parseInt(totalCategories) + 1;
-                        targetData.meta.totalCategories = incrementedTotalCategories;
-
+                    const nextData = produce(dataCat, draftData => {
+                        draftData.data[indexUpdateCategorie] = response?.data
                     })
-
                     return nextData;
                 }
-
             })
 
             setBackdrop({active: false})
@@ -161,7 +145,7 @@ const CategoriesCreate = () => {
         onError: ({response}) => {
             
             setError('root.serverError', { 
-                message: response.data.msg || "Une erreur s'est produite lors de la création de la catégorie"
+                message: response.data.msg || "Une erreur s'est produite lors de la création du service"
                 // message: "Une erreur s'est produite lors de la connexion"
             })
             toast.error('Une Erreur s\'est produite', {
@@ -215,7 +199,7 @@ const CategoriesCreate = () => {
 
                                     <div className=" w-[full] md:w-[55%] order-1 " >
 
-                                        <div className=" w-full flex flex-col flex-wrap gap-y-4 mt-1 justify-center " >
+                                        <div className=" w-full flex flex-col flex-wrap gap-y-6 justify-center " >
 
                                             <div className=" w-[95%] min-w-[200px] mx-[2.5%] " >
                                                 <Controller
@@ -227,6 +211,10 @@ const CategoriesCreate = () => {
                                                             <AsyncSelect 
                                                                 cacheOptions 
                                                                 ref={ref}
+                                                                defaultValue={{
+                                                                    label: state.categoryGroup.group_name,
+                                                                    value: state.categoryGroup.id
+                                                                }}
                                                                 defaultOptions 
                                                                 loadOptions={loadOptionsGroupCategorie} 
                                                                 styles={{
@@ -289,7 +277,7 @@ const CategoriesCreate = () => {
 
                                         </div>
 
-                                        <div className=" w-full flex flex-row flex-wrap gap-y-2 mt-5 justify-center " >
+                                        <div className=" w-full flex flex-row flex-wrap mt-6 justify-center " >
 
                                             <div className=" w-[95%] min-w-[200px] mx-[2.5%] " >
                                                 <Controller
@@ -471,12 +459,12 @@ const CategoriesCreate = () => {
                             className='mt-8 w-[60%] min-w-[250px] self-center '
                             color="green"
                             onClick={handleSubmit(handleClick)}
-                            disabled={isLoading}
+                            disabled={isLoading || !isDirty}
                         >
                             {isLoading ?
                                 <BeatLoader color="#fff" size={8} />
                                 :
-                                <span>Enrégistrer la catégorie</span>
+                                <span>Modifier la catégorie</span>
                             }
                         </Button>
 
@@ -493,4 +481,4 @@ const CategoriesCreate = () => {
     );
 }
 
-export default CategoriesCreate;
+export default CategoriesEdit;

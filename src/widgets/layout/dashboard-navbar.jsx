@@ -38,7 +38,7 @@ export function DashboardNavbar() {
   return (
     <Navbar
       color={"#EFEFEF"}
-      className={`rounded-xl !bg-[#EFEFEF] transition-all sticky top-4 z-40 py-3 shadow-md shadow-blue-gray-500/5 `}
+      className={`rounded-xl !bg-primary transition-all sticky top-4 z-40 py-3 shadow-md shadow-blue-gray-500/5 `}
       fullWidth
       blurred={true}
     >
@@ -53,8 +53,8 @@ export function DashboardNavbar() {
             <Link to={`/${layout}`}>
               <Typography
                 variant="small"
-                color="blue-gray"
-                className="font-normal opacity-50 transition-all hover:text-blue-500 hover:opacity-100"
+                // color=""
+                className=" text-white font-normal opacity-50 transition-all hover:text-white hover:opacity-100"
               >
                 {layout}
               </Typography>
@@ -62,15 +62,15 @@ export function DashboardNavbar() {
 
             <Typography
               variant="small"
-              color="blue-gray"
-              className="font-normal"
+              // color="blue-gray"
+              className="font-normal text-white "
             >
               {page}
             </Typography>
 
           </Breadcrumbs>
 
-          <Typography variant="h6" color="blue-gray">
+          <Typography variant="h6" color="white">
             {page}
           </Typography>
 
@@ -91,19 +91,20 @@ export function DashboardNavbar() {
           <Link to="/dashboard/profil">
 
             <div
-              className="hidden items-center gap-x-2 justify-center pl-2 xl:flex"
+              className="hidden items-center gap-x-3 justify-center pl-2 xl:flex"
             >
 
               <Avatar
-                src="https://demos.creative-tim.com/material-dashboard/assets/img/team-2.jpg"
+                src={user.user.profil_pic || '/img/sigen/user128.png'}
                 alt="item-1"
                 size="md"
                 variant="circular"
+                className="shadow-green-900/20 ring-2 ring-white bg-blue-gray-100 "
               />
 
               <div className=" flex flex-col " >
-                <span className=" text-black text-[13px] " >{user.user.firstname+" "+user.user.lastname}</span>
-                <span className=" text-black text-[12px] font-bold " >{user.user.role.role_name}</span>
+                <span className=" text-white text-[13px] " >{user.user.firstname+" "+user.user.lastname}</span>
+                <span className=" text-white text-[12px] font-bold " >{user.user.role.role_name}</span>
               </div>
 
             </div>
@@ -112,10 +113,11 @@ export function DashboardNavbar() {
               className="grid xl:hidden ml-2"
             >
               <Avatar
-                src="https://demos.creative-tim.com/material-dashboard/assets/img/team-2.jpg"
+                src={user.user.profil_pic || '/img/sigen/user128.png'}
                 alt="item-1"
                 size="sm"
                 variant="circular"
+                className="shadow-green-900/20 ring-2 ring-white"
               />
             </div>
 

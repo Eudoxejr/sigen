@@ -25,6 +25,7 @@
     "@react-spring/web": "^9.7.3",
     "@syncfusion/ej2-react-documenteditor": "^25.1.35",
     "@syncfusion/ej2-react-lists": "^25.1.35",
+    "@syncfusion/ej2-react-pdfviewer": "^25.1.40",
     "@syncfusion/ej2-react-popups": "^25.1.35",
     "@tanstack/react-query": "^4.32.6",
     "@tanstack/react-query-devtools": "^4.32.6",

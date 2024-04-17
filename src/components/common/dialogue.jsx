@@ -13,6 +13,12 @@ import SuspendUserDialog from './suspenduser.dialog';
 import CreateClient from './createclient.dialog';
 import UpdateClient from './updateclient.dialog';
 import DetailsClient from './detailsclient.dialog';
+import CreateVariableGroup from './createvariablegroup.dialog';
+import CreateVariable from './createvariable.dialog';
+import CreateSubfolder from './createsubfolder.dialog';
+import CreateSubfolder2 from './createsubfolder2.dialog';
+import AddFile from './addfile.dialo';
+import ViewPdf from './viewpdf.dialog';
 
 import { useDialogueStore } from '@/store/dialogue.store';
 
@@ -48,6 +54,18 @@ export default function Dialogue() {
 						<UpdateClient/>
 					: dialogue?.view === "details-client" ?
 						<DetailsClient/>
+					: dialogue?.view === "create-variable-group" ?
+						<CreateVariableGroup/>
+					: dialogue?.view === "create-variable" ?
+						<CreateVariable/>
+					: dialogue?.view === "add-sub-folder" ?
+						<CreateSubfolder/>
+					: dialogue?.view === "create-folder" ?
+						<CreateSubfolder2/>
+					: dialogue?.view === "add-file" ?
+						<AddFile/>
+					: dialogue?.view === "view-pdf" ?
+						<ViewPdf/>
 					:
 						<div />
 				}

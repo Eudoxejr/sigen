@@ -20,10 +20,11 @@ import { AiOutlineClose, AiFillEye, AiFillStar } from "react-icons/ai";
 import { PhotoView } from 'react-photo-view';
 import { useNavigate } from 'react-router-dom';
 import { BsChevronRight, BsEyeFill, BsThreeDotsVertical } from "react-icons/bs";
+import { FaRegFileWord } from "react-icons/fa";
 import { FaKey } from "react-icons/fa";
 import img1 from '/img/home-decor-4.jpeg';
 import dummyProfileImg from '/img/sigen/user.png';
-import { FaFolderMinus } from "react-icons/fa";
+import { FaFolder } from "react-icons/fa";
 import { useDialogueStore } from '@/store/dialogue.store';
 // import { isAllowedTo } from "./isAllowedTo";
 // import { Permissions } from "@/data/role-access-data";
@@ -296,7 +297,6 @@ export const columnColaborateurs = [
 		}
 	}
 ];
-
 
 export const columnClients = [
 	{
@@ -580,9 +580,9 @@ export const columnClients = [
 
 export const columnDossier = [
 	{ 
-		field: '',
+		field: null,
 		headerName: 'Dossier',
-		flex: 1.2,
+		flex: 2,
 		minWidth: 170,
 		sortable: false,
 		hideSortIcons: true,
@@ -591,13 +591,13 @@ export const columnDossier = [
 
 			return (
 
-				<div className="my-6 flex items-center">
-					<div style={{backgroundColor: params.row?.category?.category_color}} className="flex h-[40px] w-[40px] items-center justify-center rounded-md">
-						<FaFolderMinus size={18} color="white" />
+				<div className="flex items-center">
+					<div style={{backgroundColor: params.row?.category?.category_color}} className="flex h-[70px] w-[70px] items-center justify-center rounded-md">
+						<FaFolder size={18} color="white" />
 					</div>
-					<div className="ml-8">
-						<h2>{params.row?.category?.category_name}</h2>
-						<p className="text-gray-500">#{params.row.id}</p>
+					<div className="ml-4">
+						<h2 className=" line-clamp-2 " >{params.row?.category?.category_name}</h2>
+						<p className="text-gray-700 mt-2 ">{params.row.folder_name || "####"}</p>
 					</div>
 				</div>
 
@@ -609,7 +609,7 @@ export const columnDossier = [
 	{
 		field: 'fullname',
 		headerName: 'Clients',
-		flex: 1.5,
+		flex: 1.8,
 		minWidth: 170,
 		sortable: true,
 		hideSortIcons: false,
@@ -618,18 +618,33 @@ export const columnDossier = [
 
 			return (
 
-				<div className="flex items-center gap-4 py-3">
-					<AvatarMui>
+				row?.client?.civility === "Structure" ?
 
-					</AvatarMui>
-					<Typography
-						variant="small"
-						color="blue-gray"
-						className="font-semibold text-[13.5px] "
-					>
-						{row?.client?.firstname + " " + row?.client?.lastname}
-					</Typography>
-				</div>
+					<div className="flex items-center gap-4 ">
+						<AvatarMui>
+						</AvatarMui>
+						<Typography
+							variant="small"
+							color="blue-gray"
+							className="font-semibold text-[13.5px] line-clamp-1 "
+						>
+							{row?.client?.denomination}
+						</Typography>
+					</div>
+
+				:
+
+					<div className="flex items-center gap-4 ">
+						<AvatarMui>
+						</AvatarMui>
+						<Typography
+							variant="small"
+							color="blue-gray"
+							className="font-semibold text-[13.5px] line-clamp-1 "
+						>
+							{row?.client?.firstname + " " + row?.client?.lastname}
+						</Typography>
+					</div>
 
 			)
 
@@ -637,7 +652,7 @@ export const columnDossier = [
 	},
 
 	{
-		field: 'coordone',
+		field: 'collabo',
 		headerName: 'Collaborateurs',
 		flex: 2,
 		minWidth: 170,
@@ -647,35 +662,39 @@ export const columnDossier = [
 		renderCell: ({row}) => {
 			return (
 				<div>
-					<Typography
-						variant="small"
-						color="blue-gray"
-						className="font-semibold text-[13.5px] "
-					>
-						{row?.manager?.firstname + " " + row?.manager?.lastname+" (Titulaire)"}
-					</Typography>
-					{/* <Typography
-						variant="small"
-						color="blue-gray"
-						className=" font-normal mt-1 text-[12.5px] "
-					>
-						{"Titulaire"}
-					</Typography> */}
+					<div className="flex items-center gap-2 ">
+						<PhotoView key={row.id} src={row.manager?.profil_pic || '/img/sigen/user128.png'}>
+							<AvatarMui src={row?.manager?.profil_pic} sx={{ width: 30, height: 30 }} />
+						</PhotoView>
+						<div>
+							<Typography
+								variant="small"
+								color="blue-gray"
+								className="font-medium opacity-85 text-[13px] line-clamp-1 capitalize"
+							>
+								{row?.manager?.firstname + " " + row?.manager?.lastname+" (Titulaire)"}
+							</Typography>
+						</div>
+					</div>
 
-					<Typography
-						variant="small"
-						color="blue-gray"
-						className="font-semibold mt-3 text-[13.5px] "
-					>
-						{row?.subManager?.firstname + " " + row?.subManager?.lastname+" (Suppléant)"}
-					</Typography>
-					{/* <Typography
-						variant="small"
-						color="blue-gray"
-						className=" font-normal mt-1 text-[12.5px] "
-					>
-						{"Suppléant"}
-					</Typography> */}
+					{row?.subManager && 
+
+						<div className="flex items-center mt-2 gap-2 ">
+							<PhotoView key={row.id} src={row.subManager?.profil_pic || '/img/sigen/user128.png'}>
+								<AvatarMui src={row?.subManager?.profil_pic} sx={{ width: 30, height: 30 }} />
+							</PhotoView>
+							<div>
+								<Typography
+									variant="small"
+									color="blue-gray"
+									className="font-medium opacity-60 text-[13px] line-clamp-1 capitalize"
+								>
+									{row?.subManager?.firstname + " " + row?.subManager?.lastname+" (Suppléant)"}
+								</Typography>
+							</div>
+						</div>
+
+					}
 				</div>
 			)
 		}
@@ -684,7 +703,7 @@ export const columnDossier = [
 	{
 		field: 'status',
 		headerName: 'Status',
-		width: 170,
+		width: 120,
 		sortable: true,
 		hideSortIcons: false,
 		disableColumnMenu: true,
@@ -697,10 +716,26 @@ export const columnDossier = [
 						variant="gradient"
 						color={params?.row?.is_treated_folder ? "green" : "orange"}
 						value={params?.row?.is_treated_folder ? "Traité" : "En Cours"}
-						className="py-2 px-2 text-[12.5px] font-medium"
+						className="py-2 px-2 !text-[12.5px] font-medium"
 					/>
 				</div>
 
+			)
+		}
+	},
+
+	{
+		field: 'created_at',
+		headerName: 'Créer le',
+		width: 120,
+		sortable: true,
+		hideSortIcons: false,
+		disableColumnMenu: true,
+		renderCell: (params) => {
+			return (
+				<div className="w-full h-full flex items-center" >
+					{dayjs(params?.row?.created_at).format('DD MMM YYYY')}
+				</div>
 			)
 		}
 	},
@@ -710,7 +745,7 @@ export const columnDossier = [
 		field: 'action',
 		headerAlign: 'center',
 		headerName: '',
-		width: 70,
+		width: 60,
 		sortable: false,
 		hideSortIcons: true,
 		disableColumnMenu: true,
@@ -735,7 +770,7 @@ export const columnDossier = [
 						{/* {isAllowedTo(Permissions.VIEW_A_DRIVER_DETAILS) && */}
 							<MenuItem
 								onClick={() =>
-									navigate(`./${params.row.idUser}`,
+									navigate(`./view`,
 										{ state: params.row })
 								}
 								className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-primary hover:!text-white font-medium flex items-center justify-between"
@@ -745,7 +780,7 @@ export const columnDossier = [
 						{/* } */}
 
 						{/* {isAllowedTo(Permissions.VIEW_A_DRIVER_DETAILS) && */}
-							<MenuItem
+							{/* <MenuItem
 								onClick={() =>
 									setDialogue({
 										size: "md",
@@ -757,11 +792,11 @@ export const columnDossier = [
 								className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-primary hover:!text-white font-medium flex items-center justify-between mt-1"
 							>
 								Modifier le dossier
-							</MenuItem>
+							</MenuItem> */}
 						{/* } */}
 
 						
-						<MenuItem
+						{/* <MenuItem
 							// onClick={() => dispatch({
 							// 	type: "SET_DIALOG",
 							// 	value: {
@@ -776,7 +811,7 @@ export const columnDossier = [
 							className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-red-600 hover:!text-white font-medium flex items-center justify-between mt-1"
 						>
 							Supprimer le dossier
-						</MenuItem>
+						</MenuItem> */}
 
 					</MenuList>
 				</Menu>
@@ -809,8 +844,7 @@ export const columnMinutes = [
 
 					<Typography
 						variant="small"
-						color="blue-gray"
-						className=" font-medium mt-2 text-[12.5px] "
+						className=" font-medium mt-2 text-[12px] "
 					>
 						{dayjs(params?.row?.created_at).format('DD MMM YYYY')}
 					</Typography>
@@ -823,32 +857,18 @@ export const columnMinutes = [
 	},
 
 	{
-		field: 'fullname',
-		headerName: 'Titre du template',
-		flex: 1.5,
-		minWidth: 170,
+		field: '',
+		headerName: '',
+		width: 55,
 		sortable: true,
 		hideSortIcons: false,
 		disableColumnMenu: true,
 		renderCell: ({row}) => {
-
 			return (
-
-				<div className="flex items-center gap-4 py-3">
-					<AvatarMui >
-
-					</AvatarMui>
-					<Typography
-						variant="small"
-						color="blue-gray"
-						className="font-semibold text-[13.5px] "
-					>
-						{row.civility == "Structure" ? row?.denomination : row?.firstname + " " + row?.lastname}
-					</Typography>
+				<div className="flex items-center justify-center w-[40px] h-[40px] bg-primary rounded-full">
+					<FaRegFileWord size={18} color="#fff" />
 				</div>
-
 			)
-
 		}
 	},
 
@@ -866,16 +886,9 @@ export const columnMinutes = [
 					<Typography
 						variant="small"
 						color="blue-gray"
-						className="font-semibold text-[13.5px] "
+						className=" font-medium text-[13.5px] "
 					>
-						{params.row.email || "Email inexistant"}
-					</Typography>
-					<Typography
-						variant="small"
-						color="blue-gray"
-						className=" font-normal mt-1 text-[12.5px] "
-					>
-						{params.row.phone_number || "Tel inexistant"}
+						{params.row.email}
 					</Typography>
 				</div>
 			)
@@ -896,12 +909,12 @@ export const columnMinutes = [
 
 				params?.row?.numero_ufu &&
 				<div className="w-full h-full flex items-center" >
-					<Chip
+					{/* <Chip
 						variant="gradient"
 						color={params?.row?.numero_ufu ? "green" : "red"}
 						value={params?.row?.numero_ufu}
 						className="py-2 px-2 text-[12.5px] font-medium"
-					/>
+					/> */}
 				</div>
 
 			)
