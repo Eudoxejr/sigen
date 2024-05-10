@@ -3,18 +3,17 @@
 import * as React from 'react';
 import { useEffect, useRef } from 'react';
 
-import { DocumentEditorContainerComponent, Toolbar, WordExport, SfdtExport } from '@syncfusion/ej2-react-documenteditor';
-import {
-	Input
-} from "@material-tailwind/react";
+import { DocumentEditorContainerComponent, Toolbar } from '@syncfusion/ej2-react-documenteditor';
 
 import { DialogUtility, Dialog } from '@syncfusion/ej2-react-popups';
+import { AiOutlineArrowLeft} from "react-icons/ai";
 import { ListView } from '@syncfusion/ej2-react-lists';
 import { useForm, Controller, useFieldArray, useWatch } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import Box from '@mui/material/Box';
 import { styled, alpha } from '@mui/material/styles';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem, treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import Typography from '@mui/material/Typography';
@@ -28,8 +27,11 @@ import NextedTreeItem from './nestedTreeItem';
 import { useDialogueStore } from '@/store/dialogue.store';
 import AsyncSelect from 'react-select/async';
 import { CategoriesApi } from "@/api/api";
-import { uploadFile } from '@/utils/uploadS3';
-
+import { uploadBlobToS3 } from '@/utils/uploadS3V2';
+import { toast } from 'react-toastify';
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { handleBackendErrors } from "@/utils/handleHandler";
+import { TemplateApi } from '@/api/api';
 
 const StyledTreeItemLabel = styled(Typography)({
     color: 'inherit',
@@ -121,48 +123,53 @@ const StyledTreeItem = React.forwardRef(function StyledTreeItem(props, ref) {
     );
 });
 
-
 DocumentEditorContainerComponent.Inject(Toolbar);
 
-const TemplateEdit = () => {
+const TemplateEdit = ({edit}) => {
 
     useEffect(() => {
         rendereComplete();
     }, []);
 
     const { setDialogue, setBackdrop } = useDialogueStore()
-    let container = useRef(null);
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    const {state} = useLocation();
+    const [loadFile, setloadFile] = React.useState(true);
     
+    let container = useRef(null);
+
+    // console.log(state)
 
     const schema = yup.object({
         categoryId: yup.string().trim("Sélectionner une catégorie svp").required("Sélectionner une catégorie svp"),
         templateName: yup.string().trim().required("Le nom du template est requis").max(250, "Ne doit pas dépasser 250 caractères"),
         group: yup.array().of(
             yup.object({
-                name: yup.string().trim().required("Le nom du dossier est requis").max(250, "Ne doit pas dépasser 250 caractères"),
+                id: yup.number(),
+                name: yup.string().trim().required("Le nom du groupe est requis").max(250, "Ne doit pas dépasser 250 caractères"),
                 isClientGroup: yup.boolean().required(),
-                subChild: yup.array().of(
+                variables: yup.array().of(
                     yup.object({
-                        name: yup.string().trim().required("Le nom du dossier est requis").max(250, "Ne doit pas dépasser 250 caractères"),
-                        isClientGroup: yup.boolean().required(),
+                        id: yup.number(),
+                        name: yup.string().trim().required("Le nom de la variable est requis").max(250, "Ne doit pas dépasser 250 caractères"),
                     })
-                ),
-                // informationRequested: yup.array().of(
-                //     yup.object({
-                //         question: yup.string().trim().required("L'information est requise").max(250, "Ne doit pas dépasser 250 caractères")
-                //     })
-                // ).test('is-unique-question', 'Vous demandez la même information plusieurs fois', function (value) {
+                )
+                // .test('is-unique-variable', 'Vous demandez la même information plusieurs fois', function (value) {
                 //     const questions = value.map(informationRequested => informationRequested.question);
                 //     const uniquepartyquestions = new Set(questions);
                 //     return questions.length === uniquepartyquestions.size;
                 // })
             })
-        ).test('is-unique', 'Les noms des dossiers et sous dossiers doivent être unique', function (value) {
-            const sub_dossier_names = value.map(subDos => subDos.name);
-            const uniqueSubDosNames = new Set(sub_dossier_names);
-            return sub_dossier_names.length === uniqueSubDosNames.size;
-        })
+        ).test('is-unique', 'Les noms des groupes de variable doivent être unique', function (value) {
+            const group_names = value.map(group => group.name);
+            const uniqueGroupNames = new Set(group_names);
+            return group_names.length === uniqueGroupNames.size;
+        }),
+        deletedGroup: yup.array().of(yup.string().required()),
+        deletedVariable: yup.array().of(yup.string().required())
     }).required();
+    
 
     const { control, setValue, handleSubmit, setError, formState: { errors, isDirty } } = useForm({
         resolver: yupResolver(schema),
@@ -171,10 +178,14 @@ const TemplateEdit = () => {
                 { 
                     "name": "Autres", 
                     "isClientGroup": false,
-                    "subChild": [
+                    "variables": [
                     ]
                 }
-            ]
+            ],
+            ...edit && {
+                "templateName": state.template_name,
+                "categoryId": state.category_id                
+            }
         }
     });
 
@@ -183,53 +194,145 @@ const TemplateEdit = () => {
         name: "group", // unique name for your Field Array
     });
 
+    const { append:appendDeletedGroup } = useFieldArray({
+        control, // control props comes from useForm (optional: if you are using FormContext)
+        name: "deletedGroup", // unique name for your Field Array
+    });
+
+    const { append:appendDeletedVariable} = useFieldArray({
+        control, // control props comes from useForm (optional: if you are using FormContext)
+        name: "deletedVariable", // unique name for your Field Array
+    });
+
+    const {mutate} = useMutation({
+
+        mutationFn: async (data) => {
+          return TemplateApi.createTemplate(data)
+        },
+        gcTime:0,
+        onSuccess: (response) => {
+            queryClient.invalidateQueries(["getMinute"])
+            setBackdrop({active: false})
+            toast.success('Template ajouté avec succès', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "colored",
+            });
+            navigate(-1);
+        },
+        onError: ({response}) => {
+            setBackdrop({active: false})
+            toast.error(handleBackendErrors(response.data, "Une erreur s'est produite"), {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "colored",
+            });
+        }
+  
+    })
+
+    const {mutate:mutate2} = useMutation({
+
+        mutationFn: async (data) => {
+          return TemplateApi.updateTemplate(data, state.id)
+        },
+        gcTime:0,
+        onSuccess: (response) => {
+            setBackdrop({active: false})
+            queryClient.invalidateQueries(["getMinute"])
+            toast.success('Template modifié avec succès', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "colored",
+            });
+            navigate(-1);
+        },
+        onError: ({response}) => {
+            setBackdrop({active: false})
+            toast.error(handleBackendErrors(response.data, "Une erreur s'est produite"), {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "colored",
+            });
+        }
+  
+    })
+
+    const { isError, data: listVariable,  isLoading } = useQuery({
+		queryKey: ["getVariablesOfTemplate", state?.id],
+		queryFn: async ({ queryKey }) => {
+			return TemplateApi.getTemplateVariable(queryKey[1])
+		},
+		enabled: edit || false,
+        staleTime: 0,
+        refetchOnWindowFocus: false
+	})
+
+    function addCustomIdToGroups(data) {
+        return data.group.map(group => {
+            const updatedVariables = group.variables.map(variable => {
+                return { ...variable, customId: variable.id };
+            });
+            return { ...group, customId: group.id, variables: updatedVariables };
+        });
+    }
+
+    useEffect(() => {
+        if(listVariable?.group)
+        {
+            const newData = { ...listVariable, group: addCustomIdToGroups(listVariable) }
+            setValue('group', newData.group)
+        }
+    }, [listVariable]);
+
     const handleClick = async (data) => {
-        // console.log(data);
-        // container.current.documentEditor.save('text','Sfdt')
-        // let sfdt = { content: container.current.documentEditor.serialize() };
-        // //Send the sfdt content to server side.
-        // console.log(sfdt);
-        // container.current.documentEditor.saveAsBlob('Sfdt').then(async(blob) => {
-        //     console.log(blob);
-        //     await uploadFile(blob)
-        //     .then((s3Link) => {
-        //         // data.profilPic = s3Link.Location
-        //         // mutate(data)
-        //         let file = 'https://versus-bkt.s3.eu-west-3.amazonaws.com/inputs/file_1712835604541.'
-
-        //         let fileReader = new FileReader();
-
-        //         fileReader.onload = (e) => {
-        //             // let contents = 
-        //             // let proxy = container.current.documentEditor;
-        //             // console.log(contents);
-        //             // proxy.open(contents);
-        //         };
-
-        //         //Read the file as text.
-        //         fileReader.readAsText(file);
-        //         // documenteditor.documentName = file.name.substr(0, file.name.lastIndexOf('.'));
-
-        //     })
-        //     .catch((err) => {
-
-        //         console.log(err);
-        //         // toast.error("Une erreur s'est produite lors de l'upload de l'image", {
-        //         // position: "top-right",
-        //         // autoClose: 3000,
-        //         // hideProgressBar: true,
-        //         // closeOnClick: true,
-        //         // pauseOnHover: false,
-        //         // draggable: false,
-        //         // progress: undefined,
-        //         // theme: "colored",
-        //         // });
-
-        //         //setBackdrop({active: false})
-
-        //     })
-        // })
         setBackdrop({active: true})
+        container.current.documentEditor.saveAsBlob('Sfdt').then(async(blob) => {
+            await uploadBlobToS3(blob)
+            .then((s3Link) => {
+                data.url = s3Link.Location
+                if(edit){
+                    console.log(data);
+                    mutate2(data)
+                }
+                else {
+                    mutate(data)
+                }
+            })
+            .catch((err) => {
+                setBackdrop({active: false})
+                toast.error("Une erreur s'est produite lors de l'enrégistrement du template", {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: false,
+                    progress: undefined,
+                    theme: "colored",
+                });
+            })
+        })
     };
 
     let hostUrl = "https://services.syncfusion.com/react/production/api/documenteditor/";
@@ -326,17 +429,36 @@ const TemplateEdit = () => {
         ],
     });
 
+    const loadDocumentFromURL = async () => {
+        fetch(state?.url)
+        .then(response => response.text()) // Assurez-vous que le contenu est lu correctement
+        .then(sfdtContent => {
+            container.current.documentEditor.open(sfdtContent);
+            setloadFile(false)
+        })
+        .catch(error => {
+            navigate(-1)
+            toast.error('Une erreur s\'est produite lors du chargement du fichier', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "colored",
+            });
+            setloadFile(false)
+        });
+    };
+
     const onLoadDefault = () => {
-        // let defaultDocument = {
-        //     sfdt: 'https://versus-bkt.s3.eu-west-3.amazonaws.com/inputs/file_1712798301480.Docx'
-        // };
-        // container.current.documentEditor.open(JSON.stringify({Location: 'https://versus-bkt.s3.eu-west-3.amazonaws.com/inputs/file_1712799002811.'}));
+        if(edit){loadDocumentFromURL()}
         container.current.documentEditor.documentName = "Template de minute";
         container.current.documentEditorSettings.showRuler = true;
         let item = toolbarOptions;
         container.current.toolbarItems = item;
         container.current.documentChange = () => {
-            titleBar.updateDocumentTitle();
             container.current.documentEditor.focusIn();
         };
     };
@@ -358,7 +480,6 @@ const TemplateEdit = () => {
         container.current.documentEditor.pageOutline = "#E0E0E0";
         container.current.documentEditor.acceptTab = true;
         container.current.documentEditor.resize();
-        // titleBar = new TitleBar(document.getElementById("documenteditor_titlebar"), container.current.documentEditor, true);
         onLoadDefault();
     };
 
@@ -377,15 +498,10 @@ const TemplateEdit = () => {
 
         <div className="control-pane ">
 
-            {/* <div id="documenteditor_titlebar" className="e-de-ctn-title !bg-primary mt-3 flex items-center "></div> */}
+            <div className=" w-full items-center justify-between flex flex-row my-3" >
 
-            <div className=" w-full items-center justify-between flex flex-row mt-3" >
-
-                <button 
-                    onClick={handleSubmit(handleClick)}
-                    className=" bg-primary px-2 text-white rounded-md h-[35px]  font-medium text-[13px] " 
-                >
-                    Enrégistrer
+                <button onClick={() => navigate(-1)} className=" bg-primary w-[35px] h-[35px] mr-3 rounded-full flex justify-center items-center" >
+                    <AiOutlineArrowLeft className=' text-white ' size={16} />
                 </button>
 
                 <Controller
@@ -394,7 +510,7 @@ const TemplateEdit = () => {
                         fieldState: { invalid, error}
                     }) => (
                         <div className="w-[300px]" >
-                            <Input ref={ref} onChange={onChange} className="h-[40px] w-full text-[13px] font-normal text-blue-gray-600" value={value} type="text" color="blue-gray" label="Title du template" size="lg" error={invalid} />
+                            <input onChange={onChange} className="h-[40px] w-full text-[13px] font-normal border border-gray-400 rounded-md px-2 text-blue-gray-600" value={value} type="text" color="blue-gray" placeholder="Title du template" size="lg" error={invalid} />
                             {error && 
                                 <span className=" text-[10px] text-red-400" >{error.message}</span>
                             }
@@ -403,7 +519,6 @@ const TemplateEdit = () => {
                     name="templateName"
                     control={control}
                 />
-
 
                 <Controller
                     render={({
@@ -415,6 +530,10 @@ const TemplateEdit = () => {
                                 cacheOptions
                                 ref={ref}
                                 defaultOptions
+                                defaultValue={edit && {
+                                    label: state.category.category_name,
+                                    value: state.category.id
+                                }}
                                 loadOptions={loadOptionsCategorie}
                                 styles={{
                                     control: (baseStyles, state) => ({
@@ -438,6 +557,24 @@ const TemplateEdit = () => {
                     control={control}
                 />
 
+                {!(edit && loadFile) ?
+                    <button 
+                        // disabled={!isDirty}
+                        onClick={handleSubmit(handleClick)}
+                        className=" bg-green-500 px-4 text-white disabled:bg-gray-600 rounded-md h-[35px]  font-medium text-[13px] " 
+                    >
+                        {edit? "Enrégistrer" : "Valider"}
+                    </button>
+                :
+                    <button 
+                        disabled={true}
+                        onClick={handleSubmit(handleClick)}
+                        className=" bg-green-500 px-4 text-white disabled:bg-gray-600 rounded-md h-[35px]  font-medium text-[13px] " 
+                    >
+                        chargement...
+                    </button>
+                }
+
             </div>
 
             <div className="control-section w-full overflow-hidden flex-1 flex flex-row ">
@@ -447,50 +584,139 @@ const TemplateEdit = () => {
                     paddingLeft: 5,
                     paddingRight: 5
                 }}>
-                    <div className=" flex flex-col " >
-                        <label className=" font-medium " style={{ display: "block", margin: "1px", paddingTop: "8px" }}>
-                            Liste des variables
-                        </label>
-                        <button 
-                            onClick={() => { 
-                                setDialogue({
-                                    size: "sm",
-                                    open: true,
-                                    view: "create-variable-group",
-                                    data: null,
-                                    functionPrependGroupVariable: prependGroup
-                                })
-                            }}
-                            className=" bg-primary text-white rounded-md h-[35px] mt-3 font-medium text-[13px] " 
-                        >
-                            Créer un groupe de variable
-                        </button>
-                    </div>
-                    <div className=" mt-2 h-[500px] overflow-scroll w-full " >
+                    {edit ?
+                    
+                        !isLoading  ?
 
-                        <SimpleTreeView
-                            aria-label="customized"
-                            sx={{ overflowX: 'hidden', minHeight: 270, flexGrow: 1, maxWidth: 280 }}
-                        >
-                            {fieldGroup.map((field, index) => (
-                                <StyledTreeItem 
-                                    key={`FoldersGen1${index}`}
-                                    itemId={`FoldersGen1${index}`} 
-                                    labelIcon={FaFolder} 
-                                    delete={field.name == "Autres"} 
-                                    labelText={field.name}
-                                    onHandleDelete={() => removeGroup(index)}
+                            <>
+                                <div className=" flex flex-col " >
+                                    <label className=" font-medium " style={{ display: "block", margin: "1px", paddingTop: "8px" }}>
+                                        Liste des variables
+                                    </label>
+                                    <button 
+                                        onClick={() => { 
+                                            setDialogue({
+                                                size: "sm",
+                                                open: true,
+                                                view: "create-variable-group",
+                                                data: null,
+                                                functionPrependGroupVariable: prependGroup
+                                            })
+                                        }}
+                                        disabled={isLoading}
+                                        className=" bg-primary disabled:bg-gray-600 text-white rounded-md h-[35px] mt-3 font-medium text-[13px] " 
+                                    >
+                                        Créer un groupe de variable
+                                    </button>
+                                </div>
+                                <div className=" mt-2 h-[500px] overflow-scroll w-full " >
+
+                                    <Controller
+                                        render={({
+                                            fieldState: {error}
+                                        }) => (
+
+                                            <>
+                                                {error && <span className=" text-[12px] text-red-500 " >{error.message}</span>}
+
+                                                <SimpleTreeView
+                                                    aria-label="customized"
+                                                    sx={{ overflowX: 'hidden', minHeight: 270, flexGrow: 1, maxWidth: 280 }}
+                                                >
+                                                    {fieldGroup.map((field, index) => (
+                                                        <StyledTreeItem 
+                                                            key={`FoldersGen1${index}`}
+                                                            itemId={`FoldersGen1${index}`} 
+                                                            labelIcon={FaFolder} 
+                                                            delete={field.name == "Autres"} 
+                                                            labelText={field.name}
+                                                            onHandleDelete={() => { appendDeletedGroup(field.customId); removeGroup(index)} }
+                                                        >
+                                                            <NextedTreeItem insertField={insertField} deletedVariable={appendDeletedVariable} add={!field.isClientGroup} nextIndex={index} control={control}/>
+                                                        </StyledTreeItem>
+                                                    ))}
+                                                </SimpleTreeView>
+                                            </>
+
+                                        )}
+                                        name="group"
+                                        control={control}
+                                    />
+
+                                </div>
+                            </>
+
+                        :  
+                            <div className=" flex flex-1 flex-col items-center gap-y-2 mt-2 " >
+                                {Array.from({ length: 6 }).map((_, key) => (
+                                <div key={"variables"+key} className=" animate-pulse bg-gradient-to-br from-gray-100 to-blue-gray-200  rounded-[8px] bg-white p-[2%] h-[40px] w-[95%] " />
+                                ))}
+                            </div>
+
+                        :
+
+                        <>
+                            <div className=" flex flex-col " >
+                                <label className=" font-medium " style={{ display: "block", margin: "1px", paddingTop: "8px" }}>
+                                    Liste des variables
+                                </label>
+                                <button 
+                                    onClick={() => { 
+                                        setDialogue({
+                                            size: "sm",
+                                            open: true,
+                                            view: "create-variable-group",
+                                            data: null,
+                                            functionPrependGroupVariable: prependGroup
+                                        })
+                                    }}
+                                    className=" bg-primary disabled:bg-gray-600 text-white rounded-md h-[35px] mt-3 font-medium text-[13px] " 
                                 >
-                                    <NextedTreeItem insertField={insertField} add={!field.isClientGroup} nextIndex={index} control={control}/>
-                                </StyledTreeItem>
-                            ))}
-                        </SimpleTreeView>
+                                    Créer un groupe de variable
+                                </button>
+                            </div>
+                            <div className=" mt-2 h-[500px] overflow-scroll w-full " >
 
-                    </div>
+                                <Controller
+                                    render={({
+                                        fieldState: {error}
+                                    }) => (
+
+                                        <>
+                                            {error && <span className=" text-[12px] text-red-500 " >{error.message}</span>}
+
+                                            <SimpleTreeView
+                                                aria-label="customized"
+                                                sx={{ overflowX: 'hidden', minHeight: 270, flexGrow: 1, maxWidth: 280 }}
+                                            >
+                                                {fieldGroup.map((field, index) => (
+                                                    <StyledTreeItem 
+                                                        key={`FoldersGen1${index}`}
+                                                        itemId={`FoldersGen1${index}`} 
+                                                        labelIcon={FaFolder} 
+                                                        delete={field.name == "Autres"} 
+                                                        labelText={field.name}
+                                                        onHandleDelete={() => removeGroup(index)}
+                                                    >
+                                                        <NextedTreeItem insertField={insertField} add={!field.isClientGroup} nextIndex={index} control={control}/>
+                                                    </StyledTreeItem>
+                                                ))}
+                                            </SimpleTreeView>
+                                        </>
+
+                                    )}
+                                    name="group"
+                                    control={control}
+                                />
+
+                            </div>
+                        </>
+                    }
+                    
                 </div>
 
                 <div className="w-[80%] flex flex-1 control-section mb-10 " style={{ paddingLeft: "0px", paddingRight: "0px", paddingTop: "5px" }}>
-                    <DocumentEditorContainerComponent id="container" ref={container} style={{ display: "block" }} height={590} serviceUrl={hostUrl} enableWordExport={true} enableSfdtExport={true} enableTextExport={true} enableToolbar={true} locale="fr-FR" />
+                    <DocumentEditorContainerComponent id="container" ref={container} style={{ display: "block" }} height={590} serviceUrl={hostUrl} enableSfdtExport={true} enableToolbar={true} locale="fr-FR" />
                 </div>
 
             </div>

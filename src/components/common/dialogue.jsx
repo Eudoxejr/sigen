@@ -9,6 +9,7 @@ import DeleteCategorieGroup from './deletecategoriegroup.dialog';
 
 import CreateCollaborateur from './createcollabo.dialog';
 import UpdateCollaborateur from './updatecollabo.dialog';
+import DeleteUserDialog from './deleteuser.dialog';
 import SuspendUserDialog from './suspenduser.dialog';
 import CreateClient from './createclient.dialog';
 import UpdateClient from './updateclient.dialog';
@@ -19,6 +20,7 @@ import CreateSubfolder from './createsubfolder.dialog';
 import CreateSubfolder2 from './createsubfolder2.dialog';
 import AddFile from './addfile.dialo';
 import ViewPdf from './viewpdf.dialog';
+import ViewTemplate from './viewtemplate.dialog';
 
 import { useDialogueStore } from '@/store/dialogue.store';
 
@@ -48,6 +50,8 @@ export default function Dialogue() {
 						<UpdateCollaborateur/>
 					: dialogue?.view === "suspend-collaborateur" ?
 						<SuspendUserDialog/>
+					: dialogue?.view === "delete-collaborateur" ?
+						<DeleteUserDialog/>
 					: dialogue?.view === "create-client" ?
 						<CreateClient/>
 					: dialogue?.view === "update-client" ?
@@ -66,6 +70,8 @@ export default function Dialogue() {
 						<AddFile/>
 					: dialogue?.view === "view-pdf" ?
 						<ViewPdf/>
+					: dialogue?.view === "view-template" ?
+						<ViewTemplate/>
 					:
 						<div />
 				}

@@ -102,7 +102,7 @@ export default function DataGridComponent({
     },
     enabled: true,
     // staleTime: 0
-    staleTime: 40 * 60 * 1000,
+    staleTime: 10 * 60 * 1000,
     // refetchOnMount: "always"
 
   })

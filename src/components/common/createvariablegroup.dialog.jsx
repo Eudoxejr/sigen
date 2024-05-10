@@ -17,58 +17,55 @@ import Switch from '@mui/material/Switch';
 
 function CreateVariableGroup() {
 
-    const { setDialogue, dialogue } = useDialogueStore()
-
-    console.log(dialogue);
+  const { setDialogue, dialogue } = useDialogueStore()
 
   const schema = yup.object({
-    name: yup.string().required("Le nom du groupe est requis").min(2, "le title du groupe doit être au moins de 2 caractères" ).max(250, "le title du groupe doit être au plus de 250 caractères" ),
+    name: yup.string().required("Le nom du groupe est requis").notOneOf(["Autres"], "Entrez un nom de groupe autre que << Autres >>").min(2, "le title du groupe doit être au moins de 2 caractères" ).max(250, "le title du groupe doit être au plus de 250 caractères" ),
     isClientGroup: yup.boolean(),
-    subChild: yup.array().required()
+    variables: yup.array().required()
   }).required();
 
   const {control, handleSubmit, setError, formState:{ errors } } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-        subChild: [],
-        isClientGroup: false
+      variables: [],
+      isClientGroup: false
     }
   });
 
-
   const handleClick = async (data) => {
     if(data.isClientGroup){
-        dialogue.functionPrependGroupVariable({
-            ...data,
-            subChild: [
-                { name: data.name+'_prenom', valueInTable: 'firstname' },
-                { name: data.name+'_nom', valueInTable: 'lastname' },
-                { name: data.name+'_matricule', valueInTable: 'matricule' },
-                { name: data.name+'_denomination', valueInTable: 'denomination' },
-                { name: data.name+'_numeroDeTelephone', valueInTable: 'phone_number' },
-                { name: data.name+'_email', valueInTable: 'email' },
-                { name: data.name+'_adressePhysique', valueInTable: 'adresse_physique' },
-                { name: data.name+'_adresseDuSiege', valueInTable: 'adresse_siege' },
-                { name: data.name+'_nomCompletDuPere', valueInTable: 'fullname_father' },
-                { name: data.name+'_nomCompletDeLaMere', valueInTable: 'fullname_monther' },
-                { name: data.name+'_nomCompletDuConjoint', valueInTable: 'fullname_conjoint' },
-                { name: data.name+'_civilité', valueInTable: 'civility' },
-                { name: data.name+'_formeDeLaStructure', valueInTable: 'forme_structure' },
-                { name: data.name+'_profession', valueInTable: 'profession' },
-                { name: data.name+'_statutMatrimonial', valueInTable: 'marital_status' },
-                { name: data.name+'_numeroUFU', valueInTable: 'numero_ufu' },
-                { name: data.name+'_numeroRCC', valueInTable: 'numero_rcc' }
-            ]
-        })
+      dialogue.functionPrependGroupVariable({
+        ...data,
+        variables: [
+          { name: data.name+'_prenom', valueInTable: 'firstname' },
+          { name: data.name+'_nom', valueInTable: 'lastname' },
+          { name: data.name+'_matricule', valueInTable: 'matricule' },
+          { name: data.name+'_denomination', valueInTable: 'denomination' },
+          { name: data.name+'_numeroDeTelephone', valueInTable: 'phone_number' },
+          { name: data.name+'_email', valueInTable: 'email' },
+          { name: data.name+'_adressePhysique', valueInTable: 'adresse_physique' },
+          { name: data.name+'_adresseDuSiege', valueInTable: 'adresse_siege' },
+          { name: data.name+'_nomCompletDuPere', valueInTable: 'fullname_father' },
+          { name: data.name+'_nomCompletDeLaMere', valueInTable: 'fullname_monther' },
+          { name: data.name+'_nomCompletDuConjoint', valueInTable: 'fullname_conjoint' },
+          { name: data.name+'_civilité', valueInTable: 'civility' },
+          { name: data.name+'_formeDeLaStructure', valueInTable: 'forme_structure' },
+          { name: data.name+'_profession', valueInTable: 'profession' },
+          { name: data.name+'_statutMatrimonial', valueInTable: 'marital_status' },
+          { name: data.name+'_numeroUFU', valueInTable: 'numero_ufu' },
+          { name: data.name+'_numeroRCC', valueInTable: 'numero_rcc' }
+        ]
+      })
     }
     else {
-        dialogue.functionPrependGroupVariable(data)
+      dialogue.functionPrependGroupVariable(data)
     }
     setDialogue({
-        size: "sm",
-        open: false,
-        view: null,
-        data: null
+      size: "sm",
+      open: false,
+      view: null,
+      data: null
     })
   };
 

@@ -190,7 +190,6 @@ export const CategoriesApi = {
 export const FoldersApi = {
 
 	async getFolders(page, perPage, q, categories) {
-
 		const response = await axiosPrivate.request({
 			method: 'get',
 			url: API_URL + '/folders',
@@ -205,24 +204,20 @@ export const FoldersApi = {
 	},
 
 	async getFolderTree(id) {
-
 		const response = await axiosPrivate.request({
 			method: 'get',
 			url: API_URL + '/folders/tree/'+id
 		})
 		return response.data;
-		
 	},
 
 
 	async getFolder(id) {
-
 		const response = await axiosPrivate.request({
 			method: 'get',
 			url: API_URL + '/folders/'+id
 		})
 		return response.data;
-		
 	},
 
 
@@ -270,6 +265,60 @@ export const FoldersApi = {
 
 }
 
+export const TemplateApi = {
+
+	async getTemplate(page, perPage, q, categories) {
+
+		const response = await axiosPrivate.request({
+			method: 'get',
+			url: API_URL + '/templates',
+			params: {
+				page: page,
+				perPage: perPage,
+				keyword: q,
+				categories: JSON.stringify(categories),
+			}
+		})
+		return response.data;
+	},
+
+	async getTemplateVariable(templateId) {
+
+		const response = await axiosPrivate.request({
+			method: 'get',
+			url: API_URL + '/templates/' + templateId
+		})
+		return response.data;
+	},
+
+	async createTemplate(data) {
+		// console.log(data);
+		const response = await axiosPrivate.request({
+			method: 'post',
+			url: API_URL + '/templates',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			data: JSON.stringify(data)
+		})
+		return response.data;
+	},
+
+	async updateTemplate(data, id) {
+		// console.log(data);
+		const response = await axiosPrivate.request({
+			method: 'put',
+			url: API_URL + '/templates/'+id,
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			data: JSON.stringify(data)
+		})
+		return response.data;
+	}
+
+}
+
 
 export const CollaboApi = {
 
@@ -284,6 +333,15 @@ export const CollaboApi = {
 				keyword: q,
 				role: JSON.stringify(role),
 			}
+		})
+		return response.data;
+	},
+
+	async getSpecificCollabo(id) {
+
+		const response = await axiosPrivate.request({
+			method: 'get',
+			url: API_URL + '/users/'+id,
 		})
 		return response.data;
 	},
@@ -354,6 +412,20 @@ export const CollaboApi = {
 			data: JSON.stringify(data)
 		})
 		return response.data;
+	},
+
+	async deleteUser(id) {
+
+		const response = await axiosPrivate.request({
+			method: 'delete',
+			url: API_URL + '/users/'+id,
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
+
+		return response.data;
+
 	},
 
 

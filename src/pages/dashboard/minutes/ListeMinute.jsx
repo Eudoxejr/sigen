@@ -9,7 +9,7 @@ import DataGridComponent from '@/components/common/datatable';
 import { columnMinutes } from '@/utils/columsDatatable';
 import { useNavigate } from 'react-router-dom';
 import AsyncSelect from 'react-select/async';
-import { ClientApi } from '@/api/api';
+import { TemplateApi, CategoriesApi } from '@/api/api';
 import debounce from 'lodash.debounce';
 import { produce } from "immer";
 import { useDialogueStore } from '@/store/dialogue.store';
@@ -24,7 +24,7 @@ const MinuteListe = () => {
   const { setDialogue } = useDialogueStore()
   const queryClient = useQueryClient();
 
-  const minuteMeta = queryClient.getQueriesData(["getClient"])?.[0]?.[1]?.meta
+  const minuteMeta = queryClient.getQueriesData(["getMinute"])?.[0]?.[1]?.meta
 
 
   const [searchTerm, setSearchTerm] = useState(null);
@@ -33,7 +33,17 @@ const MinuteListe = () => {
     pageSize: 25
   })
   const [total, setTotal] = useState(0);
-//   const [role, setRole] = useState(null);
+  const [categorie, setCategorie] = useState(null);
+
+  const getCat = async (inputValue) => {
+    const res = await CategoriesApi.getCategories(1, 10, inputValue)
+    return res.data.map((data) => { return { label: data.category_name, value: data.id, other: data } })
+  };
+
+  const loadOptionsCategorie = (inputValue) =>
+  new Promise((resolve) => {
+    resolve(getCat(inputValue))
+  })
 
   const handleChange = (e) => {
     setSearchTerm(e.target.value);
@@ -63,6 +73,30 @@ const MinuteListe = () => {
                   Ajouter un template de minute
                 </button>
 
+                <div>
+
+                  <AsyncSelect 
+                    cacheOptions 
+                    defaultOptions 
+                    loadOptions={loadOptionsCategorie} 
+                    isMulti
+                    styles={{
+                      control: (baseStyles, state) => ({
+                        ...baseStyles,
+                        minHeight: 42,
+                        width: 250,
+                        fontSize: 13,
+                        fontWeight: "300",
+                        color: "red",
+                        zIndex: 100
+                      }),
+                    }}
+                    placeholder="Filtrer par catégorie"
+                    onChange={(val) => { val.length > 0 ? setCategorie(val.map((item) => {return item.value})) : setCategorie(null) } }
+                  />
+
+                </div>
+
                 <div class='w-[250px]'>
 
                   <div className="relative flex items-center w-full h-[42px] rounded-lg focus-within:shadow-md bg-blue-gray-800 overflow-hidden">
@@ -85,52 +119,22 @@ const MinuteListe = () => {
 
                 </div>
 
-                {/* <div class='max-w-md'>
-                      
-                  <Select  
-                    defaultOptions 
-                    styles={{
-                      control: (baseStyles, state) => ({
-                        ...baseStyles,
-                          height: 42,
-                          width: 260,
-                          fontSize: 13,
-                          fontWeight: "300",
-                          color: "red",
-                          zIndex: 100
-                      }),
-                    }}
-                    options={
-                      [
-                        { value: null, label: 'Toutes les pièces' },
-                        { value: 'CHECKING', label: 'Pièces en cours' },
-                        { value: 'VALIDATED', label: 'Pièces validées' },
-                        { value: 'REJECTED', label: 'Pièces rejetées' },
-                        { value: 'EXPIRED', label: 'Pièces expirées' }
-                      ]
-                    }
-                    placeholder="Filtrer par pièce"
-                    onChange={(val) => {setPieceStatus(val.value)} } 
-                  />
-
-                </div> */}
-
               </div>
 
               <div className="flex-1 w-full">
                 <DataGridComponent
                   idpri="id"
                   hidePagination={false}
-                  hideHeader={true}
+                  hideHeader={false}
                   columns={columnMinutes}
                   queryKey={[
                     "getMinute", 
                     pagination.page+1,
                     pagination.pageSize,
                     searchTerm,
-                    // role
+                    categorie
                   ]}
-                  fnQuery={({ queryKey }) => ClientApi.getClient(queryKey[1], queryKey[2], queryKey[3] )}
+                  fnQuery={({ queryKey }) => TemplateApi.getTemplate(queryKey[1], queryKey[2], queryKey[3], queryKey[4] )}
                   noRow={"Pas de template de minute trouvé"}
                   totalInformation={{total, setTotal}}
                   paginationInformation={{pagination, setPagination}}

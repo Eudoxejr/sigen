@@ -51,7 +51,6 @@ const CategoriesCreate = () => {
 
 
     const schema = yup.object({
-
         categoryName: yup.string().trim().required("Le nom de la catégorie est requis").max(250, "Ne doit pas dépasser 250 caractères"),
         categoryColor: yup.string().trim().required("Sélectionner une couleur de dossier").max(120, "Ne doit pas dépasser 120 caractères"),
         categorySlug: yup.string().trim().required("Ajouter un slug").max(6, "Ne doit pas dépasser 6 caractères"),
@@ -80,7 +79,6 @@ const CategoriesCreate = () => {
         
     }).required();
 
-
     const {control, setValue, handleSubmit, setError, formState:{ errors, isDirty } } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
@@ -95,7 +93,6 @@ const CategoriesCreate = () => {
             ]
         }
     });
-
 
     const getGroup = async (inputValue) => {
         const res = await CategorieGroupeApi.getCategorieGroups(1, 12, inputValue)

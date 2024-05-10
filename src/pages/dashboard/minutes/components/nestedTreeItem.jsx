@@ -106,11 +106,11 @@ const StyledTreeItem = React.forwardRef(function StyledTreeItem(props, ref) {
     );
 });
 
-const NextedTreeItem = ({nextIndex, control, add, insertField }) => {
+const NextedTreeItem = ({nextIndex, control, add, insertField, deletedVariable }) => {
 
     const { fields:fieldGroupSub, append:appendGroupSub, remove:removeGroupSub } = useFieldArray({
         control, // control props comes from useForm (optional: if you are using FormContext)
-        name: `group[${nextIndex}].subChild`, // unique name for your Field Array
+        name: `group[${nextIndex}].variables`, // unique name for your Field Array
     });
 
     const { setDialogue } = useDialogueStore()
@@ -126,7 +126,7 @@ const NextedTreeItem = ({nextIndex, control, add, insertField }) => {
                     labelIcon={FaFolder} 
                     labelText={field.name}
                     delete={!add}
-                    onHandleDelete={() => removeGroupSub(index)}
+                    onHandleDelete={() => { if(deletedVariable){deletedVariable(field.customId)}; removeGroupSub(index)} }
                     onClick={() => insertField(field.name)}
                 />
                 
