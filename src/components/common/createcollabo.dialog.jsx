@@ -17,7 +17,9 @@ import { useDialogueStore } from '@/store/dialogue.store';
 import { handleBackendErrors } from "@/utils/handleHandler";
 import AsyncSelect from 'react-select/async';
 import { CollaboApi, RoleApi } from '@/api/api';
-
+import parsePhoneNumber, { isValidPhoneNumber } from "libphonenumber-js"
+import PhoneInput from "react-phone-input-2"
+import "react-phone-input-2/lib/style.css"
 
 function CreateCollaborateur() {
 
@@ -29,9 +31,12 @@ function CreateCollaborateur() {
         lastname: yup.string().required('Le nom de famille est requis'),
         roleId: yup.number().required('Le rôle est requis').positive('Le rôle doit être un nombre positif'),
         email: yup.string().email('L\'adresse email doit être valide').required('L\'adresse email est requise'),
-        phoneNumber: yup.string()
-          .matches(/^\+?\d+$/, 'Le numéro de téléphone doit contenir uniquement des chiffres et peut commencer par un signe +')
-          .required('Le numéro de téléphone est requis'),
+        phoneNumber: yup.string('Entrez le numéro de téléphone').required().test("tel", "Télephone Invalide" , (value) => {
+            if (isValidPhoneNumber(value)) {  
+              return true;
+            }
+            return false;
+        })
     }).required();
 
     const { control, handleSubmit, setError, formState: { errors } } = useForm({
@@ -65,20 +70,20 @@ function CreateCollaborateur() {
                 theme: "colored",
             });
 
-            queryClient.setQueriesData(["getCollabo"], (dataCollabo) => {
+            // queryClient.setQueriesData(["getCollabo"], (dataCollabo) => {
 
-                const nextData = produce(dataCollabo, draftData => {
-                    draftData.data.unshift({ 
-                        ...response.data, 
-                        // meta: { totalCategories: 0 } 
-                    })
-                    draftData.meta.total = dataCollabo.meta.total + 1
-                })
+            //     const nextData = produce(dataCollabo, draftData => {
+            //         draftData.data.unshift({ 
+            //             ...response.data, 
+            //             // meta: { totalCategories: 0 } 
+            //         })
+            //         draftData.meta.total = dataCollabo.meta.total + 1
+            //     })
 
-                return nextData;
+            //     return nextData;
 
-            })
-            // queryClient.invalidateQueries(["getZone"])
+            // })
+            queryClient.invalidateQueries(["getCollabo"])
 
         },
         onError: ({ response }) => {
@@ -216,7 +221,22 @@ function CreateCollaborateur() {
                             fieldState: { invalid, error }
                         }) => (
                             <div className=" min-w-[280px] w-[300px] " >
-                                <Input onChange={onChange} value={value} placeholder='+229 xxxxxxxx' type="tel" color="blue-gray" label="Téléphone" size="lg" error={invalid} />
+                                {/* <Input onChange={onChange} value={value} placeholder='+229 xxxxxxxx' type="tel" color="blue-gray" label="Téléphone" size="lg" error={invalid} /> */}
+                                <PhoneInput
+                                    country={"bj"}
+                                    containerClass="h-[42px] w-full !bg-transparent"
+                                    inputClass=" !h-full !w-full !text-[13px] !font-normal !bg-transparent"
+                                    buttonClass=" !bg-transparent !border-none"
+                                    enableLongNumbers={true}
+                                    onChange={(val) => {
+                                        const parsedNumber = parsePhoneNumber("+" + val)
+                                        if (parsePhoneNumber("+" + val)?.number && parsedNumber?.number) {
+                                            onChange(parsedNumber.number)
+                                        } else {
+                                            onChange("+" + val)
+                                        }
+                                    }}
+                                />
                                 {error &&
                                     <span className=" text-[11px] text-red-400 mt-1" >{error.message}</span>
                                 }

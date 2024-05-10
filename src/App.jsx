@@ -16,6 +16,7 @@ import {
   MinuteListe,
   MinuteCreate,
 } from "./pages/dashboard";
+import EditMinute from "./pages/dashboard/minutes/EditMinute";
 import Roles from "./pages/dashboard/old/roles";
 import AddRoles from "./pages/dashboard/old/addRoles";
 import Folder from "./pages/dashboard/dossiers/folder";
@@ -23,6 +24,7 @@ import SubFolder from "./pages/dashboard/old/subFolder";
 import Files from "./pages/dashboard/old/files";
 import Profile from "./pages/dashboard/profile";
 import Home from "./pages/dashboard/home";
+import CollaboView from "./pages/dashboard/collaborateurs/ViewCollaborateurs";
 
 
 
@@ -44,8 +46,8 @@ function App() {
         {/* <Route path="unauthorized" element={<Unauthorized />} /> */}
 
         <Route path="/dashboard/" element={<Navigate to="/dashboard/accueil" replace />} />
-        {/* <Route path="/" element={<Navigate to="/dashboard/accueil" replace />} /> */}
-        <Route path="/" element={<Navigate to="/dashboard/dossiers" replace />} />
+        <Route path="/" element={<Navigate to="/dashboard/accueil" replace />} />
+        {/* <Route path="/" element={<Navigate to="/dashboard/dossiers" replace />} /> */}
 
         <Route path="/dashboard/*"
           element={
@@ -55,7 +57,7 @@ function App() {
           }
         >
 
-          {/* <Route index path="accueil" element={<Home/>} /> */}
+          <Route index path="accueil" element={<Home/>} />
           <Route path="profil" element={<Profile/>} />
 
           <Route path="dossiers">
@@ -72,6 +74,7 @@ function App() {
 
           <Route path="collaborateurs">
             <Route index element={<CollaborateursListe/>} />
+            <Route path=":id" element={<CollaboView/>} />
           </Route>
 
           <Route path="clients">
@@ -81,6 +84,7 @@ function App() {
           <Route path="minutes">
             <Route index element={<MinuteListe/>} />
             <Route path="add" element={<MinuteCreate/>} />
+            <Route path="edit" element={<EditMinute/>} />
           </Route>
 
         </Route>

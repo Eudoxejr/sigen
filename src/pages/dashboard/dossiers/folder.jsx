@@ -64,7 +64,7 @@ export default function Folder() {
 			return FoldersApi.getFolderTree(state.id)
 		},
 		enabled: true,
-		staleTime: 10*60*100
+		staleTime: 10*60*1000
 	})
 
 

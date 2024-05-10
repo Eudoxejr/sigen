@@ -133,7 +133,7 @@ export class TitleBar {
     };
     // tslint:disable-next-line:max-line-length
     addButton(iconClass, btnText, styles, id, tooltipText, isDropDown, items) {
-        let button = createElement('button', { id: id, styles: styles });
+        let button =    ('button', { id: id, styles: styles });
         this.tileBarDiv.appendChild(button);
         button.setAttribute('title', tooltipText);
         if (isDropDown) {

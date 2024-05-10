@@ -49,8 +49,6 @@ const CategoriesEdit = () => {
     const { setBackdrop } = useDialogueStore()
     const {state} = useLocation();
 
-    console.log(state);
-
     const schema = yup.object({
 
         categoryName: yup.string().trim().required("Le nom de la catégorie est requis").max(250, "Ne doit pas dépasser 250 caractères"),
@@ -89,7 +87,7 @@ const CategoriesEdit = () => {
             categoryName: state.category_name,
             categorySlug: state.category_slug,
             categoryDescription: state.category_description,
-            categorieGroupId: state.categorie_group_id
+            categorieGroupId: state.categoryGroup.id
         }
     });
 

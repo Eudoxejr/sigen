@@ -220,9 +220,13 @@ export const columnColaborateurs = [
 					<MenuList className="p-1 rounded-[5px]">
 						{/* {isAllowedTo(Permissions.VIEW_A_DRIVER_DETAILS) && */}
 							<MenuItem
+								onClick={() =>
+									navigate(`./${params.row.id}`,
+										{ state: params.row })
+								}
 								className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-primary hover:!text-white font-medium flex items-center justify-between"
 							>
-								Voir les dossiers assignés
+								Plus
 							</MenuItem>
 						{/* } */}
 
@@ -276,17 +280,14 @@ export const columnColaborateurs = [
 						}
 
 						<MenuItem
-							onClick={() => dispatch({
-								type: "SET_DIALOG",
-								value: {
-									active: true,
-									view: "suspendDriver",
-									value: {
-										wasActive: true,
-										user: params.row,
-									}
-								}
-							})}
+							onClick={() =>
+								setDialogue({
+									size: "xs",
+									open: true,
+									view: "delete-collaborateur",
+									data: params.row
+								})
+							}
 							className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-red-600 hover:!text-white font-medium flex items-center justify-between mt-1"
 						>
 							Supprimer le collaborateur
@@ -841,14 +842,6 @@ export const columnMinutes = [
 					>
 						{params?.row?.matricule}
 					</Typography>
-
-					<Typography
-						variant="small"
-						className=" font-medium mt-2 text-[12px] "
-					>
-						{dayjs(params?.row?.created_at).format('DD MMM YYYY')}
-					</Typography>
-
 				</div>
 
 			)
@@ -857,38 +850,25 @@ export const columnMinutes = [
 	},
 
 	{
-		field: '',
-		headerName: '',
-		width: 55,
+		field: 'template_name',
+		headerName: "Titre",
+		flex: 1.5,
+		minWidth: 170,
 		sortable: true,
 		hideSortIcons: false,
 		disableColumnMenu: true,
-		renderCell: ({row}) => {
-			return (
-				<div className="flex items-center justify-center w-[40px] h-[40px] bg-primary rounded-full">
-					<FaRegFileWord size={18} color="#fff" />
-				</div>
-			)
-		}
-	},
-
-	{
-		field: 'description',
-		headerName: 'Description',
-		flex: 2,
-		minWidth: 170,
-		sortable: false,
-		hideSortIcons: true,
-		disableColumnMenu: true,
 		renderCell: (params) => {
 			return (
-				<div>
+				<div className="flex-row flex items-center gap-x-3 " >
+					<span className=" w-[40px] h-[40px] rounded-full flex justify-center items-center bg-primary " >
+						<FaRegFileWord size={18} color="#fff" />
+					</span>
 					<Typography
 						variant="small"
 						color="blue-gray"
 						className=" font-medium text-[13.5px] "
 					>
-						{params.row.email}
+						{params?.row?.template_name}
 					</Typography>
 				</div>
 			)
@@ -900,23 +880,14 @@ export const columnMinutes = [
 		headerName: 'Catégorie',
 		flex: 1.2,
 		width: 170,
-		sortable: true,
+		sortable: false,
 		hideSortIcons: false,
 		disableColumnMenu: true,
-		renderCell: (params) => {
-
+		renderCell: ({row}) => {
 			return (
-
-				params?.row?.numero_ufu &&
-				<div className="w-full h-full flex items-center" >
-					{/* <Chip
-						variant="gradient"
-						color={params?.row?.numero_ufu ? "green" : "red"}
-						value={params?.row?.numero_ufu}
-						className="py-2 px-2 text-[12.5px] font-medium"
-					/> */}
+				<div>
+					{row?.category?.category_name}
 				</div>
-
 			)
 		}
 	},
@@ -924,7 +895,7 @@ export const columnMinutes = [
 	{
 		field: 'createDate',
 		headerName: 'Date de création',
-		flex: 0.3,
+		flex: 0.5,
 		minWidth: 170,
 		sortable: true,
 		hideSortIcons: false,
@@ -934,12 +905,7 @@ export const columnMinutes = [
 			return (
 
 				<div className="w-full h-full flex items-center" >
-					<Chip
-						variant="gradient"
-						color={"blue"}
-						value={row.meta.folders_count+" Dossiers"}
-						className="py-0.5 px-2 text-[11px] font-medium"
-					/>
+					{dayjs(row?.created_at).format('DD MMM YYYY à HH:mm')}
 				</div>
 
 			)
@@ -950,26 +916,17 @@ export const columnMinutes = [
 	{
 		field: 'updateDate',
 		headerName: 'Dernière modification',
-		flex: 0.3,
+		flex: 0.5,
 		minWidth: 170,
 		sortable: true,
 		hideSortIcons: false,
 		disableColumnMenu: true,
 		renderCell: ({row}) => {
-
 			return (
-
 				<div className="w-full h-full flex items-center" >
-					<Chip
-						variant="gradient"
-						color={"blue"}
-						value={row.meta.folders_count+" Dossiers"}
-						className="py-0.5 px-2 text-[11px] font-medium"
-					/>
+					{dayjs(row?.updated_at).format('DD MMM YYYY à HH:mm')}
 				</div>
-
 			)
-
 		}
 	},
 
@@ -1001,50 +958,33 @@ export const columnMinutes = [
 					<MenuList className="p-1 rounded-[5px]">
 
 						{/* {isAllowedTo(Permissions.VIEW_A_DRIVER_DETAILS) && */}
-							<MenuItem
-								onClick={() =>
-									setDialogue({
-										size: "md",
-										open: true,
-										view: "update-client",
-										data: params.row
-									})
-								}
-								className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-primary hover:!text-white font-medium flex items-center justify-between mt-1"
-							>
-								Modifier le template
-							</MenuItem>
+						<MenuItem
+							onClick={() =>
+								setDialogue({
+									size: "lg",
+									open: true,
+									view: "view-template",
+									data: params.row
+								})
+							}
+							className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-primary hover:!text-white font-medium flex items-center justify-between mt-1"
+						>
+							Aperçu
+						</MenuItem>
 						{/* } */}
 
-						
 						{/* {isAllowedTo(Permissions.VIEW_A_DRIVER_DETAILS) && */}
 							<MenuItem
 								onClick={() =>
-									setDialogue({
-										size: "md",
-										open: true,
-										view: "details-client",
-										data: params.row
-									})
+									navigate('edit', {state: params.row} )
 								}
 								className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-primary hover:!text-white font-medium flex items-center justify-between mt-1"
 							>
-								Voir le template
+								Editer le template
 							</MenuItem>
 						{/* } */}
 
 						<MenuItem
-							// onClick={() => dispatch({
-							// 	type: "SET_DIALOG",
-							// 	value: {
-							// 		active: true,
-							// 		view: "suspendDriver",
-							// 		value: {
-							// 			wasActive: true,
-							// 			user: params.row,
-							// 		}
-							// 	}
-							// })}
 							className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-red-600 hover:!text-white font-medium flex items-center justify-between mt-1"
 						>
 							Supprimer le template
