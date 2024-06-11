@@ -11,6 +11,7 @@ import { FaUserShield } from "react-icons/fa6";
 import { GiBookPile } from "react-icons/gi";
 import { BiCategoryAlt } from "react-icons/bi";
 import { SiAuth0 } from "react-icons/si";
+import { MdCategory } from "react-icons/md";
 
 
 const icon = {
@@ -24,7 +25,7 @@ export function Dashboard() {
   const { sidenavType } = controller;
 
   return (
-    <div className="min-h-screen">
+    <div className=" w-full-screen ">
       <Sidenav
         routes={[
           {
@@ -56,6 +57,11 @@ export function Dashboard() {
                 path: "/minutes"
               },
               {
+                icon: <MdCategory {...icon} />,
+                name: "Groupe catégorie",
+                path: "/groupes-categories"
+              },
+              {
                 icon: <BiCategoryAlt {...icon} />,
                 name: "Categories",
                 path: "/categories"
@@ -69,7 +75,7 @@ export function Dashboard() {
           },
         ]}
       />
-      <div className="p-4 xl:ml-80">
+      <div className="p-3 xl:ml-80 ">
         <DashboardNavbar />
         <div>
           <Outlet />

@@ -47,6 +47,7 @@ const ClientListe = () => {
   return (
     // <RenderIf allowedTo={Permissions.VIEW_ADMINS_LIST}>
       <div className="mt-6 flex-1 w-full flex flex-col">
+        
         <Card>
             <CardBody className="md:h-[calc(100vh-125px)] shadow-none flex flex-col px-4 pt-0 pb-4 gap-[15px] overflow-auto">
               

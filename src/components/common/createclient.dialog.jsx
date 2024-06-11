@@ -16,6 +16,9 @@ import { toast } from 'react-toastify';
 import { useDialogueStore } from '@/store/dialogue.store';
 import { handleBackendErrors } from "@/utils/handleHandler";
 import { ClientApi } from '@/api/api';
+import parsePhoneNumber, { isValidPhoneNumber } from "libphonenumber-js"
+import PhoneInput from "react-phone-input-2"
+import "react-phone-input-2/lib/style.css"
 
 
 function CreateClient() {
@@ -52,7 +55,12 @@ function CreateClient() {
                 return schema.nullable()
             }
         }),
-        phoneNumber: yup.string().trim().required('Le numéro de téléphone est requis'),
+        phoneNumber: yup.string('Entrez le numéro de téléphone').required().test("tel", "Télephone Invalide" , (value) => {
+            if (isValidPhoneNumber(value)) {  
+              return true;
+            }
+            return false;
+        }),
         email: yup.string().email('Format email invalide'),
         numeroUfu: yup.string().when(['civility'], ([civility], schema) => {
             if (civility == 'Structure') 
@@ -319,15 +327,26 @@ function CreateClient() {
                                 field: { ref, onChange, value, ...field },
                                 fieldState: { invalid, error }, 
                             }) => 
-                                <div className="w-full" >
-                                    <input 
-                                        type="tel"
-                                        disabled={isLoading} ref={ref} onChange={onChange} value={value}
-                                        className=" w-full text-[12px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 "
+                                <div className=" w-full " >
+                                    {/* <Input onChange={onChange} value={value} placeholder='+229 xxxxxxxx' type="tel" color="blue-gray" label="Téléphone" size="lg" error={invalid} /> */}
+                                    <PhoneInput
+                                        country={"bj"}
+                                        containerClass="h-[42px] w-full !bg-transparent"
+                                        inputClass=" !h-full !w-full !text-[13px] !font-normal !bg-transparent"
+                                        buttonClass=" !bg-transparent !border-none"
+                                        enableLongNumbers={true}
+                                        onChange={(val) => {
+                                            const parsedNumber = parsePhoneNumber("+" + val)
+                                            if (parsePhoneNumber("+" + val)?.number && parsedNumber?.number) {
+                                                onChange(parsedNumber.number)
+                                            } else {
+                                                onChange("+" + val)
+                                            }
+                                        }}
                                     />
-                                    { error && 
-                                        <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
-                                    }  
+                                    {error &&
+                                        <span className=" text-[11px] text-red-400 mt-1" >{error.message}</span>
+                                    }
                                 </div>
                             }
                         />

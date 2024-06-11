@@ -76,6 +76,14 @@ function SuspendUserDialog() {
               return nextData;
             });
 
+            queryClient.setQueriesData(["getCollaboSpecific"], (dataCollabo) => {
+                const nextData = produce(dataCollabo, draftData => {
+                    draftData.data.is_suspend = response.data.is_suspend
+                })
+                // console.log(nextData);
+                return nextData;
+            })
+
         },
         onError: ({ response }) => {
             const errorTraited = handleBackendErrors(response.data)

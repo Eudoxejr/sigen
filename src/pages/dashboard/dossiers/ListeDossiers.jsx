@@ -3,24 +3,28 @@ import {
   Card,
   CardHeader,
   CardBody,
+  Tooltip,
   Typography,
 } from "@material-tailwind/react";
 import DataGridComponent from '@/components/common/datatable';
-import { columnClients, columnDossier } from '@/utils/columsDatatable';
-import { useNavigate } from 'react-router-dom';
+import { columnDossierForUser, columnDossier } from '@/utils/columsDatatable';
+import { AiOutlineArrowLeft } from "react-icons/ai";
+import { useNavigate, useLocation } from 'react-router-dom';
 import AsyncSelect from 'react-select/async';
 import { FoldersApi, CategoriesApi } from '@/api/api';
 import debounce from 'lodash.debounce';
 import { produce } from "immer";
 import { useDialogueStore } from '@/store/dialogue.store';
+import {Avatar as AvatarMui} from '@mui/material';
 // import { RenderIf } from '@/components/common';
 // import { Permissions } from '@/data/role-access-data';
 // import { isAllowedTo } from '@/utils';
 import { useQueryClient } from "@tanstack/react-query";
 
-const DossierListe = () => {
+const DossierListe = ({specificUser}) => {
 
   const navigate = useNavigate();
+  const {state} = useLocation();
   const { setDialogue } = useDialogueStore()
   const queryClient = useQueryClient();
 
@@ -60,18 +64,46 @@ const DossierListe = () => {
         <Card>
             <CardBody className="md:h-[calc(100vh-125px)] shadow-none flex flex-col px-4 pt-0 pb-4 gap-[15px] overflow-auto">
               
-              <Typography variant="h6" color="blue-gray" >
-                DOSSIERS ({clientMeta?.total || total})
-              </Typography>
-
+              <div className="flex items-center" >
+                {specificUser &&
+                  <Tooltip content="Retour">
+                    <button onClick={() => navigate(-1)} className=" bg-primary mb-2 w-[40px] h-[40px] mr-4 rounded-full flex justify-center items-center" >
+                      <AiOutlineArrowLeft className=' text-white ' size={16} />
+                    </button>
+                  </Tooltip>
+                }
+                <Typography variant="h6" color="blue-gray" >
+                  DOSSIERS ({clientMeta?.total || total})
+                </Typography>
+              </div>
+                
               <div className=" w-full mb-2 flex justify-between items-center flex-wrap gap-y-3 " >
 
-                <button 
-                  onClick={() => navigate("add")}
-                  class=' bg-primary text-white px-4 py-2 rounded-md text-[13px] font-semibold '
-                >
-                  Nouveau Dossier
-                </button>
+                {specificUser ?
+                    <div className=" w-[320px] h-[90px] flex flex-col justify-center px-3 border-1 border-gray-800 bg-gray-100 rounded-md " >
+                      <span className=" text-[13px] " >Client</span>
+                      <div className="flex items-center gap-3 py-1">
+                        <AvatarMui >
+                        </AvatarMui>
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-semibold text-[13.5px] "
+                        >
+                          {state.civility == "Structure" ? state?.denomination : state?.firstname + " " + state?.lastname}
+                        </Typography>
+                      </div>
+
+                    </div>
+
+                :
+                  <button 
+                    onClick={() => navigate("add")}
+                    class=' bg-primary text-white px-4 py-2 rounded-md text-[13px] font-semibold '
+                  >
+                    Nouveau Dossier
+                  </button>
+                }
 
                 <div>
 
@@ -155,17 +187,25 @@ const DossierListe = () => {
                 <DataGridComponent
                   idpri="id"
                   hidePagination={false}
-                  hideHeader={false}
-                  columns={columnDossier}
+                  hideHeader={specificUser}
+                  columns={specificUser ? columnDossierForUser : columnDossier}
                   queryKey={[
                     "getDossier", 
                     pagination.page+1,
                     pagination.pageSize,
                     searchTerm,
-                    categorie
+                    categorie,
+                    null,
+                    state?.id
                   ]}
-                  fnQuery={({ queryKey }) => FoldersApi.getFolders(queryKey[1], queryKey[2], queryKey[3], queryKey[4] )}
+                  fnQuery={({ queryKey }) => FoldersApi.getFolders(queryKey[1], queryKey[2], queryKey[3], queryKey[4], queryKey[5], queryKey[6] )}
                   noRow={"Pas de dossier trouvé"}
+                  onRowClick={(params) => {
+                    specificUser ?
+                      navigate(`../../dossiers/view`, { state: params.row })
+                    :
+                      navigate(`../dossiers/view`, { state: params.row })
+                  }}
                   totalInformation={{total, setTotal}}
                   paginationInformation={{pagination, setPagination}}
                 />

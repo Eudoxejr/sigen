@@ -14,6 +14,7 @@ import SuspendUserDialog from './suspenduser.dialog';
 import CreateClient from './createclient.dialog';
 import UpdateClient from './updateclient.dialog';
 import DetailsClient from './detailsclient.dialog';
+import DeleteClientDialog from './deleteclient.dialog';
 import CreateVariableGroup from './createvariablegroup.dialog';
 import CreateVariable from './createvariable.dialog';
 import CreateSubfolder from './createsubfolder.dialog';
@@ -72,6 +73,8 @@ export default function Dialogue() {
 						<ViewPdf/>
 					: dialogue?.view === "view-template" ?
 						<ViewTemplate/>
+					: dialogue?.view === "delete-client" ?
+						<DeleteClientDialog/>
 					:
 						<div />
 				}

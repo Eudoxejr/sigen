@@ -87,7 +87,8 @@ export default function DataGridComponent({
   totalInformation, 
   noRow,
   paginationInformation,
-  hideHeader
+  hideHeader,
+  onRowClick
 }) {
 
   const {isError, data:results, error, isLoading } = useQuery({
@@ -102,7 +103,7 @@ export default function DataGridComponent({
     },
     enabled: true,
     // staleTime: 0
-    staleTime: 10 * 60 * 1000,
+    staleTime: 2 * 60 * 1000,
     // refetchOnMount: "always"
 
   })
@@ -136,13 +137,14 @@ export default function DataGridComponent({
           noResultsOverlay:() => CustomNoRowsOverlay(noRow)
         }}
         // error={true}
+        slotProps={{ pagination: { labelRowsPerPage: 'Lignes par page' } }}
         disableSelectionOnClick
         getRowId={(row) =>  row[`${idpri}`]}
         getRowHeight={() => 'auto'}
         loading={isLoading}
         hideFooter={hidePagination}
         paginationMode="server"
-        paginationModel={paginationInformation.pagination}
+        paginationModel={hidePagination ? null : paginationInformation.pagination}
         rowCount={results?.meta?.total || totalInformation.total}
         pageSizeOptions={[25,50,100]}
         onPaginationModelChange={(params) => paginationInformation.setPagination(params)}
@@ -189,6 +191,7 @@ export default function DataGridComponent({
           }
 
         ]}
+        onRowClick={onRowClick || null}
       />
 
     </div>

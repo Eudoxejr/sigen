@@ -177,9 +177,10 @@ const CollaborateursListe = () => {
                     pagination.page+1,
                     pagination.pageSize,
                     searchTerm,
-                    role
+                    role,
+                    true
                   ]}
-                  fnQuery={({ queryKey }) => CollaboApi.getCollabo(queryKey[1], queryKey[2], queryKey[3], queryKey[4] )}
+                  fnQuery={({ queryKey }) => CollaboApi.getCollabo(queryKey[1], queryKey[2], queryKey[3], queryKey[4], queryKey[5] )}
                   noRow={"Pas de collaborateur trouvé"}
                   totalInformation={{total, setTotal}}
                   paginationInformation={{pagination, setPagination}}

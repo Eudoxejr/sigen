@@ -17,30 +17,30 @@ import {
   MinuteCreate,
 } from "./pages/dashboard";
 import EditMinute from "./pages/dashboard/minutes/EditMinute";
-import Roles from "./pages/dashboard/old/roles";
-import AddRoles from "./pages/dashboard/old/addRoles";
 import Folder from "./pages/dashboard/dossiers/folder";
-import SubFolder from "./pages/dashboard/old/subFolder";
-import Files from "./pages/dashboard/old/files";
 import Profile from "./pages/dashboard/profile";
 import Home from "./pages/dashboard/home";
 import CollaboView from "./pages/dashboard/collaborateurs/ViewCollaborateurs";
+import RolesListe from "./pages/dashboard/roles/RolesListe";
 
 
 
 function App() {
 
   return (
-    <div>
+
+    // <div className="scrollbar-thin w-screen h-screen scrollbar-thumb-primary scrollbar-track-secondary overflow-scroll" >
+
+
+    <div className=" flex flex-col flex-1 w-screen h-screen overflow-y-scroll scrollbar-thin overflow-x-hidden " >
+
       <Routes>
 
         <Route path="/auth/" element={<Navigate to="/auth/login" replace />} />
         <Route path="/auth/*" element={<Auth />}>
-
           <Route path="login" element={<SignIn />} />
           <Route path="forgot-password" element={<ForgotPsw/>} />
           <Route path="reset-password" element={<ResetPsw/>} />
-
         </Route>
 
         {/* <Route path="unauthorized" element={<Unauthorized />} /> */}
@@ -79,10 +79,17 @@ function App() {
 
           <Route path="clients">
             <Route index element={<ClientsListe/>} />
+            <Route path=":id" element={<DossiersListe specificUser={true} />} />
           </Route>
 
           <Route path="minutes">
             <Route index element={<MinuteListe/>} />
+            <Route path="add" element={<MinuteCreate/>} />
+            <Route path="edit" element={<EditMinute/>} />
+          </Route>
+
+          <Route path="roles">
+            <Route index element={<RolesListe/>} />
             <Route path="add" element={<MinuteCreate/>} />
             <Route path="edit" element={<EditMinute/>} />
           </Route>
@@ -94,6 +101,7 @@ function App() {
       <Dialogue />
 
     </div>
+
   );
 }
 

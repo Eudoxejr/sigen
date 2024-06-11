@@ -29,14 +29,13 @@ function CreateVariable() {
 
 
     const handleClick = async (data) => {
-        dialogue.functionAppendVariable(data)
-        setDialogue({
-            size: "sm",
-            open: false,
-            view: null,
-            data: null
-        })
-        
+      dialogue.functionAppendVariable(data)
+      setDialogue({
+        size: "sm",
+        open: false,
+        view: null,
+        data: null
+      })
     };
 
 

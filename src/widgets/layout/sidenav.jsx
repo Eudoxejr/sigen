@@ -101,20 +101,31 @@ export function Sidenav({ brandImg, brandName, routes }) {
               </li>
 
             ))}
+
+            <li className="mt-6" >
+              {/* <NavLink to={`/${layout}${path}`}> */}
+                {/* {({ isActive }) => ( */}
+                  <Button
+                    variant={"gradient" }
+                    color={"blue-gray"}
+                    className="flex items-center gap-4 px-4 capitalize"
+                    fullWidth
+                    onClick={() => setUser(false) }
+                  >
+                    <FiLogOut size={20} className="rotate-180" />
+                    <Typography
+                      color="inherit"
+                      className="font-medium text-[13px] capitalize"
+                    >
+                      Déconnexion
+                    </Typography>
+                  </Button>
+              {/* </NavLink> */}
+              </li>
           </ul>
 
         ))}
 
-      </div>
-
-      <div className="w-full py-[20px] flex items-center justify-center border-t-[1px] border-white/20">
-        <button
-          className="flex items-center capitalize justify-center gap-3 text-gray-900"
-          onClick={() => setUser(false) }
-        >
-          <FiLogOut size={20} className="rotate-180" />
-          Déconnexion
-        </button>
       </div>
     </aside>
   );
