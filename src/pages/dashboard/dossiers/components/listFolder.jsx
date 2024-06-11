@@ -16,7 +16,7 @@ export default function ListFolder({currentFolder, setCurrentFolder}) {
 			return FoldersApi.getFolder(queryKey[1])
 		},
 		enabled: true,
-		staleTime: 10*60*100
+		staleTime: 10*60*1000
 	})
 
     const { setDialogue } = useDialogueStore()

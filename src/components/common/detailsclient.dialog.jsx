@@ -16,6 +16,9 @@ import { toast } from 'react-toastify';
 import { useDialogueStore } from '@/store/dialogue.store';
 import { handleBackendErrors } from "@/utils/handleHandler";
 import { ClientApi } from '@/api/api';
+import parsePhoneNumber, { isValidPhoneNumber } from "libphonenumber-js"
+import PhoneInput from "react-phone-input-2"
+import "react-phone-input-2/lib/style.css"
 
 
 function DetailsClient() {
@@ -24,40 +27,117 @@ function DetailsClient() {
     const queryClient = useQueryClient();
 
     const schema = yup.object({
+        civility: yup.string().required('La civilité est requise').oneOf(["Monsieur", "Madame", "Structure"], "Selectionner une civilité"),
         firstname: yup.string().when(['civility'], ([civility], schema) => {
-            if (civility !== 'Societe') 
+            if (civility !== 'Structure') 
             {
-                return schema.required("Le prenom est requis")
+                return schema.required("Le prenom est requis").max(45, "45 caractères maximum")
             }
             else {
                 return schema.nullable()
             }
         }),
         lastname: yup.string().when(['civility'], ([civility], schema) => {
-            if (civility !== 'Societe') 
+            if (civility !== 'Structure') 
             {
-                return schema.required("Le nom est requis")
+                return schema.required("Le nom est requis").max(45, "45 caractères maximum")
+            }
+            else {
+                return schema.nullable()
+            }
+        }),
+        adressePhysique: yup.string().when(['civility'], ([civility], schema) => {
+            if (civility !== 'Structure') 
+            {
+                return schema.required("L'addresse physique est requise").max(180, "180 caractères maximum")
+            }
+            else {
+                return schema.nullable()
+            }
+        }),
+        phoneNumber: yup.string('Entrez le numéro de téléphone').required().test("tel", "Télephone Invalide" , (value) => {
+            if (isValidPhoneNumber(value)) {  
+              return true;
+            }
+            return false;
+        }),
+        email: yup.string().email('Format email invalide'),
+        numeroUfu: yup.string().when(['civility'], ([civility], schema) => {
+            if (civility == 'Structure') 
+            {
+                return schema.trim().required('Le numéro UFU est requis').max(14)
+            }
+            else {
+                return schema.nullable()
+            }
+        }),
+        profession: yup.string().trim().max(45).nullable(),
+        fullnameFather: yup.string().trim().max(180).nullable(),
+        fullnameMonther: yup.string().trim().max(180).nullable(),
+        maritalStatus: yup.string().when(['civility'], ([civility], schema) => {
+            if (civility !== 'Structure') 
+            {
+                return schema.trim().required('Le statut matrimonial est requis').oneOf(["Single", "Maried", "Divorced"])
+            }
+            else {
+                return schema.nullable()
+            }
+        }),
+        fullnameConjoint:yup.string().when(['maritalStatus'], ([maritalStatus], schema) => {
+            if (maritalStatus == 'Maried') 
+            {
+                return schema.trim().required('Le nom complet conjoint(e) est requis').max(180)
+            }
+            else {
+                return schema.nullable()
+            }
+        }),
+        formeStructure: yup.string().when(['civility'], ([civility], schema) => {
+
+            if (civility == 'Structure') 
+            {
+                return schema.trim().required('La forme de la structure est requise').oneOf([
+                    "Société Anonyme (SA)", 
+                    "Société A Responsabilité Limitée (SARL)", 
+                    "Société par Action Simplifiée (SAS)",
+                   "Société Civile Immobilière (SCI)",
+                   "Société Civile Professionnelle (SCP)" ,
+                   "Association (Ass)",
+                   "Organisation Non Gouvernementale (ONG)",
+                   "Autre"
+                ], 'La forme de la structure est requise')
             }
             else {
                 return schema.nullable()
             }
         }),
         denomination: yup.string().when(['civility'], ([civility], schema) => {
-            if (civility == 'Societe') 
+            if (civility == 'Structure') 
             {
-                return schema.required("La denomination de la société est requise")
+                return schema.trim().required("La denomination de la société est requise")
             }
             else {
                 return schema.nullable()
             }
         }),
-        phoneNumber: yup.string().trim().required('Le numéro de téléphone est requis'),
-        email: yup.string().email('Format email invalide').nullable(),
-        civility: yup.string().required('La civilité est requise').oneOf(["Monsieur", "Madame", "Societe"]),
-        profession: yup.string().trim().required('La profession est requise').max(45),
-        maritalStatus: yup.string().trim().required('Le statut marital est requis').oneOf(["Single", "Maried", "Divorced"]),
-        numeroUfu: yup.string().trim().required('Le numéro UFU est requis').max(14),
-        numeroRcc: yup.string().trim().required('Le numéro RCC est requis').max(45),
+        adresseSiege: yup.string().when(['civility'], ([civility], schema) => {
+            if (civility == 'Structure') 
+            {
+                return schema.trim().required("L'addresse physique du siège est requise")
+            }
+            else {
+                return schema.nullable()
+            }
+        }),
+        numeroRcc: yup.string().when(['civility'], ([civility], schema) => {
+            if (civility == 'Structure') 
+            {
+                return schema.trim().required('Le numéro RCC est requis').max(45)
+            }
+            else {
+                return schema.nullable()
+            }
+        }),
     }).required();
 
     const { control, handleSubmit, setError, watch, formState: { errors, isDirty } } = useForm({
@@ -65,6 +145,7 @@ function DetailsClient() {
         defaultValues: {
             firstname: dialogue?.data?.firstname,
             lastname: dialogue?.data?.lastname,
+            adressePhysique: dialogue?.data?.adresse_physique,
             denomination: dialogue?.data?.denomination,
             phoneNumber: dialogue?.data?.phone_number,
             email: dialogue?.data?.email,
@@ -73,11 +154,15 @@ function DetailsClient() {
             maritalStatus: dialogue?.data?.marital_status,
             numeroUfu: dialogue?.data?.numero_ufu,
             numeroRcc: dialogue?.data?.numero_rcc,
+            fullnameFather: dialogue?.data?.fullname_father,
+            fullnameMonther: dialogue?.data?.fullname_monther,
+            fullnameConjoint: dialogue?.data?.fullname_conjoint,
+            formeStructure: dialogue?.data?.forme_structure,
+            adresseSiege: dialogue?.data?.adresse_siege,
         }
     });
 
-    const watchCivility = watch("civility");
-
+    const civilityWatch = watch('civility')
 
     const { mutate, isLoading } = useMutation({
 
@@ -135,7 +220,7 @@ function DetailsClient() {
 
         <>
 
-            <DialogHeader className='text-sm ' >Ajouter un nouveau client</DialogHeader>
+            <DialogHeader className='text-sm ' >Modifier un client</DialogHeader>
 
 
             <DialogBody className=" flex flex-col" divider>
@@ -144,10 +229,9 @@ function DetailsClient() {
                     <span className=" text-[11px] text-center mb-3 text-red-400" >{errors.root?.serverError.message}</span>
                 }
 
-                
-                <div className=' w-full flex flex-row flex-wrap justify-center mt-[20px] gap-y-[20px] gap-x-[30px]' >
+                <div className=' w-full flex flex-row flex-wrap justify-center px-5 md:px-8 mt-[20px] gap-y-[20px] gap-x-[30px]' >
 
-                    <div className="min-w-[280px] w-[300px] md:w-[620px]" >
+                    <div className="min-w-[280px] flex flex-col flex-1 " >
                         <label className=" text-[14px] text-gray-800 font-semibold " >Civilité</label>
                         <Controller
                             name="civility"
@@ -158,9 +242,10 @@ function DetailsClient() {
                             }) => 
                                 <div className="w-full" >
                                     <select disabled={true} ref={ref} onChange={onChange} value={value} className=" w-full text-[14px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 " {...field}>
-                                        <option disabled value="Monsieur">Monsieur</option>
-                                        <option disabled value="Madame">Madame</option>
-                                        <option disabled value="Societe">Societé</option>
+                                        <option value=""></option>
+                                        <option value="Monsieur">Monsieur</option>
+                                        <option value="Madame">Madame</option>
+                                        <option value="Structure">Structure</option>
                                     </select>
                                     { error && 
                                         <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
@@ -172,143 +257,115 @@ function DetailsClient() {
 
                 </div>
 
-                { watchCivility !== 'Societe' &&
-                    <div className=' w-full flex flex-row flex-wrap justify-center mt-[20px] gap-y-[20px] gap-x-[30px]' >
+                <div className=' w-full flex flex-row flex-wrap justify-center mt-[20px] px-5 md:px-8 gap-y-[20px] gap-x-[30px]' >
 
+                    {civilityWatch !== 'Structure' &&
 
-                        <div className="min-w-[280px] w-[300px]" >
-                            <label className=" text-[14px] text-gray-800 font-semibold " >Nom du client</label>
-                            <Controller
-                                name="lastname"
-                                control={control}
-                                render={({ 
-                                    field: { ref, onChange, value, ...field },
-                                    fieldState: { invalid, error }, 
-                                }) => 
-                                    <div className="w-full" >
-                                        <input 
-                                            disabled={true} ref={ref} onChange={onChange} value={value}
-                                            className=" w-full text-[12px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 "
-                                        />
-                                        { error && 
-                                            <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
-                                        }  
-                                    </div>
-                                }
-                            />
-                        </div>
+                        <>
+                            <div className="min-w-[280px] flex flex-col flex-1" >
+                                <label className=" text-[14px] text-gray-800 font-semibold " >Nom du client (*)</label>
+                                <Controller
+                                    name="lastname"
+                                    control={control}
+                                    render={({ 
+                                        field: { ref, onChange, value, ...field },
+                                        fieldState: { invalid, error }, 
+                                    }) => 
+                                        <div className="w-full" >
+                                            <input 
+                                                disabled={true} ref={ref} onChange={onChange} value={value}
+                                                className=" w-full text-[12px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 "
+                                            />
+                                            { error && 
+                                                <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
+                                            }  
+                                        </div>
+                                    }
+                                />
+                            </div>
 
+                            <div className="min-w-[280px] flex flex-col flex-1" >
+                                <label className=" text-[14px] text-gray-800 font-semibold " >Prenom du client (*)</label>
+                                <Controller
+                                    name="firstname"
+                                    control={control}
+                                    render={({ 
+                                        field: { ref, onChange, value, ...field },
+                                        fieldState: { invalid, error }, 
+                                    }) => 
+                                        <div className="w-full" >
+                                            <input 
+                                                disabled={true} ref={ref} onChange={onChange} value={value}
+                                                className=" w-full text-[12px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 "
+                                            />
+                                            { error && 
+                                                <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
+                                            }  
+                                        </div>
+                                    }
+                                />
+                            </div>
 
-                        <div className="min-w-[280px] w-[300px]" >
-                            <label className=" text-[14px] text-gray-800 font-semibold " >Prenom du client</label>
-                            <Controller
-                                name="firstname"
-                                control={control}
-                                render={({ 
-                                    field: { ref, onChange, value, ...field },
-                                    fieldState: { invalid, error }, 
-                                }) => 
-                                    <div className="w-full" >
-                                        <input 
-                                            disabled={true} ref={ref} onChange={onChange} value={value}
-                                            className=" w-full text-[12px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 "
-                                        />
-                                        { error && 
-                                            <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
-                                        }  
-                                    </div>
-                                }
-                            />
-                        </div>
+                            <div className="min-w-[280px] flex flex-col flex-1" >
+                                <label className=" text-[14px] text-gray-800 font-semibold " >Adresse Physique (*)</label>
+                                <Controller
+                                    name="adressePhysique"
+                                    control={control}
+                                    render={({ 
+                                        field: { ref, onChange, value, ...field },
+                                        fieldState: { invalid, error }, 
+                                    }) => 
+                                        <div className="w-full" >
+                                            <input 
+                                                disabled={true} ref={ref} onChange={onChange} value={value}
+                                                className=" w-full text-[12px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 "
+                                            />
+                                            { error && 
+                                                <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
+                                            }  
+                                        </div>
+                                    }
+                                />
+                            </div>
+                        </>
 
+                    }
+
+                    <div className="min-w-[280px] flex flex-col flex-1" >
+                        <label className=" text-[14px] text-gray-800 font-semibold " >Numéro de téléphone (*)</label>
+                        <Controller
+                            name="phoneNumber"
+                            control={control}
+                            render={({ 
+                                field: { ref, onChange, value, ...field },
+                                fieldState: { invalid, error }, 
+                            }) => 
+                                <div className=" w-full " >
+                                    {/* <Input onChange={onChange} value={value} placeholder='+229 xxxxxxxx' type="tel" color="blue-gray" label="Téléphone" size="lg" error={invalid} /> */}
+                                    <PhoneInput
+                                        country={"bj"}
+                                        value={value}
+                                        containerClass="h-[42px] w-full !bg-transparent"
+                                        inputClass=" !h-full !w-full !text-[13px] !font-normal !bg-transparent"
+                                        enableLongNumbers={true}
+                                        onChange={(val) => {
+                                            const parsedNumber = parsePhoneNumber("+" + val)
+                                            if (parsePhoneNumber("+" + val)?.number && parsedNumber?.number) {
+                                                onChange(parsedNumber.number)
+                                            } else {
+                                                onChange("+" + val)
+                                            }
+                                        }}
+                                    />
+                                    {error &&
+                                        <span className=" text-[11px] text-red-400 mt-1" >{error.message}</span>
+                                    }
+                                </div>
+                            }
+                        />
                     </div>
-                }
 
-                {watchCivility === 'Societe' &&
-                    <div className=' w-full flex flex-row flex-wrap justify-center mt-[20px] gap-y-[20px] gap-x-[30px]' >
-
-                        <div className="min-w-[280px] w-[300px]" >
-                            <label className=" text-[14px] text-gray-800 font-semibold " >Dénomination de la société</label>
-                            <Controller
-                                name="denomination"
-                                control={control}
-                                render={({ 
-                                    field: { ref, onChange, value, ...field },
-                                    fieldState: { invalid, error }, 
-                                }) => 
-                                    <div className="w-full" >
-                                        <input 
-                                            disabled={true} ref={ref} onChange={onChange} value={value}
-                                            className=" w-full text-[12px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 "
-                                        />
-                                        { error && 
-                                            <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
-                                        }  
-                                    </div>
-                                }
-                            />
-                        </div>
-
-                        <div className="min-w-[280px] w-[300px]" >
-                            <label className=" text-[14px] text-gray-800 font-semibold " >Numéro de téléphone</label>
-                            <Controller
-                                name="phoneNumber"
-                                control={control}
-                                render={({ 
-                                    field: { ref, onChange, value, ...field },
-                                    fieldState: { invalid, error }, 
-                                }) => 
-                                    <div className="w-full" >
-                                        <input 
-                                            type="tel"
-                                            disabled={true} ref={ref} onChange={onChange} value={value}
-                                            className=" w-full text-[12px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 "
-                                        />
-                                        { error && 
-                                            <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
-                                        }  
-                                    </div>
-                                }
-                            />
-                        </div>
-
-                    </div>
-                }
-
-                { watchCivility !== 'Societe' &&
-                    <div className=' w-full flex flex-row flex-wrap justify-center mt-[20px] gap-y-[20px] gap-x-[30px]' >
-
-                        <div className="min-w-[280px] w-[300px] md:w-[620px]" >
-                            <label className=" text-[14px] text-gray-800 font-semibold " >Numéro de téléphone</label>
-                            <Controller
-                                name="phoneNumber"
-                                control={control}
-                                render={({ 
-                                    field: { ref, onChange, value, ...field },
-                                    fieldState: { invalid, error }, 
-                                }) => 
-                                    <div className="w-full" >
-                                        <input 
-                                            type="tel"
-                                            disabled={true} ref={ref} onChange={onChange} value={value}
-                                            className=" w-full text-[12px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 "
-                                        />
-                                        { error && 
-                                            <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
-                                        }  
-                                    </div>
-                                }
-                            />
-                        </div>
-
-                    </div>
-                }
-
-
-                <div className=' w-full flex flex-row flex-wrap justify-center mt-[20px] gap-y-[20px] gap-x-[30px]' >
-
-
-                    <div className="min-w-[280px] w-[300px] md:w-[620px]" >
+                    <div className="min-w-[280px] flex flex-col flex-1 " >
                         <label className=" text-[14px] text-gray-800 font-semibold " >Adresse e-mail</label>
                         <Controller
                             name="email"
@@ -331,66 +388,128 @@ function DetailsClient() {
                         />
                     </div>
 
-                </div>
 
+                    {civilityWatch !== 'Structure' &&
 
-                <div className=' w-full flex flex-row flex-wrap justify-center mt-[20px] gap-y-[20px] gap-x-[30px]' >
+                        <>
+                            <div className="min-w-[280px] flex flex-col flex-1" >
+                                <label className=" text-[14px] text-gray-800 font-semibold " >Nom complet du père</label>
+                                <Controller
+                                    name="fullnameFather"
+                                    control={control}
+                                    render={({ 
+                                        field: { ref, onChange, value, ...field },
+                                        fieldState: { invalid, error }, 
+                                    }) => 
+                                        <div className="w-full" >
+                                            <input 
+                                                disabled={true} ref={ref} onChange={onChange} value={value}
+                                                className=" w-full text-[12px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 "
+                                            />
+                                            { error && 
+                                                <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
+                                            }  
+                                        </div>
+                                    }
+                                />
+                            </div>
 
+                            <div className="min-w-[280px] flex flex-col flex-1" >
+                                <label className=" text-[14px] text-gray-800 font-semibold " >Nom complet de la mère</label>
+                                <Controller
+                                    name="fullnameMonther"
+                                    control={control}
+                                    render={({ 
+                                        field: { ref, onChange, value, ...field },
+                                        fieldState: { invalid, error }, 
+                                    }) => 
+                                        <div className="w-full" >
+                                            <input 
+                                                disabled={true} ref={ref} onChange={onChange} value={value}
+                                                className=" w-full text-[12px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 "
+                                            />
+                                            { error && 
+                                                <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
+                                            }  
+                                        </div>
+                                    }
+                                />
+                            </div>
 
-                    <div className="min-w-[280px] w-[300px]" >
-                        <label className=" text-[14px] text-gray-800 font-semibold " >Profession</label>
-                        <Controller
-                            name="profession"
-                            control={control}
-                            render={({ 
-                                field: { ref, onChange, value, ...field },
-                                fieldState: { invalid, error }, 
-                            }) => 
-                                <div className="w-full" >
-                                    <input 
-                                        disabled={true} ref={ref} onChange={onChange} value={value}
-                                        className=" w-full text-[12px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 "
-                                    />
-                                    { error && 
-                                        <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
-                                    }  
-                                </div>
-                            }
-                        />
-                    </div>
+                            <div className="min-w-[280px] flex flex-col flex-1" >
+                                <label className=" text-[14px] text-gray-800 font-semibold " >Profession</label>
+                                <Controller
+                                    name="profession"
+                                    control={control}
+                                    render={({ 
+                                        field: { ref, onChange, value, ...field },
+                                        fieldState: { invalid, error }, 
+                                    }) => 
+                                        <div className="w-full" >
+                                            <input 
+                                                disabled={true} ref={ref} onChange={onChange} value={value}
+                                                className=" w-full text-[12px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 "
+                                            />
+                                            { error && 
+                                                <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
+                                            }  
+                                        </div>
+                                    }
+                                />
+                            </div>
 
+                            
+                            <div className="min-w-[280px] flex flex-col flex-1" >
+                                <label className=" text-[14px] text-gray-800 font-semibold " >Status Matrimonial (*)</label>
+                                <Controller
+                                    name="maritalStatus"
+                                    control={control}
+                                    render={({ 
+                                        field: { ref, onChange, value, ...field },
+                                        fieldState: { invalid, error }, 
+                                    }) => 
+                                        <div className="w-full" >
+                                            <select disabled={true} ref={ref} onChange={onChange} value={value} className=" w-full text-[14px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 " {...field}>
+                                                <option value=""></option>
+                                                <option value="Single">Célibataire</option>
+                                                <option value="Maried">Marié</option>
+                                                <option value="Divorced">Divorcé</option>
+                                            </select>
+                                            { error && 
+                                                <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
+                                            }  
+                                        </div>
+                                    }
+                                />
+                            </div>
 
-                    <div className="min-w-[280px] w-[300px]" >
-                        <label className=" text-[14px] text-gray-800 font-semibold " >Status Matrimonial</label>
-                        <Controller
-                            name="maritalStatus"
-                            control={control}
-                            render={({ 
-                                field: { ref, onChange, value, ...field },
-                                fieldState: { invalid, error }, 
-                            }) => 
-                                <div className="w-full" >
-                                    <select disabled ref={ref} onChange={onChange} value={value} className=" w-full text-[14px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 " {...field}>
-                                        <option disabled value="Single">Célibataire</option>
-                                        <option disabled value="Maried">Marié</option>
-                                        <option disabled value="Divorced">Divorcé</option>
-                                    </select>
-                                    { error && 
-                                        <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
-                                    }  
-                                </div>
-                            }
-                        />
-                    </div>
+                            <div className="min-w-[280px] flex flex-col flex-1" >
+                                <label className=" text-[14px] text-gray-800 font-semibold " >Nom complet conjoint(e)</label>
+                                <Controller
+                                    name="fullnameConjoint"
+                                    control={control}
+                                    render={({ 
+                                        field: { ref, onChange, value, ...field },
+                                        fieldState: { invalid, error }, 
+                                    }) => 
+                                        <div className="w-full" >
+                                            <input 
+                                                disabled={true} ref={ref} onChange={onChange} value={value}
+                                                className=" w-full text-[12px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 "
+                                            />
+                                            { error && 
+                                                <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
+                                            }  
+                                        </div>
+                                    }
+                                />
+                            </div>
+                        </>
+                    }
+                    
 
-                </div>
-
-
-                <div className=' w-full flex flex-row flex-wrap justify-center mt-[20px] gap-y-[20px] gap-x-[30px]' >
-
-
-                    <div className="min-w-[280px] w-[300px]" >
-                        <label className=" text-[14px] text-gray-800 font-semibold " >Numéro IFU</label>
+                    <div className="min-w-[280px] flex flex-col flex-1" >
+                        <label className=" text-[14px] text-gray-800 font-semibold " >Numéro IFU (*)</label>
                         <Controller
                             name="numeroUfu"
                             control={control}
@@ -411,31 +530,111 @@ function DetailsClient() {
                         />
                     </div>
 
+                    
+                    {civilityWatch == 'Structure' &&
 
-                    <div className="min-w-[280px] w-[300px]" >
-                        <label className=" text-[14px] text-gray-800 font-semibold " >Numero RCC</label>
-                        <Controller
-                            name="numeroRcc"
-                            control={control}
-                            render={({ 
-                                field: { ref, onChange, value, ...field },
-                                fieldState: { invalid, error }, 
-                            }) => 
-                                <div className="w-full" >
-                                    <input 
-                                        disabled={true} ref={ref} onChange={onChange} value={value}
-                                        className=" w-full text-[12px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 "
-                                    />
-                                    { error && 
-                                        <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
-                                    }  
-                                </div>
-                            }
-                        />
-                    </div>
+                        <>
+
+                            <div className="min-w-[280px] flex flex-col flex-1" >   
+                                <label className=" text-[14px] text-gray-800 font-semibold " >Forme de la structure (*)</label>
+                                <Controller
+                                    name="formeStructure"
+                                    control={control}
+                                    render={({ 
+                                        field: { ref, onChange, value, ...field },
+                                        fieldState: { invalid, error }, 
+                                    }) => 
+                                        <div className="w-full" >
+                                            <select disabled={true} ref={ref} onChange={onChange} value={value} className=" w-full text-[14px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 " {...field}>
+                                                <option value=""></option>
+                                                <option value="Société Anonyme (SA)">Société Anonyme (SA)</option>
+                                                <option value="Société A Responsabilité Limitée (SARL)">Société A Responsabilité Limitée (SARL)</option>
+                                                <option value="Société par Action Simplifiée (SAS)">Société par Action Simplifiée (SAS)</option>
+                                                <option value="Société Civile Immobilière (SCI)">Société Civile Immobilière (SCI)</option>
+                                                <option value="Société Civile Professionnelle (SCP)">Société Civile Professionnelle (SCP)</option>
+                                                <option value="Association (Ass)">Association (Ass)</option>
+                                                <option value="Association (Ass)">Organisation Non Gouvernementale (ONG)</option>
+                                                <option value="Autres">Autres</option>
+                                            </select>
+                                            { error && 
+                                                <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
+                                            }  
+                                        </div>
+                                    }
+                                />
+                            </div>
+
+                            <div className="min-w-[280px] flex flex-col flex-1" >
+                                <label className=" text-[14px] text-gray-800 font-semibold " >Adresse Siège (*)</label>
+                                <Controller
+                                    name="adresseSiege"
+                                    control={control}
+                                    render={({ 
+                                        field: { ref, onChange, value, ...field },
+                                        fieldState: { invalid, error }, 
+                                    }) => 
+                                        <div className="w-full" >
+                                            <input 
+                                                disabled={true} ref={ref} onChange={onChange} value={value}
+                                                className=" w-full text-[12px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 "
+                                            />
+                                            { error && 
+                                                <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
+                                            }  
+                                        </div>
+                                    }
+                                />
+                            </div>
+
+                            <div className="min-w-[280px] flex flex-col flex-1" >
+                                <label className=" text-[14px] text-gray-800 font-semibold " >Dénomination de la société (*)</label>
+                                <Controller
+                                    name="denomination"
+                                    control={control}
+                                    render={({ 
+                                        field: { ref, onChange, value, ...field },
+                                        fieldState: { invalid, error }, 
+                                    }) => 
+                                        <div className="w-full" >
+                                            <input 
+                                                disabled={true} ref={ref} onChange={onChange} value={value}
+                                                className=" w-full text-[12px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 "
+                                            />
+                                            { error && 
+                                                <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
+                                            }  
+                                        </div>
+                                    }
+                                />
+                            </div>
+
+                            <div className="min-w-[280px] flex flex-col flex-1" >
+                                <label className=" text-[14px] text-gray-800 font-semibold " >Numero RCC (*)</label>
+                                <Controller
+                                    name="numeroRcc"
+                                    control={control}
+                                    render={({ 
+                                        field: { ref, onChange, value, ...field },
+                                        fieldState: { invalid, error }, 
+                                    }) => 
+                                        <div className="w-full" >
+                                            <input 
+                                                disabled={true} ref={ref} onChange={onChange} value={value}
+                                                className=" w-full text-[12px] h-[45px] border-[1.5px] border-gray-400 !placeholder:text-[12px] rounded-md px-2 "
+                                            />
+                                            { error && 
+                                                <span className=" text-[10px] text-red-400 mt-1" >{error.message}</span>
+                                            }  
+                                        </div>
+                                    }
+                                />
+                            </div>
+
+                        </>
+
+                    }
 
                 </div>
-
 
 
             </DialogBody>
@@ -454,6 +653,7 @@ function DetailsClient() {
                     })
                     }
                     className="mr-1"
+                    
                 >
                     <span>Fermer</span>
                 </Button>

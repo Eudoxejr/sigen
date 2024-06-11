@@ -8,48 +8,65 @@ import { HiUsers } from "react-icons/hi2";
 import { PiIdentificationCardBold } from "react-icons/pi";
 import { AiFillCar } from "react-icons/ai";
 import { FaUserShield } from "react-icons/fa6"
-import { MdOutlineModeOfTravel, MdEmojiTransportation } from "react-icons/md";
-import { GiTransportationRings } from "react-icons/gi";
+import { IoReload } from "react-icons/io5";
+import { GiTransportationRings, GiBookPile } from "react-icons/gi";
 import { BiCategoryAlt } from "react-icons/bi";
-// import TransportModeCard from "@/components/home/transportMode";
+import FolderCard from "@/components/home/folderMinuature";
 // import DriverMiniatureCard from "@/components/home/driverMiniature";
 import { StatisticsCard } from "@/widgets/cards";
 // import { isAllowedTo } from "@/utils";
 // import { Permissions } from "@/data/role-access-data";
 // import { RenderIf } from "@/components/common";
 import { useQuery } from "@tanstack/react-query";
-// import { OtherApi } from "@/api/api";
+import { OtherApi } from "@/api/api";
+import ClientMiniatureCard from "@/components/home/clientMiniature";
+import { useUserStore } from "@/store/user.store"
 
 export function Home() {
 
-  const { isError, data: kpis, error, isLoading } = useQuery({
+  const {user} = useUserStore()
+
+  const { data: kpis, refetch, isFetching } = useQuery({
 		queryKey: ['getGlobalKpi'],
 		queryFn: async ({ queryKey }) => {
 			return OtherApi.getGlobalKpi()
 		},
-		onSuccess: (data) => {},
 		enabled: true,
-		staleTime: 40 * 60 * 1000
+		staleTime: 15 * 60 * 1000
 	})
 
   // React.useEffect(() => {
   //   console.log('====================================');
-  //   console.log(isLoading);
+  //   console.log(isFetching);
   //   console.log('====================================');
-  // }, [isLoading]);
+  // }, [isFetching]);
 
   return (
 
     // <RenderIf allowedTo={Permissions.VIEW_STATS}>
 
-      <div className="mt-12">
+      <div className="mt-3">
+
+        <div className=" font-medium text-gray-600 text-[20px] mt-8 mb-2 " >
+          Bienvenue <span>{user.user.firstname+" "+user.user.lastname}</span> 
+        </div>
+
+        <div className=" w-full mb-3 flex justify-end " >
+          <button onClick={() => refetch()} className=" bg-primary flex items-center justify-center rounded-md w-[50px] h-[45px] " >
+            {isFetching ?
+              "..."
+            :
+              <IoReload color="white" />
+            }
+          </button>
+        </div>
 
         <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
 
           <StatisticsCard
             key={"Dossiers"}
             color={"pink"}
-            value={!isLoading ? kpis?.data?.user || "18" : "..."}
+            value={!isFetching ? kpis?.folderCount || "0" : "..."}
             title={"Dossiers"}
             icon={React.createElement(FaFolder, {
               className: "w-6 h-6 text-white",
@@ -59,7 +76,7 @@ export function Home() {
           <StatisticsCard
             key={"Clients"}
             color={"green"}
-            value={!isLoading ? kpis?.data?.driver || "18" : "..."}
+            value={!isFetching ? kpis?.clientCount || "0" : "..."}
             title={"Clients"}
             icon={React.createElement(HiUsers, {
               className: "w-6 h-6 text-white",
@@ -69,7 +86,7 @@ export function Home() {
           <StatisticsCard
             key={"Collaborateurs"}
             color={"orange"}
-            value={!isLoading ? kpis?.data?.reservation || "18" : "..."}
+            value={!isFetching ? kpis?.userCount || "0" : "..."}
             title={"Collaborateurs"}
             icon={React.createElement(FaUserShield, {
               className: "w-6 h-6 text-white",
@@ -79,7 +96,7 @@ export function Home() {
           <StatisticsCard
             key={"Catégories"}
             color={"cyan"}
-            value={!isLoading ? kpis?.data?.transportMode || "18" : "..."}
+            value={!isFetching ? kpis?.categoryCount || "0" : "..."}
             title={"Catégories"}
             icon={React.createElement(BiCategoryAlt, {
               className: "w-6 h-6 text-white",
@@ -89,21 +106,21 @@ export function Home() {
           <StatisticsCard
             key={"Templates"}
             color={"brown"}
-            value={!isLoading ? kpis?.data?.vehicule || "18" : "..."}
+            value={!isFetching ? kpis?.templateCount || "0" : "..."}
             title={"Templates de minute"}
-            icon={React.createElement(AiFillCar, {
-              className: "w-6 h-6 text-white",
+            icon={React.createElement(GiBookPile, {
+              className: "w-7 h-7 text-white",
             })}
           />
 
         </div>
 
-        <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div className="mb-4 flex flex-row flex-wrap gap-8">
           {/* {isAllowedTo(Permissions.VIEW_MODE_TRANSPORT) &&  */}
-            {/* <TransportModeCard /> */}
+            <FolderCard />
           {/* } */}
           {/* {isAllowedTo(Permissions.VIEW_DRIVERS_LIST) &&  */}
-            {/* <DriverMiniatureCard /> */}
+            <ClientMiniatureCard />
           {/* } */}
         </div>
 

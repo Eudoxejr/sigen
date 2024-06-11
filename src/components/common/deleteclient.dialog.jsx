@@ -16,11 +16,11 @@ import { toast } from 'react-toastify';
 import { useDialogueStore } from '@/store/dialogue.store';
 import { handleBackendErrors } from "@/utils/handleHandler";
 import AsyncSelect from 'react-select/async';
-import { CollaboApi, RoleApi } from '@/api/api';
+import { CollaboApi, RoleApi, ClientApi } from '@/api/api';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 
-function DeleteUserDialog() {
+function DeleteClientDialog() {
 
     const { setDialogue, dialogue } = useDialogueStore()
     const queryClient = useQueryClient();
@@ -29,7 +29,7 @@ function DeleteUserDialog() {
 
     const { mutate, isLoading } = useMutation({
         mutationFn: async (data) => {
-            return CollaboApi.deleteUser(params?.id)
+            return ClientApi.deleteClient(params?.id)
         },
         gcTime: 0,
         onSuccess: (response) => {
@@ -41,7 +41,7 @@ function DeleteUserDialog() {
                 data: null
             })
 
-            toast.success('Collaborateur supprimé avec succès', {
+            toast.success('client supprimé avec succès', {
                 position: "top-right",
                 autoClose: 2000,
                 hideProgressBar: true,
@@ -52,20 +52,16 @@ function DeleteUserDialog() {
                 theme: "colored",
             })
                
-            queryClient.setQueriesData(["getCollabo"], (dataUser) => {
+            queryClient.setQueriesData(["getClient"], (dataClient) => {
 
-              const indexDeleteUser = dataUser.data.findIndex((user) => user.id == params?.id)
+              const indexDeleteUser = dataClient.data.findIndex((client) => client.id == params?.id)
       
-              const nextData = produce(dataUser, draftData => {
+              const nextData = produce(dataClient, draftData => {
                 draftData.data.splice(indexDeleteUser, 1)
               });
       
               return nextData;
             });  
-
-            if(params?.goBack) {
-                navigate(-1)
-            }
 
 
         },
@@ -100,12 +96,12 @@ function DeleteUserDialog() {
 
         <>
 
-            <DialogHeader className='text-sm ' >Supprimer le collaborateur</DialogHeader>
+            <DialogHeader className='text-sm ' >Supprimer le client</DialogHeader>
 
             <DialogBody className=" flex flex-col" divider>
               <div>
-                {"Voulez vous supprimer le collaborateur "}
-                <span className="font-bold mx-1">{params?.firstname + ' ' + params?.lastname}</span> ?
+                {"Voulez vous supprimer le Client "}
+                <span className="font-bold mx-1">{params.civility == "Structure" ? params?.denomination : params?.firstname + " " + params?.lastname}</span> ?
               </div>
             </DialogBody>
             <DialogFooter>
@@ -149,4 +145,4 @@ function DeleteUserDialog() {
 
 }
 
-export default DeleteUserDialog
+export default DeleteClientDialog

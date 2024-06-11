@@ -75,8 +75,6 @@ function UpdateCollaborateur() {
                 theme: "colored",
             });
 
-            console.log(response);
-
             queryClient.setQueriesData(["getCollabo"], (dataCollabo) => {
                 const indexUpdateCollabo = dataCollabo.data.findIndex((collabo) => collabo.id == response?.data?.id )
                 const nextData = produce(dataCollabo, draftData => {
@@ -87,9 +85,9 @@ function UpdateCollaborateur() {
 
             queryClient.setQueriesData(["getCollaboSpecific"], (dataCollabo) => {
                 const nextData = produce(dataCollabo, draftData => {
-                    draftData = response?.data
+                    draftData.data = response.data
                 })
-                console.log(nextData);
+                // console.log(nextData);
                 return nextData;
             })
 

@@ -189,7 +189,7 @@ export const CategoriesApi = {
 
 export const FoldersApi = {
 
-	async getFolders(page, perPage, q, categories) {
+	async getFolders(page, perPage, q, categories, collaborateurId, userId) {
 		const response = await axiosPrivate.request({
 			method: 'get',
 			url: API_URL + '/folders',
@@ -198,6 +198,8 @@ export const FoldersApi = {
 				perPage: perPage,
 				keyword: q,
 				categories: JSON.stringify(categories),
+				collaborateur: collaborateurId,
+				userId: userId
 			}
 		})
 		return response.data;
@@ -319,11 +321,9 @@ export const TemplateApi = {
 
 }
 
-
 export const CollaboApi = {
 
-	async getCollabo(page, perPage, q, role) {
-
+	async getCollabo(page, perPage, q, role, exclude) {
 		const response = await axiosPrivate.request({
 			method: 'get',
 			url: API_URL + '/users',
@@ -332,6 +332,7 @@ export const CollaboApi = {
 				perPage: perPage,
 				keyword: q,
 				role: JSON.stringify(role),
+				exclude: exclude
 			}
 		})
 		return response.data;
@@ -431,7 +432,6 @@ export const CollaboApi = {
 
 }
 
-
 export const ClientApi = {
 
 	async getClient(page, perPage, q) {
@@ -473,16 +473,27 @@ export const ClientApi = {
 			data: JSON.stringify(data)
 		})
 		return response.data;
-	}
+	},
+
+	async deleteClient(id) {
+
+		const response = await axiosPrivate.request({
+			method: 'delete',
+			url: API_URL + '/clients/'+id,
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
+
+		return response.data;
+
+	},
 
 }
-
-
 
 export const RoleApi = {
 
 	async getRole(page, perPage, q) {
-
 		const response = await axiosPrivate.request({
 			method: 'get',
 			url: API_URL + '/roles',
@@ -498,24 +509,13 @@ export const RoleApi = {
 
 };
 
-
-
-
 export const OtherApi = {
-
-	async getAwsKey() {
-		const response = await axiosPrivate.request({
-			method: 'get',
-			url: API_URL + '/aws-credentials'
-		})
-		return response.data;
-	},
 
 	async getGlobalKpi() {
 
 		const response = await axiosPrivate.request({
 			method: 'get',
-			url: API_URL + '/admin/kpis/',
+			url: API_URL + '/other/kpis',
 			// params: {
 			// 	page: page,
 			// 	per_page: perPage,
@@ -525,7 +525,6 @@ export const OtherApi = {
 		})
 
 		return response.data;
-
 	}
 
 }

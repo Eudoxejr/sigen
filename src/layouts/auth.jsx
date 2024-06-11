@@ -33,7 +33,7 @@ export function Auth({children}) {
 
   return (
 
-    <div className="relative min-h-screen w-full">
+    <div className="relative flex flex-1 ">
       <Outlet />
     </div>
 

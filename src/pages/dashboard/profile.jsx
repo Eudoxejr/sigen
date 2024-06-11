@@ -24,6 +24,9 @@ import { toast } from 'react-toastify';
 import {CollaboApi} from '@/api/api'
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import UpdatePsw from "@/components/profil/updatePsw";
+import parsePhoneNumber, { isValidPhoneNumber } from "libphonenumber-js"
+import PhoneInput from "react-phone-input-2"
+import "react-phone-input-2/lib/style.css"
 
 export function Profile() {
 
@@ -338,12 +341,21 @@ const handleClick = async (data) => {
                     fieldState: { invalid, error}
                   }) => (
                     <div>
-                      <Input
-                        label="Téléphone"
-                        type="tel" color="blue-gray"
-                        onChange={onChange}
+                      <PhoneInput
+                        country={"bj"}
+                        containerClass="h-[42px] w-full !bg-transparent"
+                        inputClass=" !h-full !w-full !text-[13px] !font-normal !bg-transparent"
+                        buttonClass=" !bg-transparent !border-none"
+                        enableLongNumbers={true}
                         value={value}
-                        ref={ref}
+                        onChange={(val) => {
+                            const parsedNumber = parsePhoneNumber("+" + val)
+                            if (parsePhoneNumber("+" + val)?.number && parsedNumber?.number) {
+                                onChange(parsedNumber.number)
+                            } else {
+                                onChange("+" + val)
+                            }
+                        }}
                       />
                       {error && <span className=" text-[12px] text-red-500 " >{error?.message}</span>}
                     </div>
