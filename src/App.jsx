@@ -90,7 +90,7 @@ function App() {
 
           <Route path="roles">
             <Route index element={<RolesListe/>} />
-            <Route path="add" element={<MinuteCreate/>} />
+            <Route path="add" element={</>} />
             <Route path="edit" element={<EditMinute/>} />
           </Route>
 

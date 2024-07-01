@@ -1641,7 +1641,7 @@ export const rolesColumns = [
 		renderCell: ({ row, ...rest }) => {
 			return (
 				<div className="w-full h-full flex items-center" >
-					{(row?.permissions?.length ?? 0)}
+					{(row?.meta?.totalPermission ?? 0)}
 				</div>
 			);
 		}

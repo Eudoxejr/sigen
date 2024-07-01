@@ -108,6 +108,12 @@ const RolesListe = () => {
                 )
               }
               noRow={"Pas de role trouvé"}
+              // onRowClick={(params) => {
+              //   specificUser ?
+              //     navigate(`../../dossiers/view`, { state: params.row })
+              //   :
+              //     navigate(`../dossiers/view`, { state: params.row })
+              // }}
               totalInformation={{ total, setTotal }}
               paginationInformation={{ pagination, setPagination }}
             />
