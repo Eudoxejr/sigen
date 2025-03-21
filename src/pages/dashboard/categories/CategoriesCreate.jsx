@@ -39,10 +39,6 @@ import { useDialogueStore } from '@/store/dialogue.store';
 import { TwitterPicker } from 'react-color';
 
 
-// import { RenderIf } from "@/components/common";
-// import { Permissions } from "@/data/role-access-data";
-
-
 const CategoriesCreate = () => {
 
     const navigate = useNavigate();

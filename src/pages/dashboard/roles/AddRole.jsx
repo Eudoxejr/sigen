@@ -17,7 +17,7 @@ import { toast } from 'react-toastify';
 import { RolesApi } from '@/api/api';
 import { BsTrash3 } from 'react-icons/bs';
 import { FiLoader } from 'react-icons/fi';
-import { RenderIf } from '@/components/common';
+import { RenderIf } from '@/components/common/render.if';
 import { Permissions } from '@/data/role-access-data';
 
 const sxStyle = {

@@ -28,7 +28,7 @@ import { toast } from 'react-toastify';
 
 import { uploadFile } from '@/utils/uploadS3';
 import { useDialogController } from '@/context/dialogueProvider';
-import { RenderIf } from "@/components/common";
+import { RenderIf } from "@/components/common/render.if";
 import { Permissions } from "@/data/role-access-data";
 
 

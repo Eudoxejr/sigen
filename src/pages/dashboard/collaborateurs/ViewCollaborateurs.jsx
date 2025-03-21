@@ -31,8 +31,7 @@ import { AiOutlineArrowLeft, AiFillEye, AiFillCalendar, AiOutlineOrderedList } f
 import { MdOutlineModeOfTravel } from "react-icons/md";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CollaboApi } from "@/api/api";
-// import { RenderIf } from "@/components/common";
-// import { Permissions } from "@/data/role-access-data";
+
 import BeatLoader from "react-spinners/BeatLoader";
 import { PhotoView } from 'react-photo-view';
 import { useDialogueStore } from '@/store/dialogue.store';

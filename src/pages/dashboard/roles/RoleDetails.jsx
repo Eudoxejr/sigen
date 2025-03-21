@@ -18,7 +18,7 @@ import { useDialogController } from '@/context/dialogueProvider';
 import { RolesApi } from '@/api/api';
 import { toast } from 'react-toastify';
 import { FiLoader } from 'react-icons/fi';
-import { RenderIf } from '@/components/common';
+import { RenderIf } from '@/components/common/render.if';
 import { Permissions } from '@/data/role-access-data';
 import { isAllowedTo } from '@/utils';
 

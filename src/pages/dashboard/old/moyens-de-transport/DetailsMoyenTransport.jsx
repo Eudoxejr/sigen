@@ -13,7 +13,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { IoMdAddCircle } from "react-icons/io";
 import { isAllowedTo } from '@/utils';
 import { Permissions } from '@/data/role-access-data';
-import { RenderIf } from '@/components/common';
+import { RenderIf } from '@/components/common/render.if';
 import BeatLoader from "react-spinners/BeatLoader";
 import { useQuery } from "@tanstack/react-query";
 import { MoyenApi } from '@/api/api';

@@ -28,7 +28,7 @@ import { FaFolder } from "react-icons/fa";
 import { useDialogueStore } from '@/store/dialogue.store';
 // import { isAllowedTo } from "./isAllowedTo";
 // import { Permissions } from "@/data/role-access-data";
-// import { RenderIf } from "@/components/common";
+// import { RenderIf } from "@/components/common/render.if";
 
 
 export const columnColaborateurs = [

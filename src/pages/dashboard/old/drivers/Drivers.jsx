@@ -14,7 +14,7 @@ import AsyncSelect from 'react-select/async';
 import debounce from 'lodash.debounce';
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Select from 'react-select'
-import { RenderIf } from "@/components/common";
+import { RenderIf } from "@/components/common/render.if";
 import { Permissions } from "@/data/role-access-data";
 
 

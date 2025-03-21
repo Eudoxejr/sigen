@@ -20,7 +20,7 @@ import Switch from '@mui/material/Switch';
 import { toast } from 'react-toastify';
 import { produce } from 'immer';
 import { IoWarningOutline } from 'react-icons/io5';
-import { RenderIf } from '@/components/common';
+import { RenderIf } from '@/components/common/render.if';
 import { Permissions } from '@/data/role-access-data';
 import { isAllowedTo, isAllowedWith } from '@/utils';
 import useAuth from '@/hooks/useAuth';

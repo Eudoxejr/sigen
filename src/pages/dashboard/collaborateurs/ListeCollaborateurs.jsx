@@ -13,9 +13,7 @@ import { CollaboApi, RolesApi } from "@/api/api";
 import debounce from "lodash.debounce";
 import { produce } from "immer";
 import { useDialogueStore } from "@/store/dialogue.store";
-// import { RenderIf } from '@/components/common';
-// import { Permissions } from '@/data/role-access-data';
-// import { isAllowedTo } from '@/utils';
+
 import { useQueryClient } from "@tanstack/react-query";
 
 const CollaborateursListe = () => {

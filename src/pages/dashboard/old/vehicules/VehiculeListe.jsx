@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import debounce from 'lodash.debounce';
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { produce } from "immer"
-import { RenderIf } from "@/components/common";
+import { RenderIf } from "@/components/common/render.if";
 import { Permissions } from "@/data/role-access-data";
 import { isAllowedTo } from "@/utils";
 

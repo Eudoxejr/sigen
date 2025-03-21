@@ -15,4 +15,4 @@ const RenderIf = ({ allowedTo, children, placeholder }) => {
   );
 };
 
-export default RenderIf;
+export {RenderIf};

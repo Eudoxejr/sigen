@@ -12,7 +12,7 @@ import { CourseCard } from './components';
 import { CourseApi } from "@/api/api";
 import debounce from 'lodash.debounce';
 import { useQuery } from "@tanstack/react-query";
-import { RenderIf } from "@/components/common";
+import { RenderIf } from "@/components/common/render.if";
 import { Permissions } from "@/data/role-access-data";
 
 const CoursesListe = () => {

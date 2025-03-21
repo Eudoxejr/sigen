@@ -11,7 +11,7 @@ import { Pagination } from '@mui/material';
 import { PromoCard } from './components';
 import { useDebounce } from '@/hooks/useDebounce';
 import { PromosApi } from '@/api/api';
-import { RenderIf } from '@/components/common';
+import { RenderIf } from '@/components/common/render.if';
 import { Permissions } from '@/data/role-access-data';
 import { isAllowedTo } from '@/utils';
 

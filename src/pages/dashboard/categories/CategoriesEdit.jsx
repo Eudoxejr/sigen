@@ -25,22 +25,11 @@ import Switch from '@mui/material/Switch';
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CategoriesApi, CategorieGroupeApi } from "@/api/api";
 import BeatLoader from "react-spinners/BeatLoader";
-import { useDropzone } from 'react-dropzone'
-import { AiFillCloseCircle, AiFillEdit } from "react-icons/ai";
-import { RiForbidLine } from "react-icons/ri";
 import { toast } from 'react-toastify';
 
-import NextedParty from '@/components/common/nextedParty';
-import NextedInformation from '@/components/common/nextedInformation';
-import { uploadFile } from '@/utils/uploadS3';
-import { v4 as uuidv4 } from 'uuid';
 
 import { useDialogueStore } from '@/store/dialogue.store';
 import { TwitterPicker } from 'react-color';
-
-// import { RenderIf } from "@/components/common";
-// import { Permissions } from "@/data/role-access-data";
-
 
 const CategoriesEdit = () => {
 

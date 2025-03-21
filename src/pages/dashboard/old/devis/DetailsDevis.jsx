@@ -25,7 +25,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useDialogController } from '@/context/dialogueProvider';
 import AsyncSelect from 'react-select/async';
 import { components } from 'react-select';
-import { RenderIf } from '@/components/common';
+import { RenderIf } from '@/components/common/render.if';
 import { Permissions } from '@/data/role-access-data';
 
 

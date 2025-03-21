@@ -32,7 +32,7 @@ import NestedTarification from '@/components/common/nextedParty';
 import { uploadFile } from '@/utils/uploadS3';
 import { useDialogController } from '@/context/dialogueProvider';
 import { v4 as uuidv4 } from 'uuid';
-import { RenderIf } from "@/components/common";
+import { RenderIf } from "@/components/common/render.if";
 import { Permissions } from "@/data/role-access-data";
 
 
