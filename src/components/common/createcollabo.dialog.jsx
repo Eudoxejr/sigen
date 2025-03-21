@@ -16,7 +16,7 @@ import { toast } from 'react-toastify';
 import { useDialogueStore } from '@/store/dialogue.store';
 import { handleBackendErrors } from "@/utils/handleHandler";
 import AsyncSelect from 'react-select/async';
-import { CollaboApi, RoleApi } from '@/api/api';
+import { CollaboApi, RolesApi } from '@/api/api';
 import parsePhoneNumber, { isValidPhoneNumber } from "libphonenumber-js"
 import PhoneInput from "react-phone-input-2"
 import "react-phone-input-2/lib/style.css"
@@ -100,7 +100,7 @@ function CreateCollaborateur() {
     };
 
     const getRole = async (inputValue) => {
-        const res = await RoleApi.getRole(1, 12, inputValue)
+        const res = await RolesApi.getRole(1, 12, inputValue)
         // res.data.unshift({ id: null, role_name: 'Tout les roles' })
         return res.data.map((data) => { return { label: data.role_name, value: data.id } })
       };

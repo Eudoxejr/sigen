@@ -15,7 +15,7 @@ import debounce from "lodash.debounce";
 // import { RenderIf } from '@/components/common';
 // import { Permissions } from '@/data/role-access-data';
 // import { isAllowedTo } from '@/utils';
-import { RoleApi } from "@/api/api";
+import { RolesApi } from "@/api/api";
 
 const RolesListe = () => {
   const navigate = useNavigate();
@@ -100,7 +100,7 @@ const RolesListe = () => {
                 true,
               ]}
               fnQuery={({ queryKey }) =>
-                RoleApi.getRole(
+                RolesApi.getRole(
                   queryKey[1],
                   queryKey[2],
                   queryKey[3],

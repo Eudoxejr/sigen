@@ -9,7 +9,7 @@ import DataGridComponent from "@/components/common/datatable";
 import { columnColaborateurs } from "@/utils/columsDatatable";
 import { useNavigate } from "react-router-dom";
 import AsyncSelect from "react-select/async";
-import { CollaboApi, RoleApi } from "@/api/api";
+import { CollaboApi, RolesApi } from "@/api/api";
 import debounce from "lodash.debounce";
 import { produce } from "immer";
 import { useDialogueStore } from "@/store/dialogue.store";
@@ -43,7 +43,7 @@ const CollaborateursListe = () => {
   }, []);
 
   const getRole = async (inputValue) => {
-    const res = await RoleApi.getRole(1, 12, inputValue);
+    const res = await RolesApi.getRole(1, 12, inputValue);
     // res.data.unshift({ id: null, role_name: 'Tout les roles' })
     return res.data.map((data) => {
       return { label: data.role_name, value: data.id };

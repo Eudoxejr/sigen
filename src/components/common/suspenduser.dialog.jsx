@@ -16,7 +16,7 @@ import { toast } from 'react-toastify';
 import { useDialogueStore } from '@/store/dialogue.store';
 import { handleBackendErrors } from "@/utils/handleHandler";
 import AsyncSelect from 'react-select/async';
-import { CollaboApi, RoleApi } from '@/api/api';
+import { CollaboApi } from '@/api/api';
 
 
 function SuspendUserDialog() {

@@ -454,7 +454,7 @@ export const ClientApi = {
   },
 };
 
-export const RoleApi = {
+export const RolesApi = {
   async getRole(page, perPage, q, countPermission) {
     // console.log(countPermission);
     const response = await axiosPrivate.request({
