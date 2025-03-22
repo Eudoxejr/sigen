@@ -20,6 +20,8 @@ FROM nginx:stable-alpine AS production-stage
 # Copie des fichiers d'environnement
 COPY --from=build-stage /app/.env* ./
 
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
 CMD ["nginx", "-g", "daemon off;"]
