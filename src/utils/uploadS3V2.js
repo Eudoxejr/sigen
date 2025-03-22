@@ -6,10 +6,11 @@ import { Upload } from "@aws-sdk/lib-storage";
 export const uploadBlobToS3 = async (file,objectUrl) => {
 
   const s3Client = new S3Client({
-    region: import.meta.env.VITE_AWS_BUCKET_REGION,
+    region: import.meta.env.VITE_AWS_BUCKET_REGION, // us-east-1
+    endpoint: import.meta.env.VITE_AWS_BUCKET_ENDPOINT,// https://sigen.tor1.digitaloceanspaces.com
     credentials: {
-      accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY,
-      secretAccessKey: import.meta.env.VITE_AWS_SECRET_KEY,
+      accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY,// DO801N7J8ETCLJ3EL7NF
+      secretAccessKey: import.meta.env.VITE_AWS_SECRET_KEY, // q2aRO1TVw6X/lbFwPsYkI02Ai1pt0z5eEzSdcEVahLY
     },
   });
 
@@ -22,7 +23,7 @@ export const uploadBlobToS3 = async (file,objectUrl) => {
   const upload = new Upload({
     client: s3Client,
     params: {
-      Bucket: import.meta.env.VITE_AWS_BUCKET_NAME,
+      Bucket: import.meta.env.VITE_AWS_BUCKET_NAME, // sigen
       Key: key,
       Body: file,
     },

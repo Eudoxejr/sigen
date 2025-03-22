@@ -320,6 +320,7 @@ const TemplateEdit = ({edit}) => {
                 }
             })
             .catch((err) => {
+                console.log(err)
                 setBackdrop({active: false})
                 toast.error("Une erreur s'est produite lors de l'enrégistrement du template", {
                     position: "top-right",
