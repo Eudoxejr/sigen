@@ -12,6 +12,7 @@ export const uploadBlobToS3 = async (file,objectUrl) => {
       accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY,// DO801N7J8ETCLJ3EL7NF
       secretAccessKey: import.meta.env.VITE_AWS_SECRET_KEY, // q2aRO1TVw6X/lbFwPsYkI02Ai1pt0z5eEzSdcEVahLY
     },
+    s3ForcePathStyle: true,
   });
 
   const timestampInMillis = new Date().getTime();
