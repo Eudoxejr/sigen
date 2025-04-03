@@ -4,13 +4,13 @@ import {
     DialogHeader,
     DialogBody,
     DialogFooter,
-    Input,
 } from "@material-tailwind/react";
 import { useDialogueStore } from "@/store/dialogue.store";
-import { DocumentEditorContainerComponent, Toolbar } from '@syncfusion/ej2-react-documenteditor';
+import { DocumentEditorContainerComponent, Print } from '@syncfusion/ej2-react-documenteditor';
 import { useNavigate } from "react-router-dom";
 
 // import { SwitchComponent } from "@syncfusion/ej2-react-buttons";
+DocumentEditorContainerComponent.Inject(Print);
 
 function ViewTemplate() {
 
@@ -38,8 +38,8 @@ function ViewTemplate() {
 
     const onLoadDefault = () => {
         loadDocumentFromURL()
-        container.current.documentEditor.documentName = "Template de minute";
         container.current.documentEditorSettings.showRuler = true;
+        // container.current.toolbarItems = toolbarOptions;
     };
 
     const rendereComplete = () => {
@@ -55,28 +55,41 @@ function ViewTemplate() {
     return (
         <>
             <DialogHeader className="flex items-center justify-between text-sm ">
-                Visionner le template de minute
+                Visionner
 
                 { !load ?
 
                     <div className=" flex flex-row justify-center items-center gap-x-1 " >
 
-                        <Button
-                            variant="text"
-                            color="green"
-                            onClick={() => {
-                                navigate('/dashboard/minutes/edit', {state: dialogue.data} )
-                                setDialogue({
-                                    size: "sm",
-                                    open: false,
-                                    view: null,
-                                    data: null,
-                                })
-                            }}
-                            className="mr-1"
-                        >
-                            <span>Modifier</span>
-                        </Button>
+                        {dialogue.data?.isUpdate &&
+                            <Button
+                                variant="text"
+                                color="green"
+                                onClick={() => {
+                                    navigate('/dashboard/minutes/edit', {state: dialogue.data} )
+                                    setDialogue({
+                                        size: "sm",
+                                        open: false,
+                                        view: null,
+                                        data: null,
+                                    })
+                                }}
+                                className="mr-1"
+                            >
+                                <span>Modifier</span>
+                            </Button>
+                        }
+
+                        {dialogue.data?.isPrint &&
+                            <Button
+                                variant="text"
+                                color="cyan"
+                                onClick={() => container.current.documentEditor.print()}
+                                className="mr-1"
+                            >
+                                <span>Imprimer</span>
+                            </Button>
+                        }
 
                         <Button
                             variant="text"
@@ -116,7 +129,7 @@ function ViewTemplate() {
                 <div className="control-section">
                     <div className="flex-container">
                         <div>
-                            <DocumentEditorContainerComponent id="container" ref={container} style={{ display: "block" }} height={500} serviceUrl={hostUrl}  enableSfdtExport={true} enableToolbar={true} restrictEditing={true} locale="fr-FR" />
+                            <DocumentEditorContainerComponent id="container" ref={container} style={{ display: "block" }} height={500} serviceUrl={hostUrl} enablePrint={true} enableSfdtExport={true} enableToolbar={false} restrictEditing={true} locale="fr-FR" />
                         </div>
                     </div>
                 </div>

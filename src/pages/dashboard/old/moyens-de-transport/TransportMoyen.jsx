@@ -14,7 +14,7 @@ import Pagination from '@mui/material/Pagination';
 import { MoyenTransportCard } from "./components";
 import { isAllowedTo } from "@/utils";
 import { Permissions } from "@/data/role-access-data";
-import { RenderIf } from "@/components/common/render.if";
+import { RenderIf } from "@/components/common";
 
 export function TransportMoyen() {
 

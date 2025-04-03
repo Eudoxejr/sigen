@@ -19,7 +19,7 @@ import { FaUserCheck, FaUserTimes } from 'react-icons/fa';
 import { Switch } from '@mui/material';
 import { AdminsApi, RolesApi } from '@/api/api';
 import { toast } from 'react-toastify';
-import { RenderIf } from '@/components/common/render.if';
+import { RenderIf } from '@/components/common';
 import { Permissions } from '@/data/role-access-data';
 
 

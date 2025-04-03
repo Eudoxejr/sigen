@@ -1,18 +1,11 @@
 import React from "react";
-import {
-  BanknotesIcon,
-  UserIcon
-} from "@heroicons/react/24/solid";
 import { FaFolder } from "react-icons/fa";
 import { HiUsers } from "react-icons/hi2";
-import { PiIdentificationCardBold } from "react-icons/pi";
-import { AiFillCar } from "react-icons/ai";
 import { FaUserShield } from "react-icons/fa6"
 import { IoReload } from "react-icons/io5";
-import { GiTransportationRings, GiBookPile } from "react-icons/gi";
+import { GiBookPile } from "react-icons/gi";
 import { BiCategoryAlt } from "react-icons/bi";
 import FolderCard from "@/components/home/folderMinuature";
-// import DriverMiniatureCard from "@/components/home/driverMiniature";
 import { StatisticsCard } from "@/widgets/cards";
 import { useQuery } from "@tanstack/react-query";
 import { OtherApi } from "@/api/api";
@@ -32,11 +25,6 @@ export function Home() {
 		staleTime: 15 * 60 * 1000
 	})
 
-  // React.useEffect(() => {
-  //   console.log('====================================');
-  //   console.log(isFetching);
-  //   console.log('====================================');
-  // }, [isFetching]);
 
   return (
 
@@ -44,7 +32,7 @@ export function Home() {
 
       <div className="mt-3">
 
-        <div className=" font-medium text-gray-600 text-[20px] mt-8 mb-2 " >
+        <div className=" font-medium text-gray-800 text-[20px] mt-8 mb-2 " >
           Bienvenue <span>{user.user.firstname+" "+user.user.lastname}</span> 
         </div>
 

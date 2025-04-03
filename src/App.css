@@ -9,3 +9,8 @@
 @import "../node_modules/@syncfusion/ej2-documenteditor/styles/material.css";
   
 @import "../node_modules/@syncfusion/ej2-pdfviewer/styles/material.css";
+
+
+#containerViewerPdf {
+    height: calc(100vh - 200px) !important;
+}

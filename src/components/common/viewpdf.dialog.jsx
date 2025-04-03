@@ -52,7 +52,7 @@ function ViewPdf() {
         </Button>
       </DialogHeader>
 
-      <DialogBody className=" h-[550px] flex flex-col" divider>
+      <DialogBody className=" h-[calc(100vh-100px)] flex flex-col" divider>
         <div className="control-section">
           <div className="flex-container">
             {/* <label htmlFor="checked" className="switchLabel">
@@ -79,10 +79,10 @@ function ViewPdf() {
             ref={(scope) => {
               viewer = scope;
             }}
-            id="container"
+            id="containerViewerPdf"
             documentPath={dialogue.data.fileLocation}
             resourceUrl="https://cdn.syncfusion.com/ej2/23.2.6/dist/ej2-pdfviewer-lib"
-            style={{ height: "500px" }}
+            // style={{ height: "calc(100vh-100px)" }}
           >
             <Inject
               services={[

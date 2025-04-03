@@ -13,7 +13,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AdminsApi } from '@/api/api';
 import debounce from 'lodash.debounce';
 import { produce } from "immer";
-import { RenderIf } from '@/components/common/render.if';
+import { RenderIf } from '@/components/common';
 import { Permissions } from '@/data/role-access-data';
 import { isAllowedTo } from '@/utils';
 

@@ -6,7 +6,7 @@ services:
       dockerfile: ./Dockerfile
     container_name: apps-sigen
     ports:
-      - 3015:80
+      - 3005:80
     env_file:
       - .env
   

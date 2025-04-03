@@ -16,7 +16,9 @@ import debounce from 'lodash.debounce';
 import { produce } from "immer";
 import { useDialogueStore } from '@/store/dialogue.store';
 import {Avatar as AvatarMui} from '@mui/material';
-
+// import { RenderIf } from '@/components/common';
+// import { Permissions } from '@/data/role-access-data';
+// import { isAllowedTo } from '@/utils';
 import { useQueryClient } from "@tanstack/react-query";
 
 const DossierListe = ({specificUser}) => {
@@ -60,7 +62,7 @@ const DossierListe = ({specificUser}) => {
     // <RenderIf allowedTo={Permissions.VIEW_ADMINS_LIST}>
       <div className="mt-6 flex-1 w-full flex flex-col">
         <Card>
-            <CardBody className="md:h-[calc(100vh-125px)] shadow-none flex flex-col px-4 pt-0 pb-4 gap-[15px] overflow-auto">
+            <CardBody className="md:h-[calc(100vh-125px)] shadow-none flex flex-col px-4 py-4 gap-[15px] overflow-auto">
               
               <div className="flex items-center" >
                 {specificUser &&
@@ -71,7 +73,7 @@ const DossierListe = ({specificUser}) => {
                   </Tooltip>
                 }
                 <Typography variant="h6" color="blue-gray" >
-                  DOSSIERS ({clientMeta?.total || total})
+                  Dossiers ({clientMeta?.total || total})
                 </Typography>
               </div>
                 
@@ -185,7 +187,7 @@ const DossierListe = ({specificUser}) => {
                 <DataGridComponent
                   idpri="id"
                   hidePagination={false}
-                  hideHeader={specificUser}
+                  hideHeader={false}
                   columns={specificUser ? columnDossierForUser : columnDossier}
                   queryKey={[
                     "getDossier", 

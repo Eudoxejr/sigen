@@ -22,6 +22,11 @@ import CreateSubfolder2 from './createsubfolder2.dialog';
 import AddFile from './addfile.dialo';
 import ViewPdf from './viewpdf.dialog';
 import ViewTemplate from './viewtemplate.dialog';
+import SelectTemplateForFolder from './select-template-for-folder.dialog';
+import EditActe from './editacte.dialog';
+import AddFinalFile from './addfinalfile.dialog';
+import ArchivedFolderDialog from './archivedFolder.dialog';
+import DeleteFileDialog from './deletefile.dialog';
 
 import { useDialogueStore } from '@/store/dialogue.store';
 
@@ -69,12 +74,22 @@ export default function Dialogue() {
 						<CreateSubfolder2/>
 					: dialogue?.view === "add-file" ?
 						<AddFile/>
+					: dialogue?.view === "add-final-file" ?
+						<AddFinalFile/>
 					: dialogue?.view === "view-pdf" ?
 						<ViewPdf/>
 					: dialogue?.view === "view-template" ?
 						<ViewTemplate/>
 					: dialogue?.view === "delete-client" ?
 						<DeleteClientDialog/>
+					: dialogue?.view === "select-template-for-folder" ?
+						<SelectTemplateForFolder/>
+					: dialogue?.view === "edit-draft-acte" ?
+						<EditActe/>
+					: dialogue?.view === "archiver-folder" ?
+						<ArchivedFolderDialog/>
+					: dialogue?.view === "delete-file" ?
+						<DeleteFileDialog/>
 					:
 						<div />
 				}

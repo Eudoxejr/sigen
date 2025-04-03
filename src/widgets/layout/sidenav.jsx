@@ -18,7 +18,7 @@ export function Sidenav({ brandImg, brandName, routes }) {
 
   const { sidenavColor, sidenavType, openSidenav } = controller;
   const sidenavTypes = {
-    dark: "bg-gradient-to-br from-[#EFEFEF] to-[#EFEFEF]",
+    dark: "bg-gradient-to-br from-[#fff] to-[#fff]",
     white: "bg-white shadow-lg",
     transparent: "bg-transparent",
   };
@@ -30,10 +30,10 @@ export function Sidenav({ brandImg, brandName, routes }) {
         } fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] no-scrollbar overflow-y-scroll w-72 rounded-xl transition-transform duration-300 xl:translate-x-0`}
     >
       <div
-        className="relative border-b-[0.75px] bg-gradient-to-br from-[#3399EE] to-[#3399EE] border-blue-gray-400 "
+        className="relative border-b-[0.75px] bg-gradient-to-br from-primary to-primary border-blue-gray-400 "
       >
 
-        <Link to="/" className="flex from-blue-gray-400 items-center justify-center gap-4 py-6 px-8">
+        <Link to="/" className="flex from-blue-gray-400 items-center justify-center gap-4 py-12 px-8">
           <span className=" font-bold text-white text-[25px] " >
             SIGEN
           </span>
@@ -75,13 +75,12 @@ export function Sidenav({ brandImg, brandName, routes }) {
               <li key={name}>
 
                 <NavLink to={`/${layout}${path}`}>
-
                   {({ isActive }) => (
                     <Button
                       variant={isActive ? "gradient" : "text"}
                       color={
                         isActive
-                          ? sidenavColor
+                          ? "blue"
                           :  "blue-gray"
                       }
                       className="flex items-center gap-4 px-4 capitalize"
@@ -97,34 +96,33 @@ export function Sidenav({ brandImg, brandName, routes }) {
                     </Button>
                   )}
                 </NavLink>
-
               </li>
-
             ))}
-
-            <li className="mt-6" >
-              {/* <NavLink to={`/${layout}${path}`}> */}
-                {/* {({ isActive }) => ( */}
-                  <Button
-                    variant={"gradient" }
-                    color={"blue-gray"}
-                    className="flex items-center gap-4 px-4 capitalize"
-                    fullWidth
-                    onClick={() => setUser(false) }
-                  >
-                    <FiLogOut size={20} className="rotate-180" />
-                    <Typography
-                      color="inherit"
-                      className="font-medium text-[13px] capitalize"
-                    >
-                      Déconnexion
-                    </Typography>
-                  </Button>
-              {/* </NavLink> */}
-              </li>
           </ul>
-
         ))}
+
+        <ul className="mb-4 flex flex-col gap-1">
+          <li className="mt-6" >
+            {/* <NavLink to={`/${layout}${path}`}> */}
+              {/* {({ isActive }) => ( */}
+                <Button
+                  variant={"gradient" }
+                  color={"blue-gray"}
+                  className="flex items-center gap-4 px-4 capitalize"
+                  fullWidth
+                  onClick={() => setUser(false) }
+                >
+                  <FiLogOut size={20} className="rotate-180" />
+                  <Typography
+                    color="inherit"
+                    className="font-medium text-[13px] capitalize"
+                  >
+                    Déconnexion
+                  </Typography>
+                </Button>
+            {/* </NavLink> */}
+          </li>
+        </ul>
 
       </div>
     </aside>

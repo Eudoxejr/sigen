@@ -28,7 +28,7 @@ import { FaFolder } from "react-icons/fa";
 import { useDialogueStore } from '@/store/dialogue.store';
 // import { isAllowedTo } from "./isAllowedTo";
 // import { Permissions } from "@/data/role-access-data";
-// import { RenderIf } from "@/components/common/render.if";
+// import { RenderIf } from "@/components/common";
 
 
 export const columnColaborateurs = [
@@ -901,14 +901,25 @@ export const columnDossierForUser = [
 
 			return (
 
-				<div className="w-full h-full flex items-center" >
+				params?.row?.is_archived ?
+					
 					<Chip
 						variant="gradient"
-						color={params?.row?.is_treated_folder ? "green" : "orange"}
-						value={params?.row?.is_treated_folder ? "Traité" : "En Cours"}
+						color={"red"}
+						value={ "Archiver"}
 						className="py-2 px-2 !text-[12.5px] font-medium"
 					/>
-				</div>
+
+				:
+
+					<div className="w-full h-full flex items-center" >
+						<Chip
+							variant="gradient"
+							color={params?.row?.is_treated_folder ? "green" : "orange"}
+							value={params?.row?.is_treated_folder ? "Traité" : "En Cours"}
+							className="py-2 px-2 !text-[12.5px] font-medium"
+						/>
+					</div>
 
 			)
 		}
@@ -1081,18 +1092,24 @@ export const columnDossier = [
 			return (
 
 				<div className="w-full h-full flex items-center" >
-					{/* <Chip
-						variant="gradient"
-						color={params?.row?.is_treated_folder ? "green" : "orange"}
-						value={params?.row?.is_treated_folder ? "Traité" : "En Cours"}
-						className="py-2 px-2 !text-[12.5px] font-medium"
-					/> */}
 
-					<div 
-						className={" px-3 py-1 rounded-md text-white "+ (params?.row?.is_treated_folder ? "bg-green-500" : "bg-orange-500")} 
-					>
-						{params?.row?.is_treated_folder ? "Traité" : "En Cours"}
-					</div>
+					{params?.row?.is_archived ?
+					
+						<Chip
+							variant="gradient"
+							color={"red"}
+							value={ "Archiver"}
+							className="py-2 px-2 !text-[12.5px] font-medium"
+						/>
+
+					:
+
+						<div 
+							className={" px-3 py-1 rounded-md text-white "+ (params?.row?.is_treated_folder ? "bg-green-500" : "bg-orange-500")} 
+						>
+							{params?.row?.is_treated_folder ? "Traité" : "En Cours"}
+						</div>
+					}
 
 				</div>
 
@@ -1581,7 +1598,7 @@ export const columnMinutes = [
 									size: "lg",
 									open: true,
 									view: "view-template",
-									data: params.row
+									data: {...params.row, isUpdate: true}
 								})
 							}
 							className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-primary hover:!text-white font-medium flex items-center justify-between mt-1"
@@ -1597,14 +1614,14 @@ export const columnMinutes = [
 								}
 								className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-primary hover:!text-white font-medium flex items-center justify-between mt-1"
 							>
-								Editer le template
+								Editer l'exemplaire
 							</MenuItem>
 						{/* } */}
 
 						<MenuItem
 							className="text-[13px] bg-[#00000007] rounded-[3px] px-[10px] text-black hover:!bg-red-600 hover:!text-white font-medium flex items-center justify-between mt-1"
 						>
-							Supprimer le template
+							Supprimer l'exemplaire
 						</MenuItem>
 
 					</MenuList>

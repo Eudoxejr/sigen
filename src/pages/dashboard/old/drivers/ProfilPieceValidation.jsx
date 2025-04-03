@@ -16,7 +16,7 @@ import BeatLoader from "react-spinners/BeatLoader";
 import { VehicleApi } from '@/api/api';
 import { toast } from 'react-toastify';
 import { produce } from 'immer';
-import { RenderIf } from '@/components/common/render.if';
+import { RenderIf } from '@/components/common';
 import { Permissions } from '@/data/role-access-data';
 import { isAllowedTo, isAllowedWith } from '@/utils';
 import useAuth from '@/hooks/useAuth';

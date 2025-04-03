@@ -12,10 +12,10 @@ import { AiOutlinePlusCircle } from "react-icons/ai";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import debounce from "lodash.debounce";
 // import { produce } from "immer"
-// import { RenderIf } from '@/components/common/render.if';
+// import { RenderIf } from '@/components/common';
 // import { Permissions } from '@/data/role-access-data';
 // import { isAllowedTo } from '@/utils';
-import { RolesApi } from "@/api/api";
+import { RoleApi } from "@/api/api";
 
 const RolesListe = () => {
   const navigate = useNavigate();
@@ -43,7 +43,7 @@ const RolesListe = () => {
     // <RenderIf allowedTo={Permissions.VIEW_ROLES_LIST}>
     <div className="mt-12 flex w-full flex-1 flex-col">
       <Card>
-        <CardBody className="flex flex-col gap-[15px] overflow-auto px-4 pt-0 pb-4 shadow-none md:h-[calc(100vh-125px)]">
+        <CardBody className="flex flex-col gap-[15px] overflow-auto px-4 py-4 shadow-none md:h-[calc(100vh-125px)]">
           <Typography variant="h6" color="blue-gray ">
             Roles ({rolesMeta?.total || total})
           </Typography>
@@ -100,7 +100,7 @@ const RolesListe = () => {
                 true,
               ]}
               fnQuery={({ queryKey }) =>
-                RolesApi.getRole(
+                RoleApi.getRole(
                   queryKey[1],
                   queryKey[2],
                   queryKey[3],

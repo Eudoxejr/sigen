@@ -192,6 +192,18 @@ export const FoldersApi = {
     return response.data;
   },
 
+  async updateFolders(id, data) {
+    const response = await axiosPrivate.request({
+      method: "put",
+      url: API_URL + "/folders/" + id,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
   async getFolderTree(id) {
     const response = await axiosPrivate.request({
       method: "get",
@@ -244,6 +256,18 @@ export const FoldersApi = {
       },
       data: JSON.stringify(data),
     });
+    return response.data;
+  },
+
+  async deleteFile(id) {
+    const response = await axiosPrivate.request({
+      method: "delete",
+      url: API_URL + "/folders/file/" + id,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
     return response.data;
   },
 };
@@ -454,7 +478,7 @@ export const ClientApi = {
   },
 };
 
-export const RolesApi = {
+export const RoleApi = {
   async getRole(page, perPage, q, countPermission) {
     // console.log(countPermission);
     const response = await axiosPrivate.request({

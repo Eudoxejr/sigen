@@ -7,7 +7,6 @@ import { DocumentEditorContainerComponent, Toolbar } from '@syncfusion/ej2-react
 
 import { DialogUtility, Dialog } from '@syncfusion/ej2-react-popups';
 import { AiOutlineArrowLeft} from "react-icons/ai";
-import { ListView } from '@syncfusion/ej2-react-lists';
 import { useForm, Controller, useFieldArray, useWatch } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
@@ -21,17 +20,17 @@ import { FaFolder } from "react-icons/fa";
 import Collapse from '@mui/material/Collapse';
 import { animated, useSpring } from '@react-spring/web';
 import IconButton from '@mui/material/IconButton';
-import { IoMdAdd } from "react-icons/io";
 import { FaTrash } from "react-icons/fa";
 import NextedTreeItem from './nestedTreeItem';
 import { useDialogueStore } from '@/store/dialogue.store';
 import AsyncSelect from 'react-select/async';
 import { CategoriesApi } from "@/api/api";
-import { uploadBlobToS3 } from '@/utils/uploadS3V2';
 import { toast } from 'react-toastify';
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { handleBackendErrors } from "@/utils/handleHandler";
 import { TemplateApi } from '@/api/api';
+
+import { UploadFilesToS3 } from '@/utils/uploadS3V3';
 
 const StyledTreeItemLabel = styled(Typography)({
     color: 'inherit',
@@ -131,6 +130,16 @@ const TemplateEdit = ({edit}) => {
         rendereComplete();
     }, []);
 
+    const heightRef = useRef(window.innerHeight);
+
+    useEffect(() => {
+        const handleResize = () => {
+          heightRef.current = window.innerHeight;
+        };
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
     const { setDialogue, setBackdrop } = useDialogueStore()
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -138,8 +147,6 @@ const TemplateEdit = ({edit}) => {
     const [loadFile, setloadFile] = React.useState(true);
     
     let container = useRef(null);
-
-    // console.log(state)
 
     const schema = yup.object({
         categoryId: yup.string().trim("Sélectionner une catégorie svp").required("Sélectionner une catégorie svp"),
@@ -155,11 +162,11 @@ const TemplateEdit = ({edit}) => {
                         name: yup.string().trim().required("Le nom de la variable est requis").max(250, "Ne doit pas dépasser 250 caractères"),
                     })
                 )
-                // .test('is-unique-variable', 'Vous demandez la même information plusieurs fois', function (value) {
-                //     const questions = value.map(informationRequested => informationRequested.question);
-                //     const uniquepartyquestions = new Set(questions);
-                //     return questions.length === uniquepartyquestions.size;
-                // })
+                .test('is-unique-variable', 'Au moins 2 variables porte le même nom, dans un même groupe', function (value) {
+                    const questions = value.map(value => value.name);
+                    const uniquepartyquestions = new Set(questions);
+                    return questions.length === uniquepartyquestions.size;
+                })
             })
         ).test('is-unique', 'Les noms des groupes de variable doivent être unique', function (value) {
             const group_names = value.map(group => group.name);
@@ -170,8 +177,7 @@ const TemplateEdit = ({edit}) => {
         deletedVariable: yup.array().of(yup.string().required())
     }).required();
     
-
-    const { control, setValue, handleSubmit, setError, formState: { errors, isDirty } } = useForm({
+    const { control, setValue, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
             "group": [
@@ -205,7 +211,6 @@ const TemplateEdit = ({edit}) => {
     });
 
     const {mutate} = useMutation({
-
         mutationFn: async (data) => {
           return TemplateApi.createTemplate(data)
         },
@@ -238,7 +243,6 @@ const TemplateEdit = ({edit}) => {
                 theme: "colored",
             });
         }
-  
     })
 
     const {mutate:mutate2} = useMutation({
@@ -306,13 +310,18 @@ const TemplateEdit = ({edit}) => {
     }, [listVariable]);
 
     const handleClick = async (data) => {
-        setBackdrop({active: true})
+        // setBackdrop({active: true})
         container.current.documentEditor.saveAsBlob('Sfdt').then(async(blob) => {
-            await uploadBlobToS3(blob)
+            await UploadFilesToS3([
+                {
+                    preview: blob,
+                    fileName: data.templateName,
+                    isSfdt: true,
+                }  
+            ])
             .then((s3Link) => {
-                data.url = s3Link.Location
+                data.url = s3Link[0].url
                 if(edit){
-                    console.log(data);
                     mutate2(data)
                 }
                 else {
@@ -320,7 +329,6 @@ const TemplateEdit = ({edit}) => {
                 }
             })
             .catch((err) => {
-                console.log(err)
                 setBackdrop({active: false})
                 toast.error("Une erreur s'est produite lors de l'enrégistrement du template", {
                     position: "top-right",
@@ -499,7 +507,7 @@ const TemplateEdit = ({edit}) => {
 
         <div className="control-pane ">
 
-            <div className=" w-full items-center justify-between flex flex-row my-3" >
+            <div className=" w-full items-center justify-between flex flex-row my-5" >
 
                 <button onClick={() => navigate(-1)} className=" bg-primary w-[35px] h-[35px] mr-3 rounded-full flex justify-center items-center" >
                     <AiOutlineArrowLeft className=' text-white ' size={16} />
@@ -511,7 +519,7 @@ const TemplateEdit = ({edit}) => {
                         fieldState: { invalid, error}
                     }) => (
                         <div className="w-[300px]" >
-                            <input onChange={onChange} className="h-[40px] w-full text-[13px] font-normal border border-gray-400 rounded-md px-2 text-blue-gray-600" value={value} type="text" color="blue-gray" placeholder="Title du template" size="lg" error={invalid} />
+                            <input onChange={onChange} className="h-[40px] w-full text-[13px] font-normal border border-gray-400 rounded-md px-2 text-blue-gray-600" value={value} type="text" color="blue-gray" placeholder="Title de l'exemplaire" size="lg" error={invalid} />
                             {error && 
                                 <span className=" text-[10px] text-red-400" >{error.message}</span>
                             }
@@ -560,7 +568,6 @@ const TemplateEdit = ({edit}) => {
 
                 {!(edit && loadFile) ?
                     <button 
-                        // disabled={!isDirty}
                         onClick={handleSubmit(handleClick)}
                         className=" bg-green-500 px-4 text-white disabled:bg-gray-600 rounded-md h-[35px]  font-medium text-[13px] " 
                     >
@@ -575,12 +582,11 @@ const TemplateEdit = ({edit}) => {
                         chargement...
                     </button>
                 }
-
             </div>
 
             <div className="control-section w-full overflow-hidden flex-1 flex flex-row ">
 
-                <div className="w-[25%] flex flex-col px-[5px] max-h-[680px] control-section" style={{
+                <div className="w-[30%] flex flex-col px-[5px] !bg-white h-[calc(100vh-180px)] control-section" style={{
                     paddingTop: 0,
                     paddingLeft: 5,
                     paddingRight: 5
@@ -590,7 +596,7 @@ const TemplateEdit = ({edit}) => {
                         !isLoading  ?
 
                             <>
-                                <div className=" flex flex-col " >
+                                <div className=" flex flex-col bg-white " >
                                     <label className=" font-medium " style={{ display: "block", margin: "1px", paddingTop: "8px" }}>
                                         Liste des variables
                                     </label>
@@ -610,7 +616,7 @@ const TemplateEdit = ({edit}) => {
                                         Créer un groupe de variable
                                     </button>
                                 </div>
-                                <div className=" mt-2 h-[500px] overflow-scroll w-full " >
+                                <div className=" mt-2 !h-full  overflow-scroll w-full " >
 
                                     <Controller
                                         render={({
@@ -619,10 +625,10 @@ const TemplateEdit = ({edit}) => {
 
                                             <>
                                                 {error && <span className=" text-[12px] text-red-500 " >{error.message}</span>}
-
+                                                {errors?.group?.map((g) => g !== null && (<span className=" text-[12px] text-red-500 " >{g?.variables?.message}</span>))}
                                                 <SimpleTreeView
                                                     aria-label="customized"
-                                                    sx={{ overflowX: 'hidden', minHeight: 270, flexGrow: 1, maxWidth: 280 }}
+                                                    sx={{ overflowX: 'hidden', minHeight: 270,  flexGrow: 1, maxWidth: 280 }}
                                                 >
                                                     {fieldGroup.map((field, index) => (
                                                         <StyledTreeItem 
@@ -653,8 +659,7 @@ const TemplateEdit = ({edit}) => {
                                 <div key={"variables"+key} className=" animate-pulse bg-gradient-to-br from-gray-100 to-blue-gray-200  rounded-[8px] bg-white p-[2%] h-[40px] w-[95%] " />
                                 ))}
                             </div>
-
-                        :
+                    :
 
                         <>
                             <div className=" flex flex-col " >
@@ -676,7 +681,7 @@ const TemplateEdit = ({edit}) => {
                                     Créer un groupe de variable
                                 </button>
                             </div>
-                            <div className=" mt-2 h-[500px] overflow-scroll w-full " >
+                            <div className=" mt-2 !h-full overflow-scroll w-full " >
 
                                 <Controller
                                     render={({
@@ -685,7 +690,7 @@ const TemplateEdit = ({edit}) => {
 
                                         <>
                                             {error && <span className=" text-[12px] text-red-500 " >{error.message}</span>}
-
+                                            {errors?.group?.map((g) => g !== null && (<span className=" text-[12px] text-red-500 " >{g?.variables?.message}</span>))}
                                             <SimpleTreeView
                                                 aria-label="customized"
                                                 sx={{ overflowX: 'hidden', minHeight: 270, flexGrow: 1, maxWidth: 280 }}
@@ -716,8 +721,8 @@ const TemplateEdit = ({edit}) => {
                     
                 </div>
 
-                <div className="w-[80%] flex flex-1 control-section mb-10 " style={{ paddingLeft: "0px", paddingRight: "0px", paddingTop: "5px" }}>
-                    <DocumentEditorContainerComponent id="container" ref={container} style={{ display: "block" }} height={590} serviceUrl={hostUrl} enableSfdtExport={true} enableToolbar={true} locale="fr-FR" />
+                <div className="w-[80%] !h-full flex flex-1 control-section mb-10 " style={{ paddingLeft: "0px", paddingRight: "0px", paddingTop: "5px" }}>
+                    <DocumentEditorContainerComponent id="container" ref={container} style={{ display: "block" }} height={heightRef.current-180} serviceUrl={hostUrl} enableSfdtExport={true} enableToolbar={true} locale="fr-FR" />
                 </div>
 
             </div>

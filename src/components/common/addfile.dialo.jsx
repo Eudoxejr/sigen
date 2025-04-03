@@ -19,6 +19,7 @@ import { toast } from 'react-toastify';
 import { handleBackendErrors } from "@/utils/handleHandler";
 import { useDropzone } from 'react-dropzone'
 import { uploadFile } from '@/utils/uploadS3';
+import { UploadFilesToS3 } from "@/utils/uploadS3V3";
 
 function AddFile() {
 
@@ -102,13 +103,21 @@ function AddFile() {
 
     const handleClick = async (data) => {
       setloading2(true)
-      await uploadFile(data.file)
+      await UploadFilesToS3([
+        {
+          preview: data.file,
+          fileName: data.fileName,
+          isSfdt: false,
+        }  
+      ])
       .then((s3Link) => {
-          data.fileLocation = s3Link.Location
-          data.type = data.file.type
-          // data.folderId = dialogue.data.currentFolder
-          delete data.file
-          mutate(data)
+        console.log(s3Link[0]);
+        
+        data.fileLocation = s3Link[0]?.url
+        data.type = s3Link[0]?.type
+        // data.folderId = dialogue.data.currentFolder
+        delete data.file
+        mutate(data)
       })
       .catch((err) => {
 
@@ -178,7 +187,7 @@ function AddFile() {
             fieldState: { invalid, error}
           }) => (
             <>
-              <div {...getRootProps({ className: 'dropzone overflow-hidden mt-5 bg-gray-200 w-full h-[130px] mb-2 rounded-[5px] ' })}>
+              <div {...getRootProps({ className: 'dropzone cursor-pointer overflow-hidden mt-5 bg-gray-200 w-full h-[130px] mb-2 rounded-[5px] ' })}>
                 <input {...getInputProps()} />
                 <div className=' flex-1 flex h-full text-[12px] justify-center items-center '>
 

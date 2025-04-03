@@ -17,7 +17,7 @@ import Select from 'react-select';
 import { Switch } from '@mui/material';
 import { AdminsApi, RolesApi } from '@/api/api';
 import { toast } from 'react-toastify';
-import { RenderIf } from '@/components/common/render.if';
+import { RenderIf } from '@/components/common';
 import { Permissions } from '@/data/role-access-data';
 
 

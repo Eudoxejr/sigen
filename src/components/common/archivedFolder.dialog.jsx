@@ -15,21 +15,23 @@ import BeatLoader from "react-spinners/BeatLoader";
 import { toast } from 'react-toastify';
 import { useDialogueStore } from '@/store/dialogue.store';
 import { handleBackendErrors } from "@/utils/handleHandler";
-import AsyncSelect from 'react-select/async';
-import { CollaboApi, RoleApi, ClientApi } from '@/api/api';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { FoldersApi } from '@/api/api';
+import { useNavigate, useLocation } from "react-router-dom";
 
-
-function DeleteClientDialog() {
+function ArchivedFolderDialog() {
 
     const { setDialogue, dialogue } = useDialogueStore()
     const queryClient = useQueryClient();
-    const params = dialogue?.data
     const navigate = useNavigate();
+    const {state} = useLocation();
+    const params = dialogue?.data
+
 
     const { mutate, isLoading } = useMutation({
         mutationFn: async (data) => {
-            return ClientApi.deleteClient(params?.id)
+            return FoldersApi.updateFolders(params?.id, {
+                isArchived: !params?.is_archived
+            })
         },
         gcTime: 0,
         onSuccess: (response) => {
@@ -41,7 +43,7 @@ function DeleteClientDialog() {
                 data: null
             })
 
-            toast.success('client supprimé avec succès', {
+            toast.success('Dossier archivé avec succès', {
                 position: "top-right",
                 autoClose: 2000,
                 hideProgressBar: true,
@@ -51,43 +53,37 @@ function DeleteClientDialog() {
                 progress: undefined,
                 theme: "colored",
             })
-               
-            queryClient.setQueriesData(["getClient"], (dataClient) => {
 
-              const indexDeleteUser = dataClient.data.findIndex((client) => client.id == params?.id)
-      
-              const nextData = produce(dataClient, draftData => {
-                draftData.data.splice(indexDeleteUser, 1)
+            queryClient.setQueriesData(["getDossier"], (dataDossier) => {
+              const indexUpdateDossier = dataDossier.data.findIndex((data) => data.id == params?.id)
+              const nextData = produce(dataDossier, draftData => {
+                draftData.data[indexUpdateDossier].is_archived = response.data.is_archived
               });
-      
               return nextData;
-            });  
+            });
 
+            navigate("/dashboard/dossiers/view", {
+                replace: true,
+                state: { ...state, ...response.data },
+            });
 
         },
         onError: ({ response }) => {
-            setDialogue({
-                size: "sm",
-                open: false,
-                view: null,
-                data: null
-            })
-            toast.error(handleBackendErrors(response.data, "une erreur s'est produite lors de la suppression"), {
+            const errorTraited = handleBackendErrors(response.data)
+            toast.error(errorTraited || "Une erreur s'est produite", {
                 position: "top-right",
-                autoClose: 6000,
+                autoClose: 2000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: false,
                 draggable: false,
                 progress: undefined,
                 theme: "colored",
-            });
+            })
         }
-
     })
 
     const handleClick = async () => {
-        //console.log(params?.id)
         mutate()
     };
 
@@ -96,19 +92,19 @@ function DeleteClientDialog() {
 
         <>
 
-            <DialogHeader className='text-sm ' >Supprimer le client</DialogHeader>
+            <DialogHeader className='text-sm ' >{params?.is_archived ? "Désarchiver le dossier" : "Archiver le dossier"}</DialogHeader>
 
             <DialogBody className=" flex flex-col" divider>
               <div>
-                {"Voulez vous supprimer le Client "}
-                <span className="font-bold mx-1">{params.civility == "Structure" ? params?.denomination : params?.firstname + " " + params?.lastname}</span> ?
+                {params?.is_archived ? "Voulez vous désarchiver le dossier " : "Voulez vous archiver le dossier "}
+                <span className="font-bold mx-1">{params?.folder_name}</span> ?
               </div>
             </DialogBody>
             <DialogFooter>
 
                 <Button
                     variant="text"
-                    color={'green'}
+                    color={params?.is_archived ? 'red' : 'green'}
                     onClick={() => setDialogue({
                         size: "sm",
                         open: false,
@@ -124,7 +120,7 @@ function DeleteClientDialog() {
 
                 <Button
                     variant="gradient"
-                    color='red'
+                    color={!params?.is_archived ? 'red' : 'green'}
                     onClick={handleClick}
                     disabled={isLoading}
                 >
@@ -132,7 +128,7 @@ function DeleteClientDialog() {
                     {isLoading ?
                         <BeatLoader color="#fff" size={8} />
                         :
-                        <span>Supprimer</span>
+                        <span>{!params?.is_archived ? "Archiver" : "Désarchiver"}</span>
                     }
 
                 </Button>
@@ -145,4 +141,4 @@ function DeleteClientDialog() {
 
 }
 
-export default DeleteClientDialog
+export default ArchivedFolderDialog

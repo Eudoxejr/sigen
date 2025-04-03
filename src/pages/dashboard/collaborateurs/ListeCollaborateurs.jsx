@@ -9,11 +9,13 @@ import DataGridComponent from "@/components/common/datatable";
 import { columnColaborateurs } from "@/utils/columsDatatable";
 import { useNavigate } from "react-router-dom";
 import AsyncSelect from "react-select/async";
-import { CollaboApi, RolesApi } from "@/api/api";
+import { CollaboApi, RoleApi } from "@/api/api";
 import debounce from "lodash.debounce";
 import { produce } from "immer";
 import { useDialogueStore } from "@/store/dialogue.store";
-
+// import { RenderIf } from '@/components/common';
+// import { Permissions } from '@/data/role-access-data';
+// import { isAllowedTo } from '@/utils';
 import { useQueryClient } from "@tanstack/react-query";
 
 const CollaborateursListe = () => {
@@ -41,7 +43,7 @@ const CollaborateursListe = () => {
   }, []);
 
   const getRole = async (inputValue) => {
-    const res = await RolesApi.getRole(1, 12, inputValue);
+    const res = await RoleApi.getRole(1, 12, inputValue);
     // res.data.unshift({ id: null, role_name: 'Tout les roles' })
     return res.data.map((data) => {
       return { label: data.role_name, value: data.id };
@@ -63,7 +65,7 @@ const CollaborateursListe = () => {
     // <RenderIf allowedTo={Permissions.VIEW_ADMINS_LIST}>
     <div className="mt-6 flex w-full flex-1 flex-col">
       <Card>
-        <CardBody className="flex flex-col gap-[15px] overflow-auto px-4 pt-0 pb-4 shadow-none md:h-[calc(100vh-125px)]">
+        <CardBody className="flex flex-col gap-[15px] overflow-auto px-4 py-4 shadow-none md:h-[calc(100vh-125px)]">
           <Typography variant="h6" color="blue-gray">
             Collaborateurs ({collaboMeta?.total || total})
           </Typography>

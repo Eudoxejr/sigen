@@ -8,7 +8,7 @@ import {
 import { Faqs, InfosGenerales, MentionsLegales, PrivacyPolicies, TermsOfUse } from './components';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Tab } from '@mui/material';
-import { RenderIf } from '@/components/common/render.if';
+import { RenderIf } from '@/components/common';
 import { Permissions } from '@/data/role-access-data';
 
 const PageTabs = {

@@ -19,7 +19,7 @@ import { toast } from 'react-toastify';
 import { FiLoader } from 'react-icons/fi';
 import { validateCode, validateDesc, validateEndDate, validateNumberOfUse, validatePercentage, validateStartDate } from './CreatePromoCode';
 import dayjs from 'dayjs';
-import { RenderIf } from '@/components/common/render.if';
+import { RenderIf } from '@/components/common';
 import { Permissions } from '@/data/role-access-data';
 import { isAllowedTo } from '@/utils';
 

@@ -39,6 +39,10 @@ import { useDialogueStore } from '@/store/dialogue.store';
 import { TwitterPicker } from 'react-color';
 
 
+// import { RenderIf } from "@/components/common";
+// import { Permissions } from "@/data/role-access-data";
+
+
 const CategoriesCreate = () => {
 
     const navigate = useNavigate();
@@ -269,7 +273,7 @@ const CategoriesCreate = () => {
                                                         fieldState: { invalid, error}
                                                     }) => (
                                                         <>
-                                                            <Input ref={ref} onChange={onChange} className="h-[45px] w-full uppercase text-[13px] font-normal text-blue-gray-600" value={value} type="text" color="blue-gray" label="Slug de la catégorie" size="lg" error={invalid} />
+                                                            <Input ref={ref} onChange={onChange} className="h-[45px] w-full uppercase text-[13px] font-normal text-blue-gray-600" value={value} type="text" color="blue-gray" label="Code de la catégorie" size="lg" error={invalid} />
                                                             {error && 
                                                                 <span className=" text-[11px] text-red-400 mt-1" >{error.message}</span>
                                                             }

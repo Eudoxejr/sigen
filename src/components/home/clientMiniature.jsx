@@ -43,11 +43,15 @@ export function ClientMiniatureCard() {
 					</Typography>
 				</div>
 
-				<Button
+				<button onClick={() => navigate("/dashboard/clients")} className=" px-3 py-2 bg-primary text-white text-sm rounded-lg " >
+					Plus
+				</button>
+
+				{/* <Button
 					onClick={() => navigate("/dashboard/clients")}
 				>
 					Plus
-				</Button>
+				</Button> */}
 
 			</CardHeader>
 

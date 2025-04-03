@@ -26,7 +26,7 @@ import BeatLoader from "react-spinners/BeatLoader";
 import { useQuery } from "@tanstack/react-query";
 import dayjs from 'dayjs';
 import { MdLocationPin } from "react-icons/md";
-import { RenderIf } from '@/components/common/render.if';
+import { RenderIf } from '@/components/common';
 import { Permissions } from '@/data/role-access-data';
 
 

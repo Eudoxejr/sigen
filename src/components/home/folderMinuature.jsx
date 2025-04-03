@@ -51,11 +51,15 @@ function FolderCard() {
 						Dossiers
 					</Typography>
 
-					<Button
+					{/* <Button
 						onClick={() => navigate("/dashboard/dossiers")}
 					>
 						Plus
-					</Button>
+					</Button> */}
+					
+					<button onClick={() => navigate("/dashboard/dossiers")} className=" px-3 py-2 bg-primary text-white text-sm rounded-lg " >
+						Plus
+					</button>
 
 				</div>
 
@@ -76,6 +80,7 @@ function FolderCard() {
                   fnQuery={({ queryKey }) => FoldersApi.getFolders(queryKey[1], queryKey[2])}
                   noRow={"Pas de dossier trouvé"}
                   totalInformation={{total, setTotal}}
+				  onRowClick={(params) => {navigate(`/dashboard/dossiers/view`, { state: params.row })}}
                 />
 
 			</CardBody>

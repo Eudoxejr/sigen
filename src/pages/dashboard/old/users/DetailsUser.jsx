@@ -13,7 +13,7 @@ import { FaUserCheck, FaUserTimes } from 'react-icons/fa';
 import dummyProfileImg from '/img/sigen/user.png';
 import { isAllowedTo } from '@/utils';
 import { Permissions } from '@/data/role-access-data';
-import { RenderIf } from '@/components/common/render.if';
+import { RenderIf } from '@/components/common';
 
 
 const DetailsUser = () => {

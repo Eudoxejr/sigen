@@ -1,35 +1,28 @@
 import React from 'react'
-import { produce } from "immer"
 import {
     Button,
     DialogHeader,
     DialogBody,
     DialogFooter,
-    Input
 } from "@material-tailwind/react";
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from "yup";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import BeatLoader from "react-spinners/BeatLoader";
 import { toast } from 'react-toastify';
 import { useDialogueStore } from '@/store/dialogue.store';
 import { handleBackendErrors } from "@/utils/handleHandler";
-import AsyncSelect from 'react-select/async';
-import { CollaboApi, RoleApi, ClientApi } from '@/api/api';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { FoldersApi } from '@/api/api';
 
 
-function DeleteClientDialog() {
+function DeleteFileDialog() {
 
     const { setDialogue, dialogue } = useDialogueStore()
     const queryClient = useQueryClient();
     const params = dialogue?.data
-    const navigate = useNavigate();
+    
 
     const { mutate, isLoading } = useMutation({
         mutationFn: async (data) => {
-            return ClientApi.deleteClient(params?.id)
+            return FoldersApi.deleteFile(params?.id)
         },
         gcTime: 0,
         onSuccess: (response) => {
@@ -41,7 +34,7 @@ function DeleteClientDialog() {
                 data: null
             })
 
-            toast.success('client supprimé avec succès', {
+            toast.success('fichier supprimé avec succès', {
                 position: "top-right",
                 autoClose: 2000,
                 hideProgressBar: true,
@@ -52,17 +45,7 @@ function DeleteClientDialog() {
                 theme: "colored",
             })
                
-            queryClient.setQueriesData(["getClient"], (dataClient) => {
-
-              const indexDeleteUser = dataClient.data.findIndex((client) => client.id == params?.id)
-      
-              const nextData = produce(dataClient, draftData => {
-                draftData.data.splice(indexDeleteUser, 1)
-              });
-      
-              return nextData;
-            });  
-
+            queryClient.invalidateQueries(["getFolder"])
 
         },
         onError: ({ response }) => {
@@ -96,12 +79,12 @@ function DeleteClientDialog() {
 
         <>
 
-            <DialogHeader className='text-sm ' >Supprimer le client</DialogHeader>
+            <DialogHeader className='text-sm ' >Supprimer le fichier</DialogHeader>
 
             <DialogBody className=" flex flex-col" divider>
               <div>
-                {"Voulez vous supprimer le Client "}
-                <span className="font-bold mx-1">{params.civility == "Structure" ? params?.denomination : params?.firstname + " " + params?.lastname}</span> ?
+                {"Voulez vous supprimer le Fichier "}
+                <span className="font-bold mx-1">{params?.file_name}</span> ?
               </div>
             </DialogBody>
             <DialogFooter>
@@ -145,4 +128,4 @@ function DeleteClientDialog() {
 
 }
 
-export default DeleteClientDialog
+export default DeleteFileDialog

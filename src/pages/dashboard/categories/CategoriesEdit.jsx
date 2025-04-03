@@ -25,11 +25,22 @@ import Switch from '@mui/material/Switch';
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CategoriesApi, CategorieGroupeApi } from "@/api/api";
 import BeatLoader from "react-spinners/BeatLoader";
+import { useDropzone } from 'react-dropzone'
+import { AiFillCloseCircle, AiFillEdit } from "react-icons/ai";
+import { RiForbidLine } from "react-icons/ri";
 import { toast } from 'react-toastify';
 
+import NextedParty from '@/components/common/nextedParty';
+import NextedInformation from '@/components/common/nextedInformation';
+import { uploadFile } from '@/utils/uploadS3';
+import { v4 as uuidv4 } from 'uuid';
 
 import { useDialogueStore } from '@/store/dialogue.store';
 import { TwitterPicker } from 'react-color';
+
+// import { RenderIf } from "@/components/common";
+// import { Permissions } from "@/data/role-access-data";
+
 
 const CategoriesEdit = () => {
 
@@ -101,6 +112,8 @@ const CategoriesEdit = () => {
         gcTime:0,
         onSuccess: (response) => {
 
+            console.log(response);
+            
             navigate(-1)
             toast.success('Catégorie modifiée avec succès', {
                 position: "top-right",
@@ -120,7 +133,11 @@ const CategoriesEdit = () => {
                 if(indexUpdateCategorie >= 0)
                 {
                     const nextData = produce(dataCat, draftData => {
-                        draftData.data[indexUpdateCategorie] = response?.data
+                        draftData.data[indexUpdateCategorie] = {
+                            ...response?.data,
+                            meta: draftData.data[indexUpdateCategorie]?.meta,
+                            categoryGroup: draftData.data[indexUpdateCategorie]?.categoryGroup
+                        }
                     })
                     return nextData;
                 }
@@ -251,7 +268,7 @@ const CategoriesEdit = () => {
                                                         fieldState: { invalid, error}
                                                     }) => (
                                                         <>
-                                                            <Input ref={ref} onChange={onChange} className="h-[45px] w-full uppercase text-[13px] font-normal text-blue-gray-600" value={value} type="text" color="blue-gray" label="Slug de la catégorie" size="lg" error={invalid} />
+                                                            <Input ref={ref} onChange={onChange} className="h-[45px] w-full uppercase text-[13px] font-normal text-blue-gray-600" value={value} type="text" color="blue-gray" label="Code de la catégorie" size="lg" error={invalid} />
                                                             {error && 
                                                                 <span className=" text-[11px] text-red-400 mt-1" >{error.message}</span>
                                                             }

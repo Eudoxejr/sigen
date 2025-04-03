@@ -13,7 +13,9 @@ import { TemplateApi, CategoriesApi } from '@/api/api';
 import debounce from 'lodash.debounce';
 import { produce } from "immer";
 import { useDialogueStore } from '@/store/dialogue.store';
-
+// import { RenderIf } from '@/components/common';
+// import { Permissions } from '@/data/role-access-data';
+// import { isAllowedTo } from '@/utils';
 import { useQueryClient } from "@tanstack/react-query";
 
 const MinuteListe = () => {
@@ -56,10 +58,10 @@ const MinuteListe = () => {
     // <RenderIf allowedTo={Permissions.VIEW_ADMINS_LIST}>
       <div className="mt-6 flex-1 w-full flex flex-col">
         <Card>
-            <CardBody className="md:h-[calc(100vh-125px)] shadow-none flex flex-col px-4 pt-0 pb-4 gap-[15px] overflow-auto">
+            <CardBody className="md:h-[calc(100vh-125px)] shadow-none flex flex-col px-4 py-4 gap-[15px] overflow-auto">
               
               <Typography variant="h6" color="blue-gray" >
-                Template de minute ({minuteMeta?.total || total})
+                Exemplaire de minute ({minuteMeta?.total || total})
               </Typography>
 
               <div className=" w-full mb-2 flex justify-between items-center flex-wrap gap-y-3 " >
@@ -68,7 +70,7 @@ const MinuteListe = () => {
                   onClick={() => navigate("add")}
                   class=' bg-primary text-white px-4 py-2 rounded-md text-[13px] font-semibold '
                 >
-                  Ajouter un template de minute
+                  Ajouter un exemplaire de minute
                 </button>
 
                 <div>

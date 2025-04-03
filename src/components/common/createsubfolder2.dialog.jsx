@@ -59,7 +59,7 @@ function CreateSubfolder2() {
             theme: "colored",
           });
   
-        //   queryClient.invalidateQueries(["getFolderTree"])
+          queryClient.invalidateQueries(["getFolderTree"])
           queryClient.invalidateQueries(["getFolder"])
   
         },

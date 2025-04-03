@@ -13,7 +13,9 @@ import { ClientApi } from '@/api/api';
 import debounce from 'lodash.debounce';
 import { produce } from "immer";
 import { useDialogueStore } from '@/store/dialogue.store';
-
+// import { RenderIf } from '@/components/common';
+// import { Permissions } from '@/data/role-access-data';
+// import { isAllowedTo } from '@/utils';
 import { useQueryClient } from "@tanstack/react-query";
 
 const ClientListe = () => {
@@ -47,7 +49,7 @@ const ClientListe = () => {
       <div className="mt-6 flex-1 w-full flex flex-col">
         
         <Card>
-            <CardBody className="md:h-[calc(100vh-125px)] shadow-none flex flex-col px-4 pt-0 pb-4 gap-[15px] overflow-auto">
+            <CardBody className="md:h-[calc(100vh-125px)] shadow-none flex flex-col px-4 py-4 gap-[15px] overflow-auto">
               
               <Typography variant="h6" color="blue-gray" >
                 Clients ({clientMeta?.total || total})
