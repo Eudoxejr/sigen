@@ -1637,7 +1637,7 @@ export const rolesColumns = [
 		headerName: 'Titre du rôle',
 		flex: 2,
 		minWidth: 170,
-		sortable: true,
+		sortable: false,
 		hideSortIcons: false,
 		disableColumnMenu: true,
 		renderCell: ({ row, ...rest }) => {
@@ -1652,13 +1652,28 @@ export const rolesColumns = [
 		field: 'permissionsCount',
 		headerName: "Nombre d'accès",
 		flex: 2,
-		sortable: true,
+		sortable: false,
 		hideSortIcons: false,
 		disableColumnMenu: true,
 		renderCell: ({ row, ...rest }) => {
 			return (
 				<div className="w-full h-full flex items-center" >
 					{(row?.meta?.totalPermission ?? 0)}
+				</div>
+			);
+		}
+	},
+	{
+		field: 'totalUsers',
+		headerName: "Nombre de collaborateur",
+		flex: 2,
+		sortable: false,
+		hideSortIcons: false,
+		disableColumnMenu: true,
+		renderCell: ({ row, ...rest }) => {
+			return (
+				<div className="w-full h-full flex items-center" >
+					{(row?.meta?.totalUsers ?? 0)}
 				</div>
 			);
 		}

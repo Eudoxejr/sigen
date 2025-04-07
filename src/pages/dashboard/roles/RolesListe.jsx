@@ -50,7 +50,7 @@ const RolesListe = () => {
 
           <div className=" mb-2 flex w-full flex-wrap items-center justify-between gap-y-3 ">
             <button
-              onClick={() => navigate("add")}
+              onClick={() => navigate("/dashboard/roles/add")}
               class=" rounded-md bg-primary px-4 py-2 text-[13px] font-semibold text-white "
             >
               Ajouter un rôle

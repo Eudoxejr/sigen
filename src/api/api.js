@@ -494,6 +494,15 @@ export const RoleApi = {
     });
     return response.data;
   },
+
+  async getPermission() {
+    // console.log(countPermission);
+    const response = await axiosPrivate.request({
+      method: "get",
+      url: API_URL + "/permissions",
+    });
+    return response.data;
+  },
 };
 
 export const OtherApi = {

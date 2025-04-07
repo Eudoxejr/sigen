@@ -23,7 +23,8 @@ import Home from "./pages/dashboard/home";
 import CollaboView from "./pages/dashboard/collaborateurs/ViewCollaborateurs";
 import RolesListe from "./pages/dashboard/roles/RolesListe";
 import CategoriesGroup from "./pages/dashboard/groupes-categories/categorieGroupe";
-
+import AddRole from "./pages/dashboard/roles/AddRole";
+// import { RoleDetails } from "./pages/dashboard/roles";
 
 function App() {
 
@@ -92,8 +93,8 @@ function App() {
 
           <Route path="roles">
             <Route index element={<RolesListe/>} />
-            <Route path="add" element={<MinuteCreate/>} />
-            <Route path="edit" element={<EditMinute/>} />
+            <Route path="add" element={<AddRole/>} />
+            {/* <Route path="edit" element={<RoleDetails/>} /> */}
           </Route>
 
         </Route>
