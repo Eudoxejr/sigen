@@ -68,8 +68,6 @@ export const UploadFilesToS3 = async (files) => {
       const endpoint = import.meta.env.VITE_MINIO_ENDPOINT; 
       const bucket = import.meta.env.VITE_AWS_BUCKET_NAME;
       const url = `${endpoint}${bucket}/${key}`;
-
-      console.log(result)
       
       return { url: import.meta.env.VITE_S3_PROVIDER === "minio" ? url : result?.Location, fileName: fileName, type: mimeType };
     });
