@@ -7,7 +7,7 @@ export const UploadFilesToS3 = async (files) => {
 
   let s3Client;
    
-  s3Client = import.meta.env.VITE_S3_PROVIDER === "minio" ?
+  s3Client = ( import.meta.env.VITE_S3_PROVIDER === "minio" || import.meta.env.VITE_S3_PROVIDER === "digitalOcean" ) ?
     new S3Client({
       region: import.meta.env.VITE_AWS_BUCKET_REGION,
       endpoint: import.meta.env.VITE_MINIO_ENDPOINT,
@@ -52,6 +52,7 @@ export const UploadFilesToS3 = async (files) => {
         Key: key,
         Body: blob,
         ContentType: mimeType,
+        ACL: "public-read"
       },
     });
  
@@ -67,6 +68,8 @@ export const UploadFilesToS3 = async (files) => {
       const endpoint = import.meta.env.VITE_MINIO_ENDPOINT; 
       const bucket = import.meta.env.VITE_AWS_BUCKET_NAME;
       const url = `${endpoint}${bucket}/${key}`;
+
+      console.log(result)
       
       return { url: import.meta.env.VITE_S3_PROVIDER === "minio" ? url : result?.Location, fileName: fileName, type: mimeType };
     });

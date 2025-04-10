@@ -310,7 +310,7 @@ const TemplateEdit = ({edit}) => {
     }, [listVariable]);
 
     const handleClick = async (data) => {
-        // setBackdrop({active: true})
+        setBackdrop({active: true})
         container.current.documentEditor.saveAsBlob('Sfdt').then(async(blob) => {
             await UploadFilesToS3([
                 {
@@ -329,7 +329,6 @@ const TemplateEdit = ({edit}) => {
                 }
             })
             .catch((err) => {
-                setBackdrop({active: false})
                 toast.error("Une erreur s'est produite lors de l'enrégistrement du template", {
                     position: "top-right",
                     autoClose: 3000,
@@ -341,6 +340,7 @@ const TemplateEdit = ({edit}) => {
                     theme: "colored",
                 });
             })
+            .finally(() => setBackdrop({active: false}))
         })
     };
 
